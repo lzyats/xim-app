@@ -1,0 +1,168 @@
+name: alpaca
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.1.8+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # 设置国际化
+  flutter_localizations:
+    sdk: flutter
+  # ios图标库
+  cupertino_icons: ^1.0.6
+  # UI框架
+  tdesign_flutter: ^0.1.8
+  # getx框架
+  get: ^4.6.6
+  # getx框架
+  get_storage: ^2.1.1
+  # 时间格式化
+  date_format: ^2.0.7
+  # 时间格式化
+  timeago: ^3.7.0
+  # 图片处理
+  image: ^4.2.0
+  # 网络请求
+  dio: ^5.4.3+1
+  # websocket
+  web_socket_channel: ^3.0.0
+  # 数据库
+  sqflite: ^2.3.3+1
+  # 文件路径
+  path: ^1.9.0
+  path_provider: ^2.1.4
+  # 渲染网页
+  webview_flutter: ^4.8.0
+  # 弹窗提示
+  flutter_easyloading: ^3.0.5
+  # 键盘状态监听
+  flutter_keyboard_visibility: ^6.0.0
+  # 加密
+  crypto: ^3.0.3
+  encrypt: ^5.0.3
+  # uuid
+  uuid: ^4.4.0
+  # 表情输入
+  emoji_picker_flutter: ^2.2.0
+  # 包信息
+  package_info_plus: ^8.0.0
+  # 设备信息
+  device_info_plus: ^10.1.2
+  # 二维码生成
+  pretty_qr_code: ^3.3.0
+  # 二维码扫描
+  barcode_scan2: ^4.3.1
+  # 二维码识别
+  scan: ^1.6.0
+  # 图片保存
+  image_gallery_saver: ^2.0.3
+  # 图片编辑
+  image_editor_plus: ^1.0.6
+  # 选择器库
+  flutter_pickers: ^2.1.9
+  # 网络状态
+  connectivity_plus: ^6.0.3
+  # 解析html
+  flutter_html: ^3.0.0-beta.2
+  # 下拉刷新
+  pull_to_refresh: ^2.0.0
+  # 下拉刷新
+  infinite_scroll_pagination: ^4.0.0
+  # 视频播放
+  video_player: ^2.8.7
+  # 视频播放
+  chewie: ^1.8.3
+  # 通讯录
+  azlistview: ^2.0.0
+  # 拼音
+  lpinyin: ^2.0.3
+  # 分享
+  share_plus: ^9.0.0
+  # 富文本
+  extended_text_field: ^15.0.0
+  # 声音播放
+  just_audio: ^0.9.38
+  # 声音录音
+  flutter_sound_record: ^3.3.2
+  # 权限组件
+  permission_handler: ^11.3.1
+  # 打开文件
+  open_file: ^3.3.2
+  # 轮播图
+  flutter_swiper_null_safety_flutter3: ^4.0.3
+  # 富文本转换
+  flutter_parsed_text: ^2.2.1
+  # 文件选择
+  file_picker: ^8.0.7
+  # 文件类型
+  mime: ^1.0.5
+  # 图片手势
+  photo_view: ^0.15.0
+  # 图片缓存
+  cached_network_image: ^3.3.1
+  # 文件缓存
+  flutter_cache_manager: ^3.3.2
+  # 图片视频选择器(微信UI)
+  wechat_assets_picker: ^9.1.0
+  # 拍照与录像(微信UI)
+  wechat_camera_picker: ^4.3.1
+  # 滚动到指定位置
+  scroll_to_index: ^3.0.1
+  # 导航历史
+  navigation_history_observer: ^1.1.1
+  # 个推推送
+  getuiflut: ^0.2.32
+  # 高德地图
+  amap_map_fluttify: ^2.0.2
+  # 消息声音
+  flutter_ringtone_player: ^4.0.0+3
+  # 禁止截屏
+  screen_protector: ^1.4.2+1
+  # 渐变按钮
+  outline_gradient_button: ^2.0.1+1
+  # 动画渐变
+  animate_gradient: ^0.0.3
+  # 顶部通知
+  awesome_notifications: ^0.9.3+1
+  # 数据分组
+  grouped_list: ^6.0.0
+  # 微信支付
+  fluwx: ^4.5.5
+  # 支付宝支付
+  alipay_kit: ^6.0.0
+  alipay_kit_ios: ^6.0.1
+  # 视频压缩
+  video_compress: ^3.1.3
+  # 声网
+  agora_rtc_engine: ^6.1.0
+
+alipay_kit:
+  scheme: alipay123
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+ 
+flutter:
+  uses-material-design: true
+  # 资源文件
+  assets:
+    # 图片资源
+    - assets/image/
+    # 声音资源
+    - assets/audio/
+  # 字体文件
+  fonts:
+    # 默认字体
+    - family: iconfont
+      fonts:
+        - asset: assets/fonts/iconfont.ttf
+    - family: iconfonta
+      fonts:
+        - asset: assets/fonts/iconfonta.ttf

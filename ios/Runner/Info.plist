@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>羊驼IM</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>kaola</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<!-- 网络权限 -->
+	<key>NSAppTransportSecurity</key>
+	<dict> 
+        <key>NSAllowsArbitraryLoads</key> 
+        <true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+    	<true/>
+	</dict>
+	<!-- 相册权限 -->
+	<key>NSPhotoLibraryUsageDescription</key>
+ 	<string>如果不允许，你将无法在聊天中发送你的图片，也无法完整使用与相册相关的服务。</string>
+	<!-- 相机权限 -->
+	<key>NSCameraUsageDescription</key>
+ 	<string>如果不允许，你将无法在聊天中发送你的图片，也无法完整使用与相机相关的服务。</string>
+	<!-- 麦克风权限 -->
+	<key>NSMicrophoneUsageDescription</key>
+ 	<string>如果不允许，你将无法在聊天中发送你的声音，也无法完整使用与麦克风相关的服务。</string>
+	<!-- 文件权限 -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+ 	<string>如果不允许，你将无法在聊天中发送你的文件，也无法完整使用与文件相关的服务。</string>
+	<!-- 位置权限 -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+ 	<string>如果不允许，你将无法在聊天中发送你的位置，也无法完整使用与位置相关的服务。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>如果不允许，你将无法在聊天中发送你的位置，也无法完整使用与位置相关的服务。</string>
+	<key>NSLocationUsageDescription</key>
+	<string>如果不允许，你将无法在聊天中发送你的位置，也无法完整使用与位置相关的服务。</string>
+	<!-- 推送权限 -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<!-- 调用第三方 -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>weixin</string>
+		<string>weixinULAPI</string>
+		<string>weixinURLParamsAPI</string>
+	</array>
+	<!-- 二维码 -->
+	<key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
+</dict>
+</plist>
