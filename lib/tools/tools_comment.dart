@@ -1,95 +1,118 @@
-// 朋友圈信息模型
-class Moment {
-  final int id; // 对应moments.id
-  final String userId; // 对应moments.user_id
-  final String content; // 对应moments.content
-  final List<String> images; // 对应moments.images（拆分逗号）
-  final String location; // 对应moments.location
-  final String visibleRange; // 对应moments.visible_range
-  final String createTime; // 对应moments.create_time
-  final List<Comment> comments; // 关联comments表
-  final List<Like> likes; // 关联likes表
+import 'dart:convert';
 
-  Moment({
-    required this.id,
+// 朋友圈动态模型
+class MomentModel {
+  final String momentId;
+  final String userId;
+  final String userName;
+  final String userAvatarUrl;
+  final String content;
+  final List<String> images;
+  final String createTime;
+  final int likeCount;
+  final bool isLiked;
+  final List<CommentModel> comments;
+
+  MomentModel({
+    required this.momentId,
     required this.userId,
+    required this.userName,
+    required this.userAvatarUrl,
     required this.content,
     required this.images,
-    required this.location,
-    required this.visibleRange,
     required this.createTime,
+    required this.likeCount,
+    required this.isLiked,
     required this.comments,
-    required this.likes,
   });
 
-  factory Moment.fromJson(Map<String, dynamic> json) {
-    return Moment(
-      id: json['id'],
-      userId: json['user_id'],
-      content: json['content'],
-      images: json['images']?.split(',') ?? [], // 拆分逗号字符串为列表
-      location: json['location'] ?? '',
-      visibleRange: json['visible_range'] ?? 'everyone',
-      createTime: json['create_time'],
-      comments: (json['comments'] as List<dynamic>?)
-              ?.map((c) => Comment.fromJson(c))
-              .toList() ??
-          [],
-      likes: (json['likes'] as List<dynamic>?)
-              ?.map((l) => Like.fromJson(l))
+  factory MomentModel.fromJson(Map<String, dynamic> data) {
+    return MomentModel(
+      momentId: data['moment_id'] ?? '',
+      userId: data['user_id'] ?? '',
+      userName: data['user_name'] ?? '',
+      userAvatarUrl: data['user_avatar_url'] ?? '',
+      content: data['content'] ?? '',
+      images: List<String>.from(data['images'] ?? []),
+      createTime: data['create_time'] ?? '',
+      likeCount: data['like_count'] ?? 0,
+      isLiked: data['is_liked'] ?? false,
+      comments: (data['comments'] as List<dynamic>?)
+              ?.map((comment) => CommentModel.fromJson(comment))
               .toList() ??
           [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'moment_id': momentId,
+      'user_id': userId,
+      'user_name': userName,
+      'user_avatar_url': userAvatarUrl,
+      'content': content,
+      'images': images,
+      'create_time': createTime,
+      'like_count': likeCount,
+      'is_liked': isLiked,
+      'comments': comments.map((comment) => comment.toJson()).toList(),
+    };
   }
 }
 
 // 评论模型
-class Comment {
-  final String id;
+class CommentModel {
+  final String commentId;
   final String userId;
-  final String momentId;
+  final String userName;
+  final String userAvatarUrl;
   final String content;
-  final DateTime createdAt;
+  final String createTime;
+  final int likeCount;
+  final bool isLiked;
+  final String? replyToUserId;
+  final String? replyToUserName;
 
-  Comment({
-    required this.id,
+  CommentModel({
+    required this.commentId,
     required this.userId,
-    required this.momentId,
+    required this.userName,
+    required this.userAvatarUrl,
     required this.content,
-    required this.createdAt,
+    required this.createTime,
+    required this.likeCount,
+    required this.isLiked,
+    this.replyToUserId,
+    this.replyToUserName,
   });
 
-  factory Comment.fromJson(Map<String, dynamic> json) {
-    return Comment(
-      id: json['id'],
-      userId: json['userId'],
-      momentId: json['momentId'],
-      content: json['content'],
-      createdAt: DateTime.parse(json['createdAt']),
+  factory CommentModel.fromJson(Map<String, dynamic> data) {
+    return CommentModel(
+      commentId: data['comment_id'] ?? '',
+      userId: data['user_id'] ?? '',
+      userName: data['user_name'] ?? '',
+      userAvatarUrl: data['user_avatar_url'] ?? '',
+      content: data['content'] ?? '',
+      createTime: data['create_time'] ?? '',
+      likeCount: data['like_count'] ?? 0,
+      isLiked: data['is_liked'] ?? false,
+      replyToUserId: data['reply_to_user_id'],
+      replyToUserName: data['reply_to_user_name'],
     );
   }
-}
 
-// 点赞模型
-class Like {
-  final String id;
-  final String userId;
-  final String momentId;
-  final DateTime createdAt;
-
-  Like({
-    required this.id,
-    required this.userId,
-    required this.momentId,
-    required this.createdAt,
-  });
-
-  factory Like.fromJson(Map<String, dynamic> json) {
-    return Like(
-      id: json['id'],
-      userId: json['userId'],
-      momentId: json['momentId'],
-      createdAt: DateTime.parse(json['createdAt']),
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'comment_id': commentId,
+      'user_id': userId,
+      'user_name': userName,
+      'user_avatar_url': userAvatarUrl,
+      'content': content,
+      'create_time': createTime,
+      'like_count': likeCount,
+      'is_liked': isLiked,
+      'reply_to_user_id': replyToUserId,
+      'reply_to_user_name': replyToUserName,
+    };
   }
 }
