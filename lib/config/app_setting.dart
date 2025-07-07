@@ -13,9 +13,11 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://192.168.1.106:8080';
+    AppConfig.requestHost = 'http://110.42.56.25:8080';
     // socket地址
     AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
+    // 添加朋友圈API请求地址
+    AppConfig.commentHost = 'http://110.42.56.25:8088';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://baidu.com/privacy.html';
     // 请求服务协议
@@ -48,7 +50,7 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://192.168.124.18:8080';
+    AppConfig.requestHost = 'http://110.42.56.25:8080';
     // socket地址
     AppConfig.requestSocket = 'ws://192.168.124.18:8888';
     // 请求隐私协议
