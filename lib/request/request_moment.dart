@@ -75,4 +75,19 @@ class RequestMoment {
       },
     );
   }
+
+  // 定义 postComment 方法
+  static Future<void> postComment(
+      String momentId, String commentContent) async {
+    // 执行
+    await ToolsRequest().post(
+      '$_prefix/postComment',
+      data: {
+        "momentId": momentId,
+        "commentContent": commentContent,
+      },
+    );
+    // 可以添加提示信息
+    // EasyLoading.showToast('评论发布成功');
+  }
 }

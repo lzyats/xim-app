@@ -36,6 +36,58 @@ class MomentIndexController extends GetxController {
     getMomentList();
   }
 
+  // 发布评论
+  Future<void> postComment(String momentId, String content) async {
+    try {
+      // 显示加载状态
+      // 可以通过添加一个 Rx 变量来控制加载状态
+
+      // 调用API
+      final comment = await RequestMoment.postComment(momentId, content);
+
+      // 更新本地状态
+      final momentIndex = momentList.indexWhere((m) => m.momentId == momentId);
+      if (momentIndex != -1) {
+        final currentMoment = momentList[momentIndex];
+
+        // 更新评论列表
+        final updatedComments = List<CommentModel>.from(currentMoment.comments)
+          ..add(comment);
+
+        // 更新朋友圈项
+        final updatedMoment = currentMoment.copyWith(
+          commentCount: currentMoment.commentCount + 1,
+          comments: updatedComments,
+        );
+
+        // 更新列表
+        momentList[momentIndex] = updatedMoment;
+      }
+
+      // 隐藏加载状态
+      // 更新状态变量
+
+      // 显示成功提示
+      Get.snackbar('成功', '评论发布成功', duration: const Duration(seconds: 2));
+    } catch (e) {
+      print('发布评论失败: $e');
+
+      // 隐藏加载状态
+      // 更新状态变量
+
+      // 显示错误提示
+      Get.snackbar(
+        '失败',
+        '评论发布失败，请重试',
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+
+      rethrow;
+    }
+  }
+
   // 点赞/取消点赞
   Future<void> toggleLike(String momentId) async {
     try {
