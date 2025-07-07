@@ -184,4 +184,8 @@ class AppFonts {
   // USDT1
   static const IconData e886 =
       IconData(59526, fontFamily: _fontFamilya, matchTextDirection: _matchText);
+  // 字体图标常量
+  static const IconData like = IconData(0xe601, fontFamily: 'AppIcon');
+  static const IconData likeFill = IconData(0xe602, fontFamily: 'AppIcon');
+  static const IconData comment = IconData(0xe603, fontFamily: 'AppIcon');
 }

@@ -13,6 +13,8 @@ class RequestMoment {
     // 获取当前用户的 user_id
     String userId = ToolsStorage().local().userId;
 
+    print('当前用户ID：' + userId);
+
     // 执行
     AjaxData ajaxData = await ToolsRequest().page(
       '$_prefix/t.php',
@@ -20,6 +22,7 @@ class RequestMoment {
       data: {'user_id': userId, 'page': pageNum, 'page_size': pageSize},
       pageSize: pageSize,
     );
+
     // 转换
     return ajaxData.getList((data) => MomentModel.fromJson(data));
   }
