@@ -5,7 +5,7 @@ import 'package:alpaca/config/app_config.dart';
 
 // 朋友圈接口
 class RequestMoment {
-  static String get _prefix => AppConfig.commentHost + '/moment';
+  static String get _prefix => AppConfig.commentHost;
 
   // 获取朋友圈列表
   static Future<List<MomentModel>> getMomentList(
@@ -15,7 +15,7 @@ class RequestMoment {
 
     // 执行
     AjaxData ajaxData = await ToolsRequest().page(
-      '$_prefix/list',
+      '$_prefix/t.php',
       pageNum,
       data: {'user_id': userId, 'page': pageNum, 'page_size': pageSize},
       pageSize: pageSize,

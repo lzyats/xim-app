@@ -7,7 +7,7 @@ import 'package:alpaca/config/app_fonts.dart';
 import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/event/event_setting.dart';
 import 'package:alpaca/event/event_socket.dart';
-import 'package:alpaca/pages/_demo/_demo_test.dart';
+//import 'package:alpaca/pages/_demo/_demo_test.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
 import 'package:alpaca/pages/friend/friend_index_page.dart';
 import 'package:alpaca/pages/mine/mine_index_page.dart';
@@ -26,6 +26,8 @@ import 'package:alpaca/tools/tools_storage.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
+import 'package:alpaca/pages/moment/moment_index_page.dart'; // 引入朋友圈页面
+
 // tables
 class _TabsModel {
   final String label;
@@ -38,7 +40,8 @@ class MainController extends BaseController {
   // 静态属性
   static final List<_TabsModel> _pageList = [
     const _TabsModel('消息', AppFonts.e67e, MsgIndexPage()),
-    const _TabsModel('圈子', AppFonts.qz01, DemoTest()),
+    //const _TabsModel('圈子', AppFonts.qz01, DemoTest()),
+    const _TabsModel('朋友圈', AppFonts.qz01, MomentIndexPage()),
     const _TabsModel('好友', AppFonts.e689, FriendIndexPage()),
     const _TabsModel('我的', AppFonts.e70f, MineIndexPage()),
   ];
