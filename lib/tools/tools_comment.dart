@@ -1,355 +1,375 @@
 // package:alpaca/tools/tools_comment.dart
-class MomentModel {
-  final String momentId; // 朋友圈ID
-  final String userId; // 发布用户ID
-  final String content; // 内容
-  final String createTime; // 创建时间
-  final String status; // 状态：0-正常，1-删除
-  final int likeCount; // 点赞数
-  final int commentCount; // 评论数
-  final bool isLiked; // 当前用户是否已点赞
+/// 朋友圈动态模型
+class FriendMomentModel {
+  final int momentId; // 动态ID
+  final int userId; // 发布用户ID
+  final String? content; // 文字内容
+  final String? location; // 位置信息
+  final int visibility; // 可见性：0-公开，1-私密，2-部分可见，3-不给谁看
+  final DateTime createTime; // 创建时间
+  final DateTime updateTime; // 更新时间
+  final int isDeleted; // 逻辑删除标记
 
-  // 用户信息（关联查询）
-  final String userName; // 用户名
-  final String userAvatar; // 用户头像
-
-  // 媒体资源列表
-  final List<MediaResourceModel> mediaResources;
-
-  // 评论列表
-  final List<CommentModel> comments;
-
-  factory MomentModel.fromJson(Map<String, dynamic> data) {
-    // 安全解析媒体资源列表
-    final mediaResources = _safeParseList(
-        data['media_resources'], (item) => MediaResourceModel.fromJson(item));
-
-    // 安全解析评论列表
-    final comments =
-        _safeParseList(data['comments'], (item) => CommentModel.fromJson(item));
-
-    return MomentModel._(
-      momentId: _safeParseString(data['moment_id']),
-      userId: _safeParseString(data['user_id']),
-      content: _safeParseString(data['content']),
-      createTime: _safeParseString(data['create_time']),
-      status: _safeParseString(data['status']),
-      likeCount: _safeParseInt(data['like_count']),
-      commentCount: _safeParseInt(data['comment_count']),
-      isLiked: _safeParseBool(data['is_liked']),
-      userName: _safeParseString(data['user_name']),
-      userAvatar: _safeParseString(data['user_avatar']),
-      mediaResources: mediaResources,
-      comments: comments,
-    );
-  }
-
-  // 私有构造函数
-  MomentModel._({
+  FriendMomentModel({
     required this.momentId,
     required this.userId,
-    required this.content,
+    this.content,
+    this.location,
+    required this.visibility,
     required this.createTime,
-    required this.status,
-    required this.likeCount,
-    required this.commentCount,
-    required this.isLiked,
-    required this.userName,
-    required this.userAvatar,
-    required this.mediaResources,
-    required this.comments,
+    required this.updateTime,
+    required this.isDeleted,
   });
 
-  // 添加 copyWith 方法
-  MomentModel copyWith({
-    String? momentId,
-    String? userId,
-    String? content,
-    String? createTime,
-    String? status,
-    int? likeCount,
-    int? commentCount,
-    bool? isLiked,
-    String? userName,
-    String? userAvatar,
-    List<MediaResourceModel>? mediaResources,
-    List<CommentModel>? comments,
-  }) {
-    return MomentModel._(
-      momentId: momentId ?? this.momentId,
-      userId: userId ?? this.userId,
-      content: content ?? this.content,
-      createTime: createTime ?? this.createTime,
-      status: status ?? this.status,
-      likeCount: likeCount ?? this.likeCount,
-      commentCount: commentCount ?? this.commentCount,
-      isLiked: isLiked ?? this.isLiked,
-      userName: userName ?? this.userName,
-      userAvatar: userAvatar ?? this.userAvatar,
-      mediaResources: mediaResources ?? this.mediaResources,
-      comments: comments ?? this.comments,
+  // 从JSON创建实例
+  factory FriendMomentModel.fromJson(Map<String, dynamic> json) {
+    return FriendMomentModel(
+      momentId: json['moment_id'],
+      userId: json['user_id'],
+      content: json['content'],
+      location: json['location'],
+      visibility: json['visibility'],
+      createTime: DateTime.parse(json['create_time']),
+      updateTime: DateTime.parse(json['update_time']),
+      isDeleted: json['is_deleted'],
     );
   }
 
+  // 转换为JSON
   Map<String, dynamic> toJson() {
     return {
       'moment_id': momentId,
       'user_id': userId,
       'content': content,
-      'create_time': createTime,
-      'status': status,
-      'like_count': likeCount,
-      'comment_count': commentCount,
-      'is_liked': isLiked,
-      'user_name': userName,
-      'user_avatar': userAvatar,
-      'media_resources':
-          mediaResources.map((resource) => resource.toJson()).toList(),
-      'comments': comments.map((comment) => comment.toJson()).toList(),
+      'location': location,
+      'visibility': visibility,
+      'create_time': createTime.toIso8601String(),
+      'update_time': updateTime.toIso8601String(),
+      'is_deleted': isDeleted,
     };
   }
 
-  // 静态安全解析工具方法
-  static String _safeParseString(dynamic value) {
-    if (value == null) return '';
-    if (value is String) return value;
-    return value.toString();
-  }
-
-  static int _safeParseInt(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    if (value is String) return int.tryParse(value) ?? 0;
-    if (value is double) return value.toInt();
-    return 0;
-  }
-
-  static bool _safeParseBool(dynamic value) {
-    if (value == null) return false;
-    if (value is bool) return value;
-    if (value is String) return value == '1' || value.toLowerCase() == 'true';
-    if (value is int) return value == 1;
-    return false;
-  }
-
-  static List<T> _safeParseList<T>(
-      dynamic value, T Function(dynamic) converter) {
-    if (value == null) return [];
-    if (value is! List) return [];
-    return value.map(converter).whereType<T>().toList();
+  // 复制实例（支持字段更新）
+  FriendMomentModel copyWith({
+    int? momentId,
+    int? userId,
+    String? content,
+    String? location,
+    int? visibility,
+    DateTime? createTime,
+    DateTime? updateTime,
+    int? isDeleted,
+  }) {
+    return FriendMomentModel(
+      momentId: momentId ?? this.momentId,
+      userId: userId ?? this.userId,
+      content: content ?? this.content,
+      location: location ?? this.location,
+      visibility: visibility ?? this.visibility,
+      createTime: createTime ?? this.createTime,
+      updateTime: updateTime ?? this.updateTime,
+      isDeleted: isDeleted ?? this.isDeleted,
+    );
   }
 }
 
-class CommentModel {
-  final String commentId; // 评论ID
-  final String momentId; // 朋友圈ID
-  final String userId; // 评论用户ID
-  final String content; // 评论内容
-  final String createTime; // 创建时间
-  final String status; // 状态：0-正常，1-删除
-  final int likeCount; // 点赞数
-  final bool isLiked; // 当前用户是否已点赞
+/// 朋友圈评论模型
+class FriendCommentModel {
+  final int? commentId; // 评论ID（改为可选）
+  final int? momentId; // 关联动态ID（改为可选）
+  final int? userId; // 评论用户ID（改为可选）
+  final int? replyTo; // 回复的评论ID（可为空）
+  final String content; // 评论内容（保持必填）
+  final DateTime? createTime; // 创建时间（改为可选）
+  final int isDeleted; // 逻辑删除标记（根据需求调整）
 
-  // 用户信息（关联查询）
-  final String userName; // 用户名
-  final String userAvatar; // 用户头像
+  final String fromUser; // 评论者
+  final String? toUser; // 被评论者（可为空）
 
-  // 回复信息
-  final String? replyToUserId; // 回复用户ID
-  final String? replyToUserName; // 回复用户名
+  FriendCommentModel({
+    this.commentId, // 改为可选
+    this.momentId, // 改为可选
+    this.userId, // 改为可选
+    this.replyTo,
+    required this.content, // 保持必填
+    this.createTime, // 改为可选
+    this.isDeleted = 0, // 设置默认值
+    required this.fromUser,
+    this.toUser,
+  });
 
-  factory CommentModel.fromJson(Map<String, dynamic> data) {
-    return CommentModel._(
-      commentId: MomentModel._safeParseString(data['comment_id']),
-      momentId: MomentModel._safeParseString(data['moment_id']),
-      userId: MomentModel._safeParseString(data['user_id']),
-      content: MomentModel._safeParseString(data['content']),
-      createTime: MomentModel._safeParseString(data['create_time']),
-      status: MomentModel._safeParseString(data['status']),
-      likeCount: MomentModel._safeParseInt(data['like_count']),
-      isLiked: MomentModel._safeParseBool(data['is_liked']),
-      userName: MomentModel._safeParseString(data['user_name']),
-      userAvatar: MomentModel._safeParseString(data['user_avatar']),
-      replyToUserId: MomentModel._safeParseString(data['reply_to_user_id']),
-      replyToUserName: MomentModel._safeParseString(data['reply_to_user_name']),
+  // 从JSON创建实例
+  factory FriendCommentModel.fromJson(Map<String, dynamic> json) {
+    return FriendCommentModel(
+      commentId: json['comment_id'], // 直接读取，可为null
+      momentId: json['moment_id'],
+      userId: json['user_id'],
+      replyTo: json['reply_to'],
+      content: json['content'],
+      createTime: json['create_time'] != null
+          ? DateTime.parse(json['create_time'])
+          : null, // 可选时间解析
+      isDeleted: json['is_deleted'] ?? 0, // 设置默认值
+      fromUser: json['from_user'],
+      toUser: json['to_user'],
     );
   }
 
-  // 私有构造函数
-  CommentModel._({
-    required this.commentId,
-    required this.momentId,
-    required this.userId,
-    required this.content,
-    required this.createTime,
-    required this.status,
-    required this.likeCount,
-    required this.isLiked,
-    required this.userName,
-    required this.userAvatar,
-    this.replyToUserId,
-    this.replyToUserName,
-  });
+  // 转换为JSON
+  Map<String, dynamic> toJson() {
+    return {
+      if (commentId != null) 'comment_id': commentId, // 仅当非null时包含
+      if (momentId != null) 'moment_id': momentId,
+      if (userId != null) 'user_id': userId,
+      'reply_to': replyTo,
+      'content': content,
+      if (createTime != null) 'create_time': createTime?.toIso8601String(),
+      'is_deleted': isDeleted,
+      'from_user': fromUser,
+      'to_user': toUser,
+    };
+  }
 
-  // 添加 copyWith 方法
-  CommentModel copyWith({
-    String? commentId,
-    String? momentId,
-    String? userId,
+  // 复制实例（支持字段更新）
+  FriendCommentModel copyWith({
+    int? commentId,
+    int? momentId,
+    int? userId,
+    int? replyTo,
     String? content,
-    String? createTime,
-    String? status,
-    int? likeCount,
-    bool? isLiked,
-    String? userName,
-    String? userAvatar,
-    String? replyToUserId,
-    String? replyToUserName,
+    DateTime? createTime,
+    int? isDeleted,
+    String? fromUser,
+    String? toUser,
   }) {
-    return CommentModel._(
+    return FriendCommentModel(
       commentId: commentId ?? this.commentId,
       momentId: momentId ?? this.momentId,
       userId: userId ?? this.userId,
+      replyTo: replyTo ?? this.replyTo,
       content: content ?? this.content,
       createTime: createTime ?? this.createTime,
-      status: status ?? this.status,
-      likeCount: likeCount ?? this.likeCount,
-      isLiked: isLiked ?? this.isLiked,
-      userName: userName ?? this.userName,
-      userAvatar: userAvatar ?? this.userAvatar,
-      replyToUserId: replyToUserId ?? this.replyToUserId,
-      replyToUserName: replyToUserName ?? this.replyToUserName,
+      isDeleted: isDeleted ?? this.isDeleted,
+      fromUser: fromUser ?? this.fromUser,
+      toUser: toUser ?? this.toUser,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'comment_id': commentId,
-      'moment_id': momentId,
-      'user_id': userId,
-      'content': content,
-      'create_time': createTime,
-      'status': status,
-      'like_count': likeCount,
-      'is_liked': isLiked,
-      'user_name': userName,
-      'user_avatar': userAvatar,
-      'reply_to_user_id': replyToUserId,
-      'reply_to_user_name': replyToUserName,
-    };
   }
 }
 
-class LikeModel {
-  final String likeId; // 点赞ID
-  final String momentId; // 朋友圈ID
-  final String userId; // 用户ID
-  final String createTime; // 创建时间
+/// 朋友圈媒体资源模型
+class FriendMediaResourceModel {
+  final int mediaId; // 媒体资源ID
+  final int momentId; // 关联动态ID
+  final String url; // 资源URL
+  final int type; // 类型：0-图片，1-视频，2-音频
+  final int sortOrder; // 排序顺序
+  final int width; // 宽度（图片/视频）
+  final int height; // 高度（图片/视频）
+  final int duration; // 时长（视频/音频，单位：秒）
+  final DateTime createTime; // 创建时间
 
-  factory LikeModel.fromJson(Map<String, dynamic> data) {
-    return LikeModel._(
-      likeId: MomentModel._safeParseString(data['like_id']),
-      momentId: MomentModel._safeParseString(data['moment_id']),
-      userId: MomentModel._safeParseString(data['user_id']),
-      createTime: MomentModel._safeParseString(data['create_time']),
+  FriendMediaResourceModel({
+    required this.mediaId,
+    required this.momentId,
+    required this.url,
+    required this.type,
+    required this.sortOrder,
+    required this.width,
+    required this.height,
+    required this.duration,
+    required this.createTime,
+  });
+
+  // 从JSON创建实例
+  factory FriendMediaResourceModel.fromJson(Map<String, dynamic> json) {
+    return FriendMediaResourceModel(
+      mediaId: json['media_id'],
+      momentId: json['moment_id'],
+      url: json['url'],
+      type: json['type'],
+      sortOrder: json['sort_order'],
+      width: json['width'],
+      height: json['height'],
+      duration: json['duration'],
+      createTime: DateTime.parse(json['create_time']),
     );
   }
 
-  // 私有构造函数
-  LikeModel._({
+  // 转换为JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'media_id': mediaId,
+      'moment_id': momentId,
+      'url': url,
+      'type': type,
+      'sort_order': sortOrder,
+      'width': width,
+      'height': height,
+      'duration': duration,
+      'create_time': createTime.toIso8601String(),
+    };
+  }
+
+  // 复制实例（支持字段更新）
+  FriendMediaResourceModel copyWith({
+    int? mediaId,
+    int? momentId,
+    String? url,
+    int? type,
+    int? sortOrder,
+    int? width,
+    int? height,
+    int? duration,
+    DateTime? createTime,
+  }) {
+    return FriendMediaResourceModel(
+      mediaId: mediaId ?? this.mediaId,
+      momentId: momentId ?? this.momentId,
+      url: url ?? this.url,
+      type: type ?? this.type,
+      sortOrder: sortOrder ?? this.sortOrder,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      duration: duration ?? this.duration,
+      createTime: createTime ?? this.createTime,
+    );
+  }
+}
+
+/// 朋友圈点赞模型
+class FriendLikeModel {
+  final int likeId; // 点赞ID
+  final int momentId; // 关联动态ID
+  final int userId; // 点赞用户ID
+  final DateTime createTime; // 创建时间
+  final int isDeleted; // 逻辑删除标记
+
+  FriendLikeModel({
     required this.likeId,
     required this.momentId,
     required this.userId,
     required this.createTime,
+    required this.isDeleted,
   });
 
-  // 添加 copyWith 方法
-  LikeModel copyWith({
-    String? likeId,
-    String? momentId,
-    String? userId,
-    String? createTime,
-  }) {
-    return LikeModel._(
-      likeId: likeId ?? this.likeId,
-      momentId: momentId ?? this.momentId,
-      userId: userId ?? this.userId,
-      createTime: createTime ?? this.createTime,
+  // 从JSON创建实例
+  factory FriendLikeModel.fromJson(Map<String, dynamic> json) {
+    return FriendLikeModel(
+      likeId: json['like_id'],
+      momentId: json['moment_id'],
+      userId: json['user_id'],
+      createTime: DateTime.parse(json['create_time']),
+      isDeleted: json['is_deleted'],
     );
   }
 
+  // 转换为JSON
   Map<String, dynamic> toJson() {
     return {
       'like_id': likeId,
       'moment_id': momentId,
       'user_id': userId,
-      'create_time': createTime,
+      'create_time': createTime.toIso8601String(),
+      'is_deleted': isDeleted,
     };
+  }
+
+  // 复制实例（支持字段更新）
+  FriendLikeModel copyWith({
+    int? likeId,
+    int? momentId,
+    int? userId,
+    DateTime? createTime,
+    int? isDeleted,
+  }) {
+    return FriendLikeModel(
+      likeId: likeId ?? this.likeId,
+      momentId: momentId ?? this.momentId,
+      userId: userId ?? this.userId,
+      createTime: createTime ?? this.createTime,
+      isDeleted: isDeleted ?? this.isDeleted,
+    );
   }
 }
 
-class MediaResourceModel {
-  final String resourceId; // 资源ID
-  final String momentId; // 朋友圈ID
-  final String resourceType; // 资源类型：1-图片，2-视频，3-音频
-  final String url; // 资源URL
-  final String thumbnailUrl; // 缩略图URL（图片/视频）
-  final int sortOrder; // 排序序号
-  final String createTime; // 创建时间
+/// 新添加的 Moment 类模型
+class MomentModel {
+  final int momentId; // 动态ID
+  final int userId; // 用户ID
+  final String portrait; // 用户头像
+  final String nickname; // 用户昵称
+  final String content; // 动态正文
+  final String createTime; // 发布时间（改为字符串类型）
+  final List<String> images; // 图片列表
+  final List<FriendCommentModel> comments; // 评论内容
+  final List<String> likes; // 点赞列表
 
-  factory MediaResourceModel.fromJson(Map<String, dynamic> data) {
-    return MediaResourceModel._(
-      resourceId: MomentModel._safeParseString(data['resource_id']),
-      momentId: MomentModel._safeParseString(data['moment_id']),
-      resourceType: MomentModel._safeParseString(data['resource_type']),
-      url: MomentModel._safeParseString(data['url']),
-      thumbnailUrl: MomentModel._safeParseString(data['thumbnail_url']),
-      sortOrder: MomentModel._safeParseInt(data['sort_order']),
-      createTime: MomentModel._safeParseString(data['create_time']),
-    );
-  }
-
-  // 私有构造函数
-  MediaResourceModel._({
-    required this.resourceId,
+  MomentModel({
     required this.momentId,
-    required this.resourceType,
-    required this.url,
-    required this.thumbnailUrl,
-    required this.sortOrder,
-    required this.createTime,
+    required this.userId,
+    required this.portrait,
+    required this.nickname,
+    required this.content,
+    required this.createTime, // 字符串类型
+    required this.images,
+    required this.comments,
+    required this.likes,
   });
 
-  // 添加 copyWith 方法
-  MediaResourceModel copyWith({
-    String? resourceId,
-    String? momentId,
-    String? resourceType,
-    String? url,
-    String? thumbnailUrl,
-    int? sortOrder,
-    String? createTime,
-  }) {
-    return MediaResourceModel._(
-      resourceId: resourceId ?? this.resourceId,
-      momentId: momentId ?? this.momentId,
-      resourceType: resourceType ?? this.resourceType,
-      url: url ?? this.url,
-      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      sortOrder: sortOrder ?? this.sortOrder,
-      createTime: createTime ?? this.createTime,
+  // 从JSON创建实例
+  factory MomentModel.fromJson(Map<String, dynamic> json) {
+    return MomentModel(
+      momentId: json['momentId'],
+      userId: json['userId'],
+      portrait: json['portrait'],
+      nickname: json['nickname'],
+      content: json['content'],
+      createTime: json['createTime'].toString(), // 直接转为字符串
+      images: List<String>.from(json['images']),
+      comments: (json['comments'] as List<dynamic>)
+          .map((comment) => FriendCommentModel.fromJson(comment))
+          .toList(),
+      likes: List<String>.from(json['likes']),
     );
   }
 
+  // 转换为JSON
   Map<String, dynamic> toJson() {
     return {
-      'resource_id': resourceId,
-      'moment_id': momentId,
-      'resource_type': resourceType,
-      'url': url,
-      'thumbnail_url': thumbnailUrl,
-      'sort_order': sortOrder,
-      'create_time': createTime,
+      'momentId': momentId,
+      'userId': userId,
+      'portrait': portrait,
+      'nickname': nickname,
+      'content': content,
+      'createTime': createTime, // 直接序列化字符串
+      'images': images,
+      'comments': comments.map((comment) => comment.toJson()).toList(),
+      'likes': likes,
     };
+  }
+
+  // 复制实例（支持字段更新）
+  MomentModel copyWith({
+    int? momentId,
+    int? userId,
+    String? portrait,
+    String? nickname,
+    String? content,
+    String? createTime, // 字符串类型参数
+    List<String>? images,
+    List<FriendCommentModel>? comments,
+    List<String>? likes,
+  }) {
+    return MomentModel(
+      momentId: momentId ?? this.momentId,
+      userId: userId ?? this.userId,
+      portrait: portrait ?? this.portrait,
+      nickname: nickname ?? this.nickname,
+      content: content ?? this.content,
+      createTime: createTime ?? this.createTime,
+      images: images ?? this.images,
+      comments: comments ?? this.comments,
+      likes: likes ?? this.likes,
+    );
   }
 }

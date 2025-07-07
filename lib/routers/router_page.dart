@@ -8,9 +8,11 @@ import 'package:alpaca/routers/router_mine.dart';
 import 'package:alpaca/routers/router_msg.dart';
 import 'package:alpaca/routers/router_robot.dart';
 import 'package:alpaca/routers/router_wallet.dart';
+import 'package:alpaca/routers/router_demo.dart';
 import 'package:alpaca/routers/router_moment.dart'; // 引入朋友圈路由
 
 List<GetPage> getRouterPage = getMainPages +
+    getDemoPages +
     getCommonPages +
     getLoginPages +
     getMinePages +

@@ -25,6 +25,8 @@ enum SettingType {
   clear('clear'),
   // 计数器
   badger('badger'),
+  // 添加 moment 常量
+  moment('moment'),
   ;
 
   const SettingType(this.value);
