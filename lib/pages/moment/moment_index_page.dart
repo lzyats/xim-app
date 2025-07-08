@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:alpaca/pages/moment/moment_index_controller.dart';
+import 'package:alpaca/pages/moment/momnet_add_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MomentIndexPage extends StatefulWidget {
   static const routeName = "/moment_index";
@@ -40,7 +42,16 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('朋友圈')),
+      appBar: AppBar(
+        title: const Text('朋友圈'),
+        actions: [
+          // 添加相机图标按钮
+          IconButton(
+            icon: const Icon(Icons.camera_alt),
+            onPressed: _openMomentAddPage,
+          ),
+        ],
+      ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -71,6 +82,11 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  // 打开发布页面的方法
+  void _openMomentAddPage() {
+    Get.toNamed(MomnetAddPage.routeName);
+  }
+
   Widget _buildMomentItem(MomentModel moment) {
     return Container(
       margin: const EdgeInsets.only(top: 16),
@@ -78,18 +94,22 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildAvatar(moment.portrait),
+          _buildAvatar(moment.portrait ?? ''),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildMomentContent(moment),
+                // 修改：明确设置宽度铺满
+                Container(
+                  width: double.infinity,
+                  child: _buildMomentContent(moment),
+                ),
                 const SizedBox(height: 10),
-                _buildImageList(moment.images),
+                _buildImageList(moment.images ?? []),
                 _buildMomentFooter(moment),
-                if (moment.comments.isNotEmpty)
-                  _renderComments(moment.comments),
+                if (moment.comments != null)
+                  _renderComments(moment.comments ?? []),
               ],
             ),
           ),
@@ -110,22 +130,26 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   }
 
   Widget _buildMomentContent(MomentModel moment) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          moment.nickname,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 17,
+    return Container(
+      width: double.infinity, // 关键修改：宽度充满父容器
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            moment.nickname ?? '',
+            style: const TextStyle(
+              color: Color.fromARGB(255, 92, 104, 141),
+              fontWeight: FontWeight.bold,
+              fontSize: 17,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          moment.content,
-          style: const TextStyle(fontSize: 15),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            moment.content ?? '',
+            style: const TextStyle(fontSize: 15),
+          ),
+        ],
+      ),
     );
   }
 
@@ -146,16 +170,64 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   }
 
   Widget _buildMomentFooter(MomentModel moment) {
+    // 解析location字段，提取位置文本和经纬度
+    String? locationText;
+    double? longitude; // 经度
+    double? latitude; // 纬度
+
+    if (moment.location != null) {
+      final parts = moment.location!.split('|');
+      if (parts.length >= 1) {
+        locationText = parts[0];
+        // 确保有足够的分段来获取经纬度
+        if (parts.length >= 3) {
+          try {
+            longitude = double.parse(parts[1]); // 第二个分段为经度
+            latitude = double.parse(parts[2]); // 第三个分段为纬度
+          } catch (e) {
+            print('经纬度解析失败: $e');
+          }
+        }
+
+        // 长度截断处理
+        if (locationText.length > 30) {
+          locationText = '${locationText.substring(0, 28)}..';
+        }
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          moment.createTime,
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        // 时间和位置信息统一放入Column保持左对齐
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              moment.createTime ?? '',
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
         ),
+        // 关键修改：添加点击事件的位置文本
+        if (locationText != null)
+          GestureDetector(
+            onTap: () {
+              _openGaodeMap(longitude, latitude, locationText ?? '');
+            },
+            child: Text(
+              locationText,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 92, 104, 141),
+                fontSize: 12,
+                decoration: TextDecoration.underline, // 添加下划线标识可点击
+              ),
+            ),
+          ),
         IconButton(
           icon: const Icon(Icons.more_horiz),
           onPressed: () async {
+            // 原点击事件逻辑保持不变
             final RenderBox button = context.findRenderObject() as RenderBox;
             final Offset buttonPosition = button.localToGlobal(Offset.zero);
 
@@ -165,7 +237,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                 listItemBox.localToGlobal(Offset.zero);
             final Size listItemSize = listItemBox.size;
 
-            // 修改这里，将高度压缩三分之一
             final double maxMenuHeight = (listItemSize.height -
                     (buttonPosition.dy - listItemPosition.dy)) *
                 (2 / 3);
@@ -184,30 +255,55 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildMenuItem('赞', Icons.thumb_up, () {
-                        Navigator.pop(context);
-                      }),
+                      _buildMenuItem(
+                          '赞', Icons.thumb_up, () => Navigator.pop(context)),
                       Container(
-                        width: 1,
-                        height: 30,
-                        color: Colors.grey.withOpacity(0.2),
-                      ),
-                      _buildMenuItem('评论', Icons.comment, () {
-                        Navigator.pop(context);
-                      }),
+                          width: 1,
+                          height: 30,
+                          color: Colors.grey.withOpacity(0.2)),
+                      _buildMenuItem(
+                          '评论', Icons.comment, () => Navigator.pop(context)),
                     ],
                   ),
                 ),
               ],
               elevation: 8.0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
+                  borderRadius: BorderRadius.circular(8.0)),
             );
           },
         ),
       ],
     );
+  }
+
+// 打开高德地图的方法
+  void _openGaodeMap(double? longitude, double? latitude, String locationName) {
+    if (longitude == null || latitude == null) {
+      Get.snackbar(
+        '位置导航',
+        '未获取到有效经纬度$longitude，无法打开地图',
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
+
+    // 构建高德地图URL Scheme
+    // 格式: amapuri://route/plan/?dlat=纬度&dlon=经度&dname=目的地名称&dev=0&t=0
+    final url =
+        'amapuri://route/plan/?dlat=$latitude&dlon=$longitude&dname=$locationName&dev=0&t=0';
+
+    // 使用Flutter的url_launcher插件打开URL
+    // 需先添加依赖: url_launcher: ^6.1.0
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
+        .catchError((e) {
+      Get.snackbar(
+        '位置导航',
+        '无法打开高德地图，请检查是否已安装',
+        duration: const Duration(seconds: 2),
+      );
+      print('地图跳转失败: $e');
+    });
   }
 
   Widget _buildMenuItem(String text, IconData icon, VoidCallback onTap) {

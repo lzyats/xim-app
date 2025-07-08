@@ -1,24 +1,24 @@
 // package:alpaca/tools/tools_comment.dart
 /// 朋友圈动态模型
 class FriendMomentModel {
-  final int momentId; // 动态ID
+  final int? momentId; // 动态ID
   final int userId; // 发布用户ID
   final String? content; // 文字内容
   final String? location; // 位置信息
   final int visibility; // 可见性：0-公开，1-私密，2-部分可见，3-不给谁看
   final DateTime createTime; // 创建时间
-  final DateTime updateTime; // 更新时间
-  final int isDeleted; // 逻辑删除标记
+  final DateTime? updateTime; // 更新时间
+  final int? isDeleted; // 逻辑删除标记
 
   FriendMomentModel({
-    required this.momentId,
+    this.momentId,
     required this.userId,
     this.content,
     this.location,
     required this.visibility,
     required this.createTime,
-    required this.updateTime,
-    required this.isDeleted,
+    this.updateTime,
+    this.isDeleted,
   });
 
   // 从JSON创建实例
@@ -44,7 +44,7 @@ class FriendMomentModel {
       'location': location,
       'visibility': visibility,
       'create_time': createTime.toIso8601String(),
-      'update_time': updateTime.toIso8601String(),
+      'update_time': updateTime ?? DateTime.now().toIso8601String(),
       'is_deleted': isDeleted,
     };
   }
@@ -79,11 +79,11 @@ class FriendCommentModel {
   final int? momentId; // 关联动态ID（改为可选）
   final int? userId; // 评论用户ID（改为可选）
   final int? replyTo; // 回复的评论ID（可为空）
-  final String content; // 评论内容（保持必填）
+  final String? content; // 评论内容（保持必填）
   final DateTime? createTime; // 创建时间（改为可选）
-  final int isDeleted; // 逻辑删除标记（根据需求调整）
+  final int? isDeleted; // 逻辑删除标记（根据需求调整）
 
-  final String fromUser; // 评论者
+  final String? fromUser; // 评论者
   final String? toUser; // 被评论者（可为空）
 
   FriendCommentModel({
@@ -91,10 +91,10 @@ class FriendCommentModel {
     this.momentId, // 改为可选
     this.userId, // 改为可选
     this.replyTo,
-    required this.content, // 保持必填
+    this.content, // 保持必填
     this.createTime, // 改为可选
     this.isDeleted = 0, // 设置默认值
-    required this.fromUser,
+    this.fromUser,
     this.toUser,
   });
 
@@ -293,69 +293,81 @@ class FriendLikeModel {
 }
 
 /// 新添加的 Moment 类模型
+/// 朋友圈动态模型，支持空值判断和可选字段
 class MomentModel {
-  final int momentId; // 动态ID
-  final int userId; // 用户ID
-  final String portrait; // 用户头像
-  final String nickname; // 用户昵称
-  final String content; // 动态正文
-  final String createTime; // 发布时间（改为字符串类型）
-  final List<String> images; // 图片列表
-  final List<FriendCommentModel> comments; // 评论内容
-  final List<String> likes; // 点赞列表
+  final int? momentId; // 动态ID，改为可选类型
+  final int? userId; // 用户ID，改为可选类型
+  final String? portrait; // 用户头像，改为可选类型
+  final String? nickname; // 用户昵称，改为可选类型
+  final String? content; // 动态正文，改为可选类型
+  final String? location; // 新增：位置信息，字符类型，可为空
+  final String? createTime; // 发布时间，改为可选类型
+  final List<String>? images; // 图片列表，改为可选类型
+  final List<FriendCommentModel>? comments; // 评论内容，改为可选类型
+  final List<String>? likes; // 点赞列表，改为可选类型
 
+  // 构造函数使用可选参数，并设置默认值
   MomentModel({
-    required this.momentId,
-    required this.userId,
-    required this.portrait,
-    required this.nickname,
-    required this.content,
-    required this.createTime, // 字符串类型
-    required this.images,
-    required this.comments,
-    required this.likes,
-  });
+    this.momentId,
+    this.userId,
+    this.portrait = '', // 字符串类型设置默认空字符串
+    this.nickname = '',
+    this.content = '',
+    this.createTime,
+    this.location, // 新增字段在构造函数中声明
+    List<String>? images,
+    List<FriendCommentModel>? comments,
+    List<String>? likes,
+  })  : images = images ?? const [], // 列表类型设置默认空列表
+        comments = comments ?? const [],
+        likes = likes ?? const [];
 
-  // 从JSON创建实例
+  // 从JSON创建实例，添加全面的空值判断
   factory MomentModel.fromJson(Map<String, dynamic> json) {
     return MomentModel(
-      momentId: json['momentId'],
-      userId: json['userId'],
-      portrait: json['portrait'],
-      nickname: json['nickname'],
-      content: json['content'],
-      createTime: json['createTime'].toString(), // 直接转为字符串
-      images: List<String>.from(json['images']),
-      comments: (json['comments'] as List<dynamic>)
-          .map((comment) => FriendCommentModel.fromJson(comment))
-          .toList(),
-      likes: List<String>.from(json['likes']),
+      momentId: _parseInt(json['momentId']),
+      userId: _parseInt(json['userId']),
+      portrait: _parseString(json['portrait']),
+      nickname: _parseString(json['nickname']),
+      content: _parseString(json['content']),
+      createTime: _parseString(json['createTime']),
+      location: _parseString(json['location']), // 新增字段的JSON解析
+      images: _parseStringList(json['images']),
+      comments: _parseCommentList(json['comments']),
+      likes: _parseStringList(json['likes']),
     );
   }
 
-  // 转换为JSON
+  // 转换为JSON，忽略null值
   Map<String, dynamic> toJson() {
+    final localImages = images;
+    final localcomments = comments;
+    final locallikes = likes;
     return {
-      'momentId': momentId,
-      'userId': userId,
-      'portrait': portrait,
-      'nickname': nickname,
-      'content': content,
-      'createTime': createTime, // 直接序列化字符串
-      'images': images,
-      'comments': comments.map((comment) => comment.toJson()).toList(),
-      'likes': likes,
+      if (momentId != null) 'momentId': momentId,
+      if (userId != null) 'userId': userId,
+      if (portrait != null && portrait != '') 'portrait': portrait,
+      if (nickname != null && nickname != '') 'nickname': nickname,
+      if (content != null && content != '') 'content': content,
+      if (createTime != null) 'createTime': createTime,
+      if (location != null && location != '')
+        'location': location, // 新增字段的JSON输出
+      if (localImages != null && localImages.isNotEmpty) 'images': images,
+      if (localcomments != null && localcomments.isNotEmpty)
+        'comments': localcomments.map((comment) => comment.toJson()).toList(),
+      if (locallikes != null && locallikes.isNotEmpty) 'likes': likes,
     };
   }
 
-  // 复制实例（支持字段更新）
+  // 复制实例，支持字段更新
   MomentModel copyWith({
     int? momentId,
     int? userId,
     String? portrait,
     String? nickname,
     String? content,
-    String? createTime, // 字符串类型参数
+    String? createTime,
+    String? location, // 新增字段在copyWith中支持更新
     List<String>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
@@ -367,9 +379,63 @@ class MomentModel {
       nickname: nickname ?? this.nickname,
       content: content ?? this.content,
       createTime: createTime ?? this.createTime,
+      location: location ?? this.location, // 新增字段的默认值使用原实例值
       images: images ?? this.images,
       comments: comments ?? this.comments,
       likes: likes ?? this.likes,
     );
+  }
+
+  // 辅助方法：解析int类型，处理null值
+  static int? _parseInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        print('解析int失败: $value');
+        return null;
+      }
+    }
+    print('无效的int类型: $value');
+    return null;
+  }
+
+  // 辅助方法：解析String类型，处理null值
+  static String? _parseString(dynamic value) {
+    if (value == null) return null;
+    return value.toString().trim().isNotEmpty ? value.toString() : null;
+  }
+
+  // 辅助方法：解析String列表，处理null值
+  static List<String> _parseStringList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((item) => _parseString(item) ?? '').toList();
+    }
+    print('无效的列表类型: $value');
+    return [];
+  }
+
+  // 辅助方法：解析评论列表，处理null值
+  static List<FriendCommentModel> _parseCommentList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((item) {
+        if (item is Map<String, dynamic>) {
+          try {
+            return FriendCommentModel.fromJson(item);
+          } catch (e) {
+            print('评论解析失败: $e');
+            return FriendCommentModel(content: '解析失败的评论');
+          }
+        }
+        print('无效的评论数据: $item');
+        return FriendCommentModel(content: '无效的评论数据');
+      }).toList();
+    }
+    print('无效的评论列表类型: $value');
+    return [];
   }
 }
