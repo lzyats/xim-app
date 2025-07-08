@@ -22,7 +22,6 @@ class RequestMoment {
       data: {'user_id': userId, 'page': pageNum, 'page_size': pageSize},
       pageSize: pageSize,
     );
-
     // 转换
     return ajaxData.getList((data) => MomentModel.fromJson(data));
   }

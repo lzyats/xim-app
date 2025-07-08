@@ -101,14 +101,16 @@ class ToolsRequest {
       } else {
         response = await _dio.get(url, queryParameters: param);
       }
+      //debugPrint('$url返回数据：');
       // 转换
       return AjaxData(response.data);
     } catch (ex) {
-      print(ex);
+      //print(ex);
       if (showError) {
         // 取消
         ToolsSubmit.cancel();
         // 提醒
+        debugPrint('$url网络开小差了');
         EasyLoading.showToast('网络开小差了，请稍后重试', dismissOnTap: false);
       }
       return Future.error('');
