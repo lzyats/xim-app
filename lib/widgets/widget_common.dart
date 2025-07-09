@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui_;
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/tools/tools_scan.dart';
 import 'package:alpaca/tools/tools_storage.dart';
-import 'package:alpaca/tools/tools_time.dart';
+import 'package:alpaca/tools/tools_format.dart';
 import 'package:alpaca/widgets/widget_image.dart';
 import 'package:alpaca/widgets/widget_keyboard.dart';
 import 'package:alpaca/widgets/widget_popup.dart';
@@ -226,13 +227,13 @@ class WidgetCommon {
   }
 
   // 时间
-  static Widget time(DateTime dateTime, bool show) {
+  static Widget timeFormat(DateTime dateTime, bool show) {
     if (!show) {
       return const Text(
         '',
       );
     }
-    timeago.setLocaleMessages('en', ToolsTime());
+    timeago.setLocaleMessages('en', ToolsFormat());
     return Text(
       timeago.format(dateTime),
       style: const TextStyle(fontSize: 12, color: Color(0xFFa9a9a9)),
@@ -319,6 +320,9 @@ class WidgetCommon {
     String value, {
     TextAlign textAlign = TextAlign.center,
   }) {
+    if (value.isEmpty) {
+      return Container();
+    }
     Alignment alignment = Alignment.center;
     if (textAlign == TextAlign.left) {
       alignment = Alignment.centerLeft;
@@ -391,6 +395,7 @@ class WidgetCommon {
             image: WidgetImage.provider(avatar),
             padding: const EdgeInsets.all(10),
             fit: BoxFit.cover,
+            onError: (exception, stackTrace) => Image.asset(AppImage.error),
           ),
         ),
       ),

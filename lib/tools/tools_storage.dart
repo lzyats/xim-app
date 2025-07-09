@@ -263,6 +263,7 @@ class LocalUser {
   String privacyCard;
   String privacyGroup;
   String payment;
+  String pass;
   AuthType auth;
 
   LocalUser(
@@ -285,6 +286,7 @@ class LocalUser {
     this.privacyCard,
     this.privacyGroup,
     this.payment,
+    this.pass,
     this.auth,
   );
 
@@ -309,6 +311,7 @@ class LocalUser {
       data?['privacyCard'] ?? '',
       data?['privacyGroup'] ?? '',
       data?['payment'] ?? 'N',
+      data?['pass'] ?? 'N',
       AuthType.init(data?['auth'] ?? '0'),
     );
   }
@@ -337,6 +340,7 @@ class LocalUser {
       'privacyCard': privacyCard,
       'privacyGroup': privacyGroup,
       'payment': payment,
+      'pass': pass,
       'auth': auth.value,
     };
   }

@@ -12,17 +12,15 @@ class EventSocket {
   EventSocket._();
   static EventSocket? _singleton;
   factory EventSocket() => _singleton ??= EventSocket._();
-  final StreamController<String> event = StreamController.broadcast();
+  final StreamController<SocketMessage> event = StreamController.broadcast();
 
   // 监听Socket
   addListen() {
     return event.stream.listen((message) async {
       // 打印消息
-      debugPrint(message);
-      if (message == 'pong') {
-        return;
-      }
-      Map<String, dynamic>? data = isJson(message);
+      debugPrint(message.pushData);
+      // 解析消息
+      Map<String, dynamic>? data = isJson(message.pushData);
       if (data == null) {
         return;
       }
@@ -34,7 +32,7 @@ class EventSocket {
       Map<String, dynamic> pushData = model.pushData;
       // 聊天消息
       if ('msg' == pushType) {
-        await EventMessage().handle(pushData);
+        await EventMessage().handle(message.pushAudio, pushData);
       }
       // 设置消息
       else if ('setting' == pushType) {
@@ -60,6 +58,16 @@ class EventSocket {
       return null;
     }
   }
+}
+
+class SocketMessage {
+  bool pushAudio;
+  String pushData;
+
+  SocketMessage(
+    this.pushAudio,
+    this.pushData,
+  );
 }
 
 class SocketModel {

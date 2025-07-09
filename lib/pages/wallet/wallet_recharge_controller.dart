@@ -11,8 +11,8 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 
 class WalletRechargeController extends BaseController {
-  // 充值次数
-  int rechargeCount = 0;
+  // 充值配置
+  WalletModel08 config = WalletModel08.init();
   // 充值金额
   List<String> rechargeAmount = [];
   // 充值方式
@@ -23,7 +23,7 @@ class WalletRechargeController extends BaseController {
   PayType payType = PayType.none;
   // 充值配置
   void _getConfig() async {
-    rechargeCount = await RequestWallet.getRechargeConfig();
+    config = await RequestWallet.getRechargeConfig();
     update();
   }
 

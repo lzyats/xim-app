@@ -4,7 +4,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart' as get_;
 import 'package:alpaca/pages/login/login_banned_page.dart';
 import 'package:alpaca/pages/login/login_index_page.dart';
-import 'package:alpaca/pages/login/login_pass_page.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/tools/tools_encrypt.dart';
 import 'package:alpaca/tools/tools_enum.dart';
@@ -101,16 +100,14 @@ class ToolsRequest {
       } else {
         response = await _dio.get(url, queryParameters: param);
       }
-      //debugPrint('$url返回数据：');
       // 转换
       return AjaxData(response.data);
     } catch (ex) {
-      //print(ex);
+      print(ex);
       if (showError) {
         // 取消
         ToolsSubmit.cancel();
         // 提醒
-        debugPrint('$url网络开小差了');
         EasyLoading.showToast('网络开小差了，请稍后重试', dismissOnTap: false);
       }
       return Future.error('');
@@ -191,13 +188,6 @@ class _AuthInterCeptor extends Interceptor {
         return;
       }
       get_.Get.offAllNamed(LoginIndexPage.routeName);
-    }
-    // 设置密码
-    else if (ajax.code == LoginPassPage.routeCode) {
-      if (MiddleStatus.pass == ToolsStorage().status()) {
-        return;
-      }
-      get_.Get.offAllNamed(LoginPassPage.routeName);
     }
     // 账号封禁
     else if (ajax.code == LoginBannedPage.routeCode) {

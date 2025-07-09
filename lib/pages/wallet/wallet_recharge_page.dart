@@ -56,7 +56,13 @@ class WalletRechargePage extends GetView<WalletRechargeController> {
                 child: _buildType(),
               ),
               WidgetCommon.tips(
-                '今日剩余充值次数：${controller.rechargeCount} 次',
+                '今日剩余充值次数：${controller.config.count} 次',
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              WidgetCommon.tips(
+                controller.config.remark,
               ),
               const SizedBox(
                 height: 30,

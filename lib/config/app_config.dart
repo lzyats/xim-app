@@ -42,8 +42,6 @@ class AppConfig {
   static late String appSecret;
   // secret
   static late String secret;
-  // 朋友圈接口请求地址
-  static late String commentHost;
   // 接口请求地址
   static late String requestHost;
   // socket地址
@@ -88,7 +86,7 @@ class AppConfig {
   // 密码文本
   static const String passText = '密码长度为8-16位，可以使用字母、数字和特殊字符';
   // 通话
-  static bool callKit = false;
+  static String callKit = '';
   // 定时
   static Timer? _timer;
 

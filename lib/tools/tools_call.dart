@@ -16,6 +16,7 @@ import 'package:alpaca/widgets/widget_common.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 
+// 音视频
 class ToolsCall extends StatefulWidget {
   final String portrait;
   final String nickname;
@@ -53,7 +54,7 @@ class _ToolsCallState extends State<ToolsCall> {
     token = widget.token;
     channel = widget.channel;
     _trigger = widget.request;
-    AppConfig.callKit = true;
+    AppConfig.callKit = widget.chatId;
     // 初始化
     _initSetting();
     // 监听关闭
@@ -113,7 +114,7 @@ class _ToolsCallState extends State<ToolsCall> {
       _subscription.cancel();
       _timer?.cancel();
     }
-    AppConfig.callKit = false;
+    AppConfig.callKit = '';
     super.dispose();
   }
 
@@ -237,6 +238,7 @@ class _ToolsCallState extends State<ToolsCall> {
         video: widget.video,
         channel: channel,
         token: token,
+        chatId: widget.chatId,
       ),
     );
   }
@@ -268,6 +270,7 @@ class ToolsCallVideo extends StatefulWidget {
   final String nickname;
   final String channel;
   final String token;
+  final String chatId;
 
   const ToolsCallVideo({
     super.key,
@@ -276,6 +279,7 @@ class ToolsCallVideo extends StatefulWidget {
     required this.nickname,
     required this.channel,
     required this.token,
+    required this.chatId,
   });
 
   @override
@@ -294,14 +298,14 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   @override
   void initState() {
     super.initState();
-    AppConfig.callKit = true;
+    AppConfig.callKit = widget.chatId;
     initializeCalling();
   }
 
   @override
   void dispose() {
     _engine?.leaveChannel();
-    AppConfig.callKit = false;
+    AppConfig.callKit = '';
     super.dispose();
   }
 

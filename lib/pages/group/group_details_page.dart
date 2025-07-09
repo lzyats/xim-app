@@ -39,7 +39,7 @@ class GroupDetailsPage extends GetView<GroupDetailsController> {
             title: const Text('群详情'),
             actions: [
               WidgetAction(
-                icon: const Icon(Icons.more_horiz),
+                icon: const Icon(Icons.settings),
                 enable: MemberType.normal != chatGroup.memberType,
                 onTap: () {
                   Get.toNamed(

@@ -28,8 +28,6 @@ class WalletPaymentPage extends GetView<WalletPaymentController> {
                 return;
               }
               // 校验
-              _checkPhone();
-              // 校验
               _checkCode();
               // 校验
               _checkPass();
@@ -57,18 +55,11 @@ class WalletPaymentPage extends GetView<WalletPaymentController> {
 
   _buildPhone() {
     return TextField(
-      keyboardType: TextInputType.phone,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(
-          ToolsRegex.regExpNumber,
-        ),
-        LengthLimitingTextInputFormatter(11),
-      ],
       controller: controller.phoneController,
       decoration: const InputDecoration(
-        hintText: '请输入手机号码',
         prefixIcon: Icon(Icons.phone_iphone),
       ),
+      readOnly: true,
     );
   }
 
@@ -96,8 +87,6 @@ class WalletPaymentPage extends GetView<WalletPaymentController> {
             right: 10,
             child: GestureDetector(
               onTap: () {
-                // 校验
-                _checkPhone();
                 // 提交
                 controller.sendCode();
               },
@@ -151,14 +140,6 @@ class WalletPaymentPage extends GetView<WalletPaymentController> {
         },
       ),
     );
-  }
-
-  // 校验
-  _checkPhone() {
-    var phone = controller.phoneController.text.trim();
-    if (!ToolsRegex.isPhone(phone)) {
-      throw Exception('请输入正确的手机号码');
-    }
   }
 
   // 校验

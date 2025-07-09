@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_pickers/pickers.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 
@@ -20,6 +21,7 @@ class _WidgetInformState extends State<WidgetInform> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
           "举报类型：",

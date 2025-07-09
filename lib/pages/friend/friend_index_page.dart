@@ -30,7 +30,6 @@ class FriendIndexPage extends GetView<FriendIndexController> {
           ],
         ),
         body: WidgetContact(
-          search: false,
           header: _buildHeader(),
           dataList: builder.dataList,
           onTap: (ContactModel value) {

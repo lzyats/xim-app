@@ -164,22 +164,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                 },
                 divider: false,
               ),
-              //WidgetCommon.border(),
-              /* WidgetLineRow(
-                "退出登录",
-                leading: Icon(
-                  AppFonts.e64d,
-                  color: Colors.red,
-                  size: _iconSize,
-                ),
-                onTap: () {
-                  Get.toNamed(
-                    CommonAboutPage.routeName,
-                  );
-                },
-                divider: false,
-              ), */
-              //WidgetCommon.border(),
+              WidgetCommon.border(),
             ],
           ),
         ),

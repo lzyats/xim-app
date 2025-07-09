@@ -31,7 +31,7 @@ class EventMessage {
       StreamController.broadcast();
 
   // 处理接收到的消息
-  Future<void> handle(Map<String, dynamic> pushData) async {
+  Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
     // 历史消息
     ChatHis? chatHis = _initChatHis(pushData);
     if (chatHis == null) {
@@ -46,11 +46,14 @@ class EventMessage {
       // 语音/视频
       case MsgType.call:
         // 通话中
-        if (AppConfig.callKit) {
-          RequestMessage.callKit(
-            chatHis.msgId,
-            CallStatus.reject,
-          );
+        if (AppConfig.callKit.isNotEmpty) {
+          // 挂断
+          if (chatHis.chatId != AppConfig.callKit) {
+            RequestMessage.callKit(
+              chatHis.msgId,
+              CallStatus.reject,
+            );
+          }
         }
         // 拉起
         else if (!chatHis.self) {
@@ -88,7 +91,7 @@ class EventMessage {
       // 准备工作
       LocalUser localUser = ToolsStorage().local();
       // 提醒
-      _tips(chatMsg, localUser.userId);
+      _tips(pushAudio, chatMsg, localUser.userId);
       // 计数器
       ToolsBadger().increment(chatHis.chatId);
       // 消息
@@ -101,7 +104,7 @@ class EventMessage {
   }
 
   // 提醒
-  void _tips(ChatMsg chatMsg, String userId) async {
+  void _tips(bool pushAudio, ChatMsg chatMsg, String userId) async {
     // 语音
     if (MsgType.call == chatMsg.msgType) {
       return;
@@ -119,7 +122,7 @@ class EventMessage {
       return;
     }
     // 开启响铃
-    if ('Y' == ToolsStorage().setting().audio) {
+    if (pushAudio && 'Y' == ToolsStorage().setting().audio) {
       FlutterRingtonePlayer().play(
         android: AndroidSounds.notification, //android系统声音
         ios: IosSounds.glass, //ios系统声音

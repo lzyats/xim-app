@@ -1,6 +1,6 @@
-// 复选框
 import 'package:flutter/material.dart';
 
+// 复选框
 class WidgetCheckbox extends StatefulWidget {
   final bool value;
   final ValueChanged<bool> onChanged;

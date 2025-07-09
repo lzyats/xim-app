@@ -58,11 +58,7 @@ class LoginForgotPage extends GetView<LoginForgotController> {
               const SizedBox(
                 height: 20,
               ),
-              _buildPass1(),
-              const SizedBox(
-                height: 20,
-              ),
-              _buildPass2(),
+              _buildPass(),
             ],
           ),
         ),
@@ -135,25 +131,14 @@ class LoginForgotPage extends GetView<LoginForgotController> {
     );
   }
 
-  _buildPass1() {
+  _buildPass() {
     return TextField(
       obscureText: true,
-      controller: controller.passController1,
+      controller: controller.passController,
       decoration: const InputDecoration(
         hintText: '请输入密码',
         prefixIcon: Icon(Icons.lock),
         counterText: AppConfig.passText,
-      ),
-    );
-  }
-
-  _buildPass2() {
-    return TextField(
-      obscureText: true,
-      controller: controller.passController2,
-      decoration: const InputDecoration(
-        hintText: '请输入确认密码',
-        prefixIcon: Icon(Icons.lock),
       ),
     );
   }
@@ -168,16 +153,9 @@ class LoginForgotPage extends GetView<LoginForgotController> {
 
   // 校验
   _checkPass() {
-    var pass1 = controller.passController1.text.trim();
-    var pass2 = controller.passController2.text.trim();
-    if (pass1.isEmpty) {
+    var pass = controller.passController.text.trim();
+    if (pass.isEmpty) {
       throw Exception('请输入密码');
-    }
-    if (pass2.isEmpty) {
-      throw Exception('请输入确认密码');
-    }
-    if (pass1 != pass2) {
-      throw Exception('两次密码不一致');
     }
   }
 

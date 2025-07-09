@@ -7,8 +7,7 @@ import 'package:alpaca/pages/_demo/demo_briday.dart';
 import 'package:alpaca/pages/_demo/demo_huadong.dart';
 import 'package:alpaca/pages/_demo/demo_bank.dart';
 import 'package:alpaca/pages/_demo/demo_launcher.dart';
-// 添加朋友圈
-import 'package:alpaca/pages/moment/moment_index_page.dart';
+
 import 'package:alpaca/pages/_demo/demo_pyq.dart';
 import 'package:alpaca/pages/_demo/demo_sqflite.dart';
 import 'package:alpaca/widgets/widget_common.dart';
@@ -27,11 +26,6 @@ class _DemoDemoState extends State<DemoTest> {
     TestDemo(
       "小程序",
       Demo01.routeName,
-    ),
-    //添加朋友圈
-    TestDemo(
-      "小程序",
-      MomentIndexPage.routeName,
     ),
     TestDemo(
       "开发2",

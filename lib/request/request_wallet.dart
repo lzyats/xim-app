@@ -19,7 +19,6 @@ class RequestWallet {
 
   // 设置密码
   static Future<void> setPass(
-    String phone,
     String code,
     String password,
   ) async {
@@ -27,7 +26,6 @@ class RequestWallet {
     await ToolsRequest().post(
       '$_prefix/setPass',
       data: {
-        'phone': phone,
         'code': code,
         'password': password,
       },
@@ -37,13 +35,13 @@ class RequestWallet {
   }
 
   // 获取充值配置
-  static Future<int> getRechargeConfig() async {
+  static Future<WalletModel08> getRechargeConfig() async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().get(
       '$_prefix/recharge/getConfig',
     );
     // 转行
-    return ajaxData.getData((data) => data['count']);
+    return ajaxData.getData((data) => WalletModel08.fromJson(data));
   }
 
   // 获取充值金额
@@ -513,6 +511,30 @@ class WalletModel07 {
       TradeType.init(data?['tradeType']),
       data?['tradeAmount'] ?? '',
       data?['createTime'] ?? '',
+    );
+  }
+}
+
+class WalletModel08 {
+  int count;
+  String remark;
+
+  WalletModel08(
+    this.count,
+    this.remark,
+  );
+
+  factory WalletModel08.fromJson(Map<String, dynamic>? data) {
+    return WalletModel08(
+      data?['count'] ?? 0,
+      data?['remark'] ?? '',
+    );
+  }
+
+  factory WalletModel08.init() {
+    return WalletModel08(
+      0,
+      '',
     );
   }
 }

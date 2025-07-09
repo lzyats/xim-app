@@ -148,7 +148,7 @@ class MsgChatPage extends GetView<MsgChatController> {
         backgroundColor: AppTheme.color,
         textStyle: const TextStyle(
           color: Colors.white,
-          fontSize: 14,
+          fontSize: 15,
         ),
         leftIconColor: Colors.white,
       ),

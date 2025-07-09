@@ -25,7 +25,6 @@ class RobotIndexPage extends GetView<RobotIndexController> {
           return WidgetCommon.none();
         }
         return WidgetContact(
-          search: false,
           dataList: controller.dataList,
           onTap: (ContactModel value) {
             ToolsRoute().chatPage(

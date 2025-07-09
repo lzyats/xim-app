@@ -71,7 +71,7 @@ class WidgetLineRow extends StatelessWidget {
   final double hight;
   final Icon? leading;
   final bool badger;
-  final String? value;
+  final String value;
   final Widget? widget;
   final bool arrow;
   final GestureTapCallback? onTap;
@@ -86,7 +86,7 @@ class WidgetLineRow extends StatelessWidget {
     this.hight = 0.0,
     this.leading,
     this.badger = false,
-    this.value,
+    this.value = '',
     this.widget,
     this.arrow = true,
     this.onTap,
@@ -128,24 +128,30 @@ class WidgetLineRow extends StatelessWidget {
                       ),
                     )
                   : null,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  value != null
-                      ? Padding(
-                          padding: EdgeInsets.only(right: arrow ? 0 : 10),
-                          child: Text(
-                            value!,
-                            maxLines: 8,
-                            style: const TextStyle(
-                              fontSize: 14,
-                            ),
+              trailing: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 150,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: arrow ? 0 : 10),
+                        child: Text(
+                          value,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 14,
                           ),
-                        )
-                      : Container(),
-                  widget ?? Container(),
-                  arrow ? WidgetCommon.arrow() : Container(),
-                ],
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ),
+                    widget ?? Container(),
+                    arrow ? WidgetCommon.arrow() : Container(),
+                  ],
+                ),
               ),
               onTap: onTap,
               onLongPress: onLongPress,
@@ -253,7 +259,7 @@ class WidgetLineContent extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  width: 10,
+                  width: 25,
                 ),
                 Expanded(
                   child: Text(

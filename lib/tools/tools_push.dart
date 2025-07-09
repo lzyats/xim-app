@@ -5,7 +5,7 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:getuiflut/getuiflut.dart';
 
-// push
+// push个推
 class ToolsPush {
   ToolsPush._();
   static ToolsPush? _singleton;
@@ -22,7 +22,7 @@ class ToolsPush {
       // ios接收消息
       onReceivePayload: (Map<String, dynamic> message) async {
         if (MiddleStatus.normal == ToolsStorage().status()) {
-          EventSocket().event.add(message['payloadMsg']);
+          EventSocket().event.add(SocketMessage(false, message['payloadMsg']));
         }
       },
       onReceiveNotificationResponse: (Map<String, dynamic> message) async {},
@@ -38,7 +38,7 @@ class ToolsPush {
       // android接收消息
       onReceiveMessageData: (Map<String, dynamic> event) async {
         if (MiddleStatus.normal == ToolsStorage().status()) {
-          EventSocket().event.add(event['payload']);
+          EventSocket().event.add(SocketMessage(false, event['payload']));
         }
       },
       onNotificationMessageArrived: (Map<String, dynamic> event) async {},

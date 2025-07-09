@@ -44,6 +44,7 @@ class WidgetContact extends StatefulWidget {
 class _WidgetContactState extends State<WidgetContact> {
   List<ContactModel> displayList = [];
   List<String> selectList = [];
+  bool showHeader = true;
   @override
   void initState() {
     super.initState();
@@ -77,13 +78,19 @@ class _WidgetContactState extends State<WidgetContact> {
     }
     return TDSearchBar(
       placeHolder: '请输内容',
-      onTextChanged: (value) {
+      onTextChanged: (values) {
         setState(() {
+          // 显示头部
+          showHeader = values.isEmpty;
+          // 过滤数据
           displayList = widget.dataList.where((data) {
             if (data.select) {
               return true;
             }
-            return data.nickname.toLowerCase().contains(value.toLowerCase());
+            String nickname = data.nickname.toLowerCase();
+            String extend = data.extend.toLowerCase();
+            String value = values.toLowerCase();
+            return nickname.contains(value) || extend.contains(value);
           }).toList();
         });
       },
@@ -92,6 +99,9 @@ class _WidgetContactState extends State<WidgetContact> {
 
   _header({bool show = true}) {
     if (widget.header == null) {
+      return Container();
+    }
+    if (widget.search && !showHeader) {
       return Container();
     }
     if (show) {

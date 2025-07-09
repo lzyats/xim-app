@@ -41,7 +41,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
           WidgetCommon.buildAction(),
         ],
       ),
-      drawer: const UniIndexPage(),
+      drawer: AppConfig.mini ? const UniIndexPage() : null,
       body: Column(
         children: [
           Obx(
@@ -75,7 +75,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
         backgroundColor: AppTheme.color,
         textStyle: const TextStyle(
           color: Colors.white,
-          fontSize: 14,
+          fontSize: 15,
         ),
         leftIconColor: Colors.white,
       ),
@@ -253,7 +253,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                WidgetCommon.time(
+                WidgetCommon.timeFormat(
                   chatMsg.createTime,
                   chatMsg.msgId.isNotEmpty,
                 ),

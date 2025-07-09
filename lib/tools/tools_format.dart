@@ -1,7 +1,7 @@
 import 'package:timeago/timeago.dart';
 
 /// Chinese-China messages
-class ToolsTime implements LookupMessages {
+class ToolsFormat implements LookupMessages {
   @override
   String prefixAgo() => '';
   @override

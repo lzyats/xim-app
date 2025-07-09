@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:amap_map_fluttify/amap_map_fluttify.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -317,6 +318,9 @@ class _ShowImageState extends State<ChatMessageImageShow> {
                 }
                 return PhotoViewGalleryPageOptions(
                   imageProvider: provider,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(AppImage.error);
+                  },
                 );
               },
               scrollPhysics: const BouncingScrollPhysics(),

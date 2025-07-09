@@ -1,7 +1,6 @@
 import 'package:alpaca/pages/login/login_register_page.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/login/login_banned_page.dart';
-import 'package:alpaca/pages/login/login_pass_page.dart';
 import 'package:alpaca/pages/login/login_scan_page.dart';
 import 'package:alpaca/routers/router_base.dart';
 import 'package:alpaca/pages/login/login_forgot_page.dart';
@@ -25,12 +24,6 @@ List<GetPage> getLoginPages = [
   getPage(
     name: LoginRegisterPage.routeName,
     page: () => const LoginRegisterPage(),
-    middle: false,
-  ),
-  // 强制密码
-  getPage(
-    name: LoginPassPage.routeName,
-    page: () => const LoginPassPage(),
     middle: false,
   ),
   // 禁用页面

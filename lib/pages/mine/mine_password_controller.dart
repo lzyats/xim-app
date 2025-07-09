@@ -8,13 +8,12 @@ import 'package:alpaca/tools/tools_submit.dart';
 
 class MinePasswordController extends BaseController {
   TextEditingController oldPassController = TextEditingController();
-  TextEditingController newPwd1Controller = TextEditingController();
-  TextEditingController newPwd2Controller = TextEditingController();
+  TextEditingController newPwdController = TextEditingController();
 
   // 提交
   Future<void> submit() async {
     var oldPwd = oldPassController.text.trim();
-    var newPwd = newPwd1Controller.text.trim();
+    var newPwd = newPwdController.text.trim();
     // 执行
     await RequestMine.editPass(oldPwd, newPwd);
     // 取消
@@ -26,8 +25,7 @@ class MinePasswordController extends BaseController {
   @override
   void onClose() {
     oldPassController.dispose();
-    newPwd1Controller.dispose();
-    newPwd2Controller.dispose();
+    newPwdController.dispose();
     super.onClose();
   }
 }

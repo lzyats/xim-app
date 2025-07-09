@@ -60,9 +60,9 @@ android {
     signingConfigs {
         release {
             storeFile file('app.jks')
-            storePassword 'lijiangkkk'
+            storePassword 'qwertyui'
             keyAlias 'app'
-            keyPassword 'lijiangkkk'
+            keyPassword 'qwertyui'
         }
     }
 

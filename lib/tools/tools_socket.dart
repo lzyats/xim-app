@@ -54,7 +54,7 @@ class ToolsSocket {
           }
           // 写入消息
           else if (MiddleStatus.normal == ToolsStorage().status()) {
-            EventSocket().event.add(message);
+            EventSocket().event.add(SocketMessage(true, message));
           }
         },
         // 异常

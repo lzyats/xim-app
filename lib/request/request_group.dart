@@ -152,12 +152,11 @@ class RequestGroup {
   }
 
   // 创建群聊
-  static Future<void> create(String groupName, List<String> friendList) async {
+  static Future<void> create(List<String> friendList) async {
     // 执行
     await ToolsRequest().post(
       '$_prefix/create',
       data: {
-        'groupName': groupName,
         'friendList': friendList,
       },
     );

@@ -1,4 +1,3 @@
-// 权限工具
 import 'dart:io';
 
 import 'package:amap_map_fluttify/amap_map_fluttify.dart';
@@ -9,6 +8,7 @@ import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+// 权限工具
 class ToolsPerms {
   // 定位权限
   static Future<bool> location() async {

@@ -1,26 +1,27 @@
-import 'package:alpaca/pages/login/login_register_controller.dart';
+import 'package:alpaca/pages/mine/mine_forgot_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/widgets/widget_action.dart';
 
-// 注册账号
-class LoginRegisterPage extends GetView<LoginRegisterController> {
+// 忘记密码
+class MineForgotPage extends GetView<MineForgotController> {
   // 路由地址
-  static const String routeName = '/login_register';
-  const LoginRegisterPage({super.key});
+  static const String routeName = '/mine_forgot';
+  const MineForgotPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.lazyPut(() => LoginRegisterController());
+    Get.lazyPut(() => MineForgotController());
     return KeyboardDismissOnTap(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('注册账号'),
+          title: const Text('找回密码'),
           actions: [
             WidgetAction(
               onTap: () {
@@ -28,9 +29,7 @@ class LoginRegisterPage extends GetView<LoginRegisterController> {
                   return;
                 }
                 // 校验
-                _checkPhone();
-                // 校验
-                _checkEmail();
+                _checkPass();
                 // 校验
                 _checkCode();
                 if (ToolsSubmit.call()) {
@@ -52,11 +51,11 @@ class LoginRegisterPage extends GetView<LoginRegisterController> {
               const SizedBox(
                 height: 20,
               ),
-              _buildEmail(),
+              _buildCode(),
               const SizedBox(
                 height: 20,
               ),
-              _buildCode(),
+              _buildPass(),
             ],
           ),
         ),
@@ -66,32 +65,11 @@ class LoginRegisterPage extends GetView<LoginRegisterController> {
 
   _buildPhone() {
     return TextField(
-      keyboardType: TextInputType.phone,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(
-          ToolsRegex.regExpNumber,
-        ),
-        LengthLimitingTextInputFormatter(11),
-      ],
       controller: controller.phoneController,
       decoration: const InputDecoration(
-        hintText: '请输入手机号码',
         prefixIcon: Icon(Icons.phone_iphone),
       ),
-    );
-  }
-
-  _buildEmail() {
-    return TextField(
-      keyboardType: TextInputType.emailAddress,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(200),
-      ],
-      controller: controller.emailController,
-      decoration: const InputDecoration(
-        hintText: '请输入邮箱地址',
-        prefixIcon: Icon(Icons.email),
-      ),
+      readOnly: true,
     );
   }
 
@@ -117,9 +95,6 @@ class LoginRegisterPage extends GetView<LoginRegisterController> {
           right: 10,
           child: GestureDetector(
             onTap: () {
-              // 校验
-              _checkPhone();
-              _checkEmail();
               // 提交
               controller.sendCode();
             },
@@ -144,19 +119,23 @@ class LoginRegisterPage extends GetView<LoginRegisterController> {
     );
   }
 
-  // 校验
-  _checkPhone() {
-    var phone = controller.phoneController.text.trim();
-    if (!ToolsRegex.isPhone(phone)) {
-      throw Exception('请输入正确的手机号码');
-    }
+  _buildPass() {
+    return TextField(
+      obscureText: true,
+      controller: controller.passController,
+      decoration: const InputDecoration(
+        hintText: '请输入密码',
+        prefixIcon: Icon(Icons.lock),
+        counterText: AppConfig.passText,
+      ),
+    );
   }
 
   // 校验
-  _checkEmail() {
-    var email = controller.emailController.text.trim();
-    if (!ToolsRegex.isEmail(email)) {
-      throw Exception('请输入正确的邮箱地址');
+  _checkPass() {
+    var pass = controller.passController.text.trim();
+    if (pass.isEmpty) {
+      throw Exception('请输入密码');
     }
   }
 

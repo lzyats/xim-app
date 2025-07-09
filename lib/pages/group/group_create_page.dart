@@ -53,7 +53,8 @@ class GroupCreatePage extends GetView<GroupCreateController> {
       context: context,
       builder: (builder) {
         return CupertinoAlertDialog(
-          content: _buildGroupName(),
+          title: const Text('提示'),
+          content: const Text('确认创建新的群聊吗？'),
           actions: [
             CupertinoDialogAction(
               child: const Text('取消'),
@@ -64,33 +65,17 @@ class GroupCreatePage extends GetView<GroupCreateController> {
             CupertinoDialogAction(
               child: const Text('确认'),
               onPressed: () {
-                // 检验
-                String groupName = controller.groupNameController.text.trim();
-                if (groupName.isEmpty) {
-                  throw Exception('群聊名称不能为空');
-                }
                 // 返回
                 Get.back();
                 if (ToolsSubmit.call()) {
                   // 提交
-                  controller.create(groupName);
+                  controller.create();
                 }
               },
             ),
           ],
         );
       },
-    );
-  }
-
-  _buildGroupName() {
-    return TextField(
-      maxLength: 15,
-      maxLines: 2,
-      controller: controller.groupNameController,
-      decoration: const InputDecoration(
-        hintText: '请输入群聊名称',
-      ),
     );
   }
 }

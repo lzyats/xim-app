@@ -20,7 +20,7 @@ class GroupPacketWhiteController extends BaseController {
     // 查询成员
     List<GroupModel02> memberList = await RequestGroup.getMemberList(groupId);
     // 查询白名单
-    selectList = await RequestGroup.queryPacketWhite(groupId);
+    selectList.addAll(await RequestGroup.queryPacketWhite(groupId));
     for (var member in memberList) {
       if (MemberType.normal != member.memberType) {
         continue;

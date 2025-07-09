@@ -36,7 +36,9 @@ class WidgetAction extends StatelessWidget {
               width: 50,
               child: Text(
                 label,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
       ),

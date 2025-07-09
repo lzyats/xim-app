@@ -39,8 +39,7 @@ class MinePasswordPage extends GetView<MinePasswordController> {
         child: Column(
           children: [
             _buildOldPass(),
-            _buildNewPass1(),
-            _buildNewPass2(),
+            _buildNewPass(),
           ],
         ),
       ),
@@ -49,7 +48,7 @@ class MinePasswordPage extends GetView<MinePasswordController> {
 
   _buildOldPass() {
     return Container(
-      padding: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.only(top: 8),
       child: TextField(
         obscureText: true,
         controller: controller.oldPassController,
@@ -61,12 +60,12 @@ class MinePasswordPage extends GetView<MinePasswordController> {
     );
   }
 
-  _buildNewPass1() {
+  _buildNewPass() {
     return Container(
       padding: const EdgeInsets.only(top: 16),
       child: TextField(
         obscureText: true,
-        controller: controller.newPwd1Controller,
+        controller: controller.newPwdController,
         decoration: const InputDecoration(
           hintText: '请输入新密码',
           counterText: AppConfig.passText,
@@ -76,36 +75,15 @@ class MinePasswordPage extends GetView<MinePasswordController> {
     );
   }
 
-  _buildNewPass2() {
-    return Container(
-      padding: const EdgeInsets.only(top: 16),
-      child: TextField(
-        obscureText: true,
-        controller: controller.newPwd2Controller,
-        decoration: const InputDecoration(
-          hintText: '请输入确认密码',
-          prefixIcon: Icon(Icons.lock),
-        ),
-      ),
-    );
-  }
-
   // 校验
   _checkPass() {
     var oldPass = controller.oldPassController.text.trim();
-    var newPwd1 = controller.newPwd1Controller.text.trim();
-    var newPwd2 = controller.newPwd2Controller.text.trim();
+    var newPwd = controller.newPwdController.text.trim();
     if (oldPass.isEmpty) {
       throw Exception('请输入旧密码');
     }
-    if (newPwd1.isEmpty) {
+    if (newPwd.isEmpty) {
       throw Exception('请输入新密码');
-    }
-    if (newPwd2.isEmpty) {
-      throw Exception('请输入确认密码');
-    }
-    if (newPwd1 != newPwd2) {
-      throw Exception('两次密码不一致');
     }
   }
 }

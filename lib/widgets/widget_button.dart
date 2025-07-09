@@ -64,7 +64,13 @@ class _WidgetButtonState extends State<WidgetButton> {
         onPressed: widget.onTap,
         color: widget.color ?? AppTheme.color,
         textColor: Colors.white,
-        child: Text(label),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

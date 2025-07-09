@@ -27,7 +27,6 @@ class GroupIndexPage extends GetView<GroupIndexController> {
           return WidgetCommon.none();
         }
         return WidgetContact(
-          search: false,
           dataList: controller.dataList,
           onTap: (ContactModel value) {
             ToolsRoute().chatPage(

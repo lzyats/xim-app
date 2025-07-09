@@ -1,7 +1,7 @@
-// 类型
 import 'package:flutter/material.dart';
 import 'package:alpaca/config/app_fonts.dart';
 
+// 类型
 enum SettingType {
   // 关闭
   close('close'),
@@ -25,8 +25,6 @@ enum SettingType {
   clear('clear'),
   // 计数器
   badger('badger'),
-  // 添加 moment 常量
-  moment('moment'),
   ;
 
   const SettingType(this.value);

@@ -30,8 +30,6 @@ class RequestMine {
 
   // 设置密码
   static Future<void> setPass(
-    String portrait,
-    String nickname,
     String pass,
   ) async {
     // 密码加密
@@ -40,8 +38,6 @@ class RequestMine {
     await ToolsRequest().post(
       '$_prefix/setPass',
       data: {
-        'portrait': portrait,
-        'nickname': nickname,
         'password': password,
       },
     );
@@ -258,7 +254,6 @@ class RequestMine {
 
   // 设置邮箱
   static Future<void> setEmail(
-    String phone,
     String code,
     String email,
   ) async {
@@ -266,7 +261,6 @@ class RequestMine {
     await ToolsRequest().post(
       '$_prefix/editEmail',
       data: {
-        'phone': phone,
         'code': code,
         'email': email,
       },
@@ -278,22 +272,36 @@ class RequestMine {
   // 发送验证码
   // 3=钱包
   // 4=邮箱
-  // 5=绑定
+  // 5=找回
+  // 9=绑定
   static Future<String> sendCode(
-    String phone,
     String type,
   ) async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/sendCode',
       data: {
-        'phone': phone,
         'type': type,
       },
     );
     EasyLoading.showToast(ajaxData.getData((data) => data['msg']));
     // 转换
     return ajaxData.getData((data) => MineModel02.fromJson(data).code);
+  }
+
+  // 忘记密码
+  static Future<void> forgot(String code, String pass) async {
+    // 密码加密
+    String password = ToolsEncrypt.md5(pass);
+    // 执行
+    await ToolsRequest().post(
+      '$_prefix/forget',
+      data: {
+        'password': password,
+        'code': code,
+      },
+    );
+    EasyLoading.showToast('密码重置成功');
   }
 }
 

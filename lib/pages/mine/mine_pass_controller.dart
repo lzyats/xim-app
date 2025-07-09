@@ -3,39 +3,29 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
-import 'package:alpaca/pages/main/main_page.dart';
 import 'package:alpaca/request/request_mine.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 
-class LoginPassController extends BaseController {
-  RxString portrait = ToolsStorage().local().portrait.obs;
-  TextEditingController nicknameController = TextEditingController();
+class MinePassController extends BaseController {
+  // 密码
   TextEditingController passController = TextEditingController();
 
   // 提交
   Future<void> submit() async {
-    String nickname = nicknameController.text.trim();
+    // 密码
     String password = passController.text.trim();
     // 执行
-    await RequestMine.setPass(portrait.value, nickname, password);
+    await RequestMine.setPass(password);
     // 取消
     ToolsSubmit.cancel();
     // 跳转
-    Get.offAllNamed(MainPage.routeName);
-  }
-
-  // 提交
-  void editPortrait(String avatar) {
-    portrait.value = avatar;
-    // 取消
-    ToolsSubmit.cancel();
+    Get.back();
   }
 
   @override
   void onClose() {
-    nicknameController.dispose();
     passController.dispose();
     super.onClose();
   }

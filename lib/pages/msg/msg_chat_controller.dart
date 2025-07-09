@@ -198,6 +198,18 @@ class MsgChatController extends BaseController {
           chatHis.createTime = createTime;
           _timeMap.remove(chatHis.requestId);
         }
+        // 查询
+        chatHis0 = _dataMap[chatHis.msgId];
+        if (chatHis0 != null) {
+          // 获取索引
+          index = dataList.indexOf(chatHis0);
+        }
+        // 查询
+        createTime = _timeMap[chatHis.msgId];
+        if (createTime != null) {
+          chatHis.createTime = createTime;
+          _timeMap.remove(chatHis.msgId);
+        }
       }
       // 处理
       else {

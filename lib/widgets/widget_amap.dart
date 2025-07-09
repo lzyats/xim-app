@@ -9,6 +9,7 @@ import 'package:alpaca/config/app_fonts.dart';
 import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/widgets/widget_action.dart';
 
+// 地图组件
 class WidgetAmap extends StatefulWidget {
   final Function(Poi? pois, Uint8List? value) onTap;
   const WidgetAmap({super.key, required this.onTap});

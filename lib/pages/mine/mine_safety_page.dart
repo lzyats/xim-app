@@ -1,3 +1,6 @@
+import 'package:alpaca/pages/mine/mine_forgot_page.dart';
+import 'package:alpaca/pages/mine/mine_pass_page.dart';
+import 'package:alpaca/tools/tools_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -26,66 +29,99 @@ class MineSafetyPage extends GetView<MineSafetyController> {
       appBar: AppBar(
         title: const Text('账号安全'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Column(
-          children: [
-            WidgetLineRow(
-              '手机号码',
-              value: controller.localUser.phone,
-              arrow: false,
-            ),
-            WidgetLineRow(
-              "修改密码",
-              enable: AppConfig.loginPwd,
-              onTap: () {
-                Get.toNamed(
-                  MinePasswordPage.routeName,
-                );
-              },
-            ),
-            WidgetLineRow(
-              "注销账号",
-              color: Colors.red,
-              divider: false,
-              onTap: () {
-                Get.toNamed(
-                  MineDeletedPage.routeName,
-                );
-              },
-            ),
-            WidgetCommon.border(),
-            WidgetLineCenter(
-              "清空聊天",
-              color: Colors.red,
-              onTap: () {
-                _clear(context);
-              },
-              divider: false,
-            ),
-            WidgetCommon.border(),
-            WidgetLineCenter(
-              '退出登录',
-              divider: false,
-              color: Colors.red,
-              onTap: () {
-                _logout(context);
-              },
-            ),
-            WidgetCommon.border(),
-          ],
+      body: GetBuilder<MineSafetyController>(builder: (context) {
+        LocalUser localUser = controller.localUser;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            children: [
+              WidgetLineRow(
+                '手机号码',
+                value: localUser.phone,
+                arrow: false,
+              ),
+              _buildPass(localUser),
+              WidgetLineRow(
+                "注销账号",
+                color: Colors.red,
+                divider: false,
+                onTap: () {
+                  Get.toNamed(
+                    MineDeletedPage.routeName,
+                  );
+                },
+              ),
+              WidgetCommon.border(),
+              WidgetLineCenter(
+                "清空聊天",
+                color: Colors.red,
+                onTap: () {
+                  _clear();
+                },
+                divider: false,
+              ),
+              WidgetCommon.border(),
+              WidgetLineCenter(
+                '退出登录',
+                divider: false,
+                color: Colors.red,
+                onTap: () {
+                  _logout();
+                },
+              ),
+              WidgetCommon.border(),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  // 构建密码
+  _buildPass(LocalUser localUser) {
+    if (!AppConfig.loginPwd) {
+      return Container();
+    }
+    return Column(
+      children: [
+        WidgetLineRow(
+          "设置密码",
+          enable: 'N' == localUser.pass,
+          onTap: () {
+            Get.toNamed(
+              MinePassPage.routeName,
+            );
+          },
         ),
-      ),
+        WidgetLineRow(
+          "修改密码",
+          enable: 'Y' == localUser.pass,
+          onTap: () {
+            Get.toNamed(
+              MinePasswordPage.routeName,
+            );
+          },
+        ),
+        WidgetLineRow(
+          "找回密码",
+          enable: 'Y' == localUser.pass,
+          onTap: () {
+            Get.toNamed(
+              MineForgotPage.routeName,
+            );
+          },
+        ),
+      ],
     );
   }
 
   // 清空聊天
-  _clear(BuildContext context) {
+  _clear() {
     if (ToolsSubmit.progress()) {
       return;
     }
     showCupertinoDialog(
-      context: context,
+      context: AppConfig.navigatorKey.currentContext!,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
           title: const Text(
@@ -123,12 +159,12 @@ class MineSafetyPage extends GetView<MineSafetyController> {
   }
 
   // 用户退出
-  _logout(BuildContext context) {
+  _logout() {
     if (ToolsSubmit.progress()) {
       return;
     }
     showCupertinoDialog(
-      context: context,
+      context: AppConfig.navigatorKey.currentContext!,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
           content: const Text(

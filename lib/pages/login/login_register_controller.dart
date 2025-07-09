@@ -43,6 +43,8 @@ class LoginRegisterController extends BaseController {
     AuthModel02 model = await RequestAuth.register(phone, email, code);
     // 取消
     ToolsSubmit.cancel();
+    // 取消
+    toolsTimer.cancel();
     // 登录成功
     await _success(model);
   }

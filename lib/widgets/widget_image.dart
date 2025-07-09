@@ -145,6 +145,9 @@ class ShowImage extends StatelessWidget {
           builder: (context, index) {
             return PhotoViewGalleryPageOptions(
               imageProvider: _provider(),
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(AppImage.error);
+              },
             );
           },
           scrollPhysics: const BouncingScrollPhysics(),

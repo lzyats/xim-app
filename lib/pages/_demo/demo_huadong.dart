@@ -799,6 +799,8 @@ class _VideoPlayerFullPageState extends State<VideoPlayerFullPage> {
                   image: DecorationImage(
                     image: WidgetImage.provider(videoData.userAvatarUrl),
                     fit: BoxFit.cover,
+                    onError: (exception, stackTrace) =>
+                        Image.asset(AppImage.error),
                   )),
             ),
             Positioned(
@@ -1131,6 +1133,8 @@ class _CommentsBottomSheetState extends State<CommentBottomSheet> {
                     image: DecorationImage(
                       image: WidgetImage.provider(commentData.userAvatarUrl),
                       fit: BoxFit.cover,
+                      onError: (exception, stackTrace) =>
+                          Image.asset(AppImage.error),
                     )),
               ),
               const SizedBox(width: 10),

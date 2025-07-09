@@ -314,11 +314,15 @@ class _PacketDetailsState extends State<_PacketDetails> {
             onTap: () {
               Get.off(ChatMessageTrade(tradeId));
             },
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: _color,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              color: Colors.black.withOpacity(0),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _color,
+                ),
               ),
             ),
           ),

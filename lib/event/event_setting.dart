@@ -106,6 +106,9 @@ class EventSetting {
         case 'payment':
           localUser.payment = value;
           break;
+        case 'pass':
+          localUser.pass = value;
+          break;
         case 'email':
           localUser.email = value;
           break;

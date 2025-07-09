@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
 import 'package:alpaca/request/request_group.dart';
@@ -8,7 +7,6 @@ import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/widgets/widget_contact.dart';
 
 class GroupCreateController extends BaseController {
-  TextEditingController groupNameController = TextEditingController();
   String userId = ToolsStorage().local().userId;
   // 联系人列表
   List<ContactModel> dataList = [];
@@ -37,9 +35,9 @@ class GroupCreateController extends BaseController {
   }
 
   // 创建群聊
-  Future<void> create(String groupName) async {
+  Future<void> create() async {
     // 提交
-    await RequestGroup.create(groupName, selectList);
+    await RequestGroup.create(selectList);
     // 取消
     ToolsSubmit.cancel();
     // 返回
@@ -50,11 +48,5 @@ class GroupCreateController extends BaseController {
   void onInit() {
     super.onInit();
     _friendList();
-  }
-
-  @override
-  void onClose() {
-    groupNameController.dispose();
-    super.onClose();
   }
 }

@@ -52,4 +52,17 @@ class MineSafetyController extends BaseController {
     // 返回
     Get.back();
   }
+
+  @override
+  void onInit() {
+    super.onInit();
+    // 监听
+    subscription1 = EventSetting().event.stream.listen((model) {
+      if (SettingType.mine != model.setting) {
+        return;
+      }
+      localUser = ToolsStorage().local();
+      update();
+    });
+  }
 }

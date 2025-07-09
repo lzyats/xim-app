@@ -38,7 +38,10 @@ class WidgetBottom {
                 title: Text(
                   model.label,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.color),
+                  style: TextStyle(
+                    color: AppTheme.color,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onTap: model.onTap,
               );

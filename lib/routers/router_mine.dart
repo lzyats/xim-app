@@ -1,4 +1,6 @@
 import 'package:alpaca/pages/mine/mine_email_page.dart';
+import 'package:alpaca/pages/mine/mine_forgot_page.dart';
+import 'package:alpaca/pages/mine/mine_pass_page.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/mine/mine_birthday_page.dart';
 import 'package:alpaca/pages/mine/mine_city_page.dart';
@@ -29,8 +31,18 @@ List<GetPage> getMinePages = [
   ),
   // 设置密码
   getPage(
+    name: MinePassPage.routeName,
+    page: () => const MinePassPage(),
+  ),
+  // 修改密码
+  getPage(
     name: MinePasswordPage.routeName,
     page: () => const MinePasswordPage(),
+  ),
+  // 找回密码
+  getPage(
+    name: MineForgotPage.routeName,
+    page: () => const MineForgotPage(),
   ),
   // 设置性别
   getPage(
