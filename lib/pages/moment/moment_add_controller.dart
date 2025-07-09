@@ -4,6 +4,9 @@ import 'package:alpaca/tools/tools_storage.dart';
 // 导入 material.dart 库
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:alpaca/widgets/widget_upload.dart';
+import 'package:alpaca/tools/tools_submit.dart';
+import 'dart:math';
 
 class MomentAddController extends GetxController {
   // 文本输入控制器
@@ -20,10 +23,13 @@ class MomentAddController extends GetxController {
   List<XFile> get selectedImages => _selectedImages.value; // 返回 XFile 列表
 
   // 定位选择控制器
-  // MomentAddController.dart
-  final Rx<String> _currentLocation = ''.obs;
+  final Rx<String> _currentLocation = ''.obs; // 位置信息
+  final Rx<String> _currentLocationla = ''.obs; // 坐标
   String get currentLocation => _currentLocation.value;
   void updateLocation(String location) => _currentLocation.value = location;
+  String get currentLocationla => _currentLocationla.value;
+  void updateLocationla(String locationla) =>
+      _currentLocationla.value = locationla;
 
   // 权限选择控制器
   // 关键：使用 Rx<String> 并通过 .obs 初始化
@@ -67,22 +73,31 @@ class MomentAddController extends GetxController {
       GetSnackBar(
         title: '发表中',
         message: '正在发布你的朋友圈...',
-        duration: Duration(seconds: 5),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
       ),
     );
 
+    LocalUser localUser = ToolsStorage().local();
+
     try {
       LocalUser localUser = ToolsStorage().local();
+      String momId = generate20DigitRandomNumber();
       // 创建朋友圈模型
       final moment = FriendMomentModel(
-        content: text,
-        userId: int.parse(localUser.userId),
-        //images: selectedImages,
-        location: currentLocation,
-        visibility: int.parse(currentPermission),
-        createTime: DateTime.now(),
-      );
-
+          momId: int.parse(momId),
+          content: text,
+          userId: int.parse(localUser.userId),
+          //images: selectedImages,
+          location: currentLocation + '|' + currentLocationla,
+          visibility: getPermissionValue(currentPermission),
+          createTime: DateTime.now(),
+          updateTime: DateTime.now(),
+          isDeleted: 0);
+      print('发布到这里了');
+      // 构建附件库模型
+      //final media = FriendMediaResourceModel(url: selectedImages);
+      return;
       // 调用发表服务
       //await MomentService.publishMoment(moment);
 
@@ -107,6 +122,38 @@ class MomentAddController extends GetxController {
         ),
       );
       print('发表失败: $e');
+    }
+  }
+
+  // 生成20位随机数，且首位不为0
+  String generate20DigitRandomNumber() {
+    Random random = Random();
+    // 生成首位，范围是 1 到 9
+    int firstDigit = random.nextInt(9) + 1;
+
+    // 生成剩余的 19 位数字
+    String remainingDigits = '';
+    for (int i = 0; i < 19; i++) {
+      // 生成 0 到 9 的随机数字
+      int digit = random.nextInt(10);
+      remainingDigits += digit.toString();
+    }
+
+    // 拼接首位和剩余的 19 位数字
+    return firstDigit.toString() + remainingDigits;
+  }
+
+  // 新增的判断方法
+  int getPermissionValue(String permission) {
+    switch (permission) {
+      case '完全公开':
+        return 0;
+      case '好友可见':
+        return 1;
+      case '仅自己可见':
+        return 2;
+      default:
+        return 3; // 隐私及保留
     }
   }
 

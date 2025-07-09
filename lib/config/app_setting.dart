@@ -24,7 +24,7 @@ class AppSetting {
     AppConfig.serviceHost = 'https://baidu.com/service.html';
     // 高德地图
     AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
-    AppConfig.amapIos = '79cdb4bfa052409bdfd386dd252b4ec6';
+    AppConfig.amapIos = '1d3634f089bad2aa2ace7176d29c6878';
     // 个推推送
     AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';
     AppConfig.pushKey = 'gkVGWe6U3e4Eals5VCSDc3';
@@ -59,7 +59,7 @@ class AppSetting {
     AppConfig.serviceHost = 'https://baidu.com/service.html';
     // 高德地图
     AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
-    AppConfig.amapIos = '79cdb4bfa052409bdfd386dd252b4ec6';
+    AppConfig.amapIos = '1d3634f089bad2aa2ace7176d29c6878';
     // 个推推送
     AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';
     AppConfig.pushKey = 'gkVGWe6U3e4Eals5VCSDc3';

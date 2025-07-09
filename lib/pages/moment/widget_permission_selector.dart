@@ -54,7 +54,7 @@ class _PermissionSelectionPageState extends State<PermissionSelectionPage> {
         color: Colors.white,
         child: ListView(
           children: [
-            _buildPermissionItem('公开', Icons.public),
+            _buildPermissionItem('完全公开', Icons.public),
             _buildPermissionItem('好友可见', Icons.group),
             _buildPermissionItem('仅自己可见', Icons.lock),
           ],

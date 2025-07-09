@@ -112,7 +112,11 @@ class MomentAddPage extends GetView<MomentAddController> {
             if (pois != null) {
               // 使用空安全操作符确保title不为空
               String location = pois.title ?? '未知位置';
+              double latitudes = pois.latLng?.latitude ?? 0;
+              double longitudes = pois.latLng?.longitude ?? 0;
               controller.updateLocation(location);
+              controller.updateLocationla(
+                  latitudes.toString() + '|' + longitudes.toString());
             }
             Get.back();
           },

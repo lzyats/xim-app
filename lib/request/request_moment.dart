@@ -2,6 +2,7 @@ import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_comment.dart'; // 假设数据模型文件路径
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/config/app_config.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // 朋友圈接口
 class RequestMoment {
@@ -87,6 +88,6 @@ class RequestMoment {
       },
     );
     // 可以添加提示信息
-    // EasyLoading.showToast('评论发布成功');
+    EasyLoading.showToast('评论发布成功');
   }
 }

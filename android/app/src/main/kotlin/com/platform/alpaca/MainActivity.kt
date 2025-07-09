@@ -1,4 +1,4 @@
-package com.platform.alpaca
+package seim.im
 
 import androidx.annotation.NonNull
 import com.alibaba.fastjson.JSONObject

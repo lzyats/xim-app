@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:alpaca/tools/tools_perms.dart';
 
 class ImagePickerController extends GetxController {
   // 用于存储已选择的图片
@@ -27,6 +28,11 @@ class ImagePickerWidget extends StatelessWidget {
   // 选择多张图片的方法
   // 选择多张图片的方法
   Future<void> _pickImages() async {
+    // 权限
+    bool result = await ToolsPerms.photos();
+    if (!result) {
+      return;
+    }
     try {
       // 调用 ImagePicker 的 pickMultiImage 方法选择多张图片
       final List<XFile> pickedImages = await _picker.pickMultiImage();
@@ -70,8 +76,8 @@ class ImagePickerWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Image.file(
             File(image.path),
-            width: 80,
-            height: 80,
+            width: 120,
+            height: 120,
             fit: BoxFit.cover,
           ),
         ),
@@ -100,8 +106,8 @@ class ImagePickerWidget extends StatelessWidget {
     return GestureDetector(
       onTap: _pickImages,
       child: Container(
-        width: 80,
-        height: 80,
+        width: 120,
+        height: 120,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey[300]!),
           borderRadius: BorderRadius.circular(8),
@@ -110,7 +116,7 @@ class ImagePickerWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.add, color: Colors.grey[500]),
-            Text('选择图片', style: TextStyle(color: Colors.grey[500])),
+            Text('选择文件', style: TextStyle(color: Colors.grey[500])),
           ],
         ),
       ),

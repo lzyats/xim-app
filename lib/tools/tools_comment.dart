@@ -9,6 +9,8 @@ class FriendMomentModel {
   final DateTime createTime; // 创建时间
   final DateTime? updateTime; // 更新时间
   final int? isDeleted; // 逻辑删除标记
+  // 新增字段：非必需的momId
+  final int? momId; // 动态额外ID（非必需）
 
   FriendMomentModel({
     this.momentId,
@@ -19,6 +21,8 @@ class FriendMomentModel {
     required this.createTime,
     this.updateTime,
     this.isDeleted,
+    // 新增momId参数，默认值为null
+    this.momId,
   });
 
   // 从JSON创建实例
@@ -32,6 +36,8 @@ class FriendMomentModel {
       createTime: DateTime.parse(json['create_time']),
       updateTime: DateTime.parse(json['update_time']),
       isDeleted: json['is_deleted'],
+      // 解析mom_id字段（JSON中为下划线命名）
+      momId: json['mom_id'],
     );
   }
 
@@ -46,6 +52,8 @@ class FriendMomentModel {
       'create_time': createTime.toIso8601String(),
       'update_time': updateTime ?? DateTime.now().toIso8601String(),
       'is_deleted': isDeleted,
+      // 转换momId为mom_id
+      if (momId != null) 'mom_id': momId,
     };
   }
 
@@ -59,6 +67,7 @@ class FriendMomentModel {
     DateTime? createTime,
     DateTime? updateTime,
     int? isDeleted,
+    int? momId,
   }) {
     return FriendMomentModel(
       momentId: momentId ?? this.momentId,
@@ -69,6 +78,7 @@ class FriendMomentModel {
       createTime: createTime ?? this.createTime,
       updateTime: updateTime ?? this.updateTime,
       isDeleted: isDeleted ?? this.isDeleted,
+      momId: momId ?? this.momId,
     );
   }
 }
@@ -158,26 +168,26 @@ class FriendCommentModel {
 
 /// 朋友圈媒体资源模型
 class FriendMediaResourceModel {
-  final int mediaId; // 媒体资源ID
-  final int momentId; // 关联动态ID
+  final int? mediaId; // 媒体资源ID
+  final int? momentId; // 关联动态ID
   final String url; // 资源URL
-  final int type; // 类型：0-图片，1-视频，2-音频
-  final int sortOrder; // 排序顺序
-  final int width; // 宽度（图片/视频）
-  final int height; // 高度（图片/视频）
-  final int duration; // 时长（视频/音频，单位：秒）
-  final DateTime createTime; // 创建时间
+  final int? type; // 类型：0-图片，1-视频，2-音频
+  final int? sortOrder; // 排序顺序
+  final int? width; // 宽度（图片/视频）
+  final int? height; // 高度（图片/视频）
+  final int? duration; // 时长（视频/音频，单位：秒）
+  final DateTime? createTime; // 创建时间
 
   FriendMediaResourceModel({
-    required this.mediaId,
-    required this.momentId,
+    this.mediaId,
+    this.momentId,
     required this.url,
-    required this.type,
-    required this.sortOrder,
-    required this.width,
-    required this.height,
-    required this.duration,
-    required this.createTime,
+    this.type,
+    this.sortOrder,
+    this.width,
+    this.height,
+    this.duration,
+    this.createTime,
   });
 
   // 从JSON创建实例
@@ -206,7 +216,7 @@ class FriendMediaResourceModel {
       'width': width,
       'height': height,
       'duration': duration,
-      'create_time': createTime.toIso8601String(),
+      if (createTime != null) 'create_time': createTime?.toIso8601String(),
     };
   }
 
