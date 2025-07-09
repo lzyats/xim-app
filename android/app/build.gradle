@@ -52,7 +52,7 @@ android {
         versionName flutterVersionName
         // 个推配置 abcdefg
         manifestPlaceholders = [
-            GETUI_APPID:"PAwNNOUaZ21EYtiLkBr8EA"
+            GETUI_APPID:"0RbcZP7qpW85LeTKqhtDw1"
         ]
         multiDexEnabled true
     }
@@ -60,9 +60,9 @@ android {
     signingConfigs {
         release {
             storeFile file('app.jks')
-            storePassword 'qwertyui'
+            storePassword 'lijiangkkk'
             keyAlias 'app'
-            keyPassword 'qwertyui'
+            keyPassword 'lijiangkkk'
         }
     }
 

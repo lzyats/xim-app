@@ -163,3 +163,6 @@ flutter:
     - family: iconfont
       fonts:
         - asset: assets/fonts/iconfont.ttf
+    - family: iconfonta
+      fonts:
+        - asset: assets/fonts/iconfonta.ttf

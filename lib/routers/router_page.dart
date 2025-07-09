@@ -9,6 +9,7 @@ import 'package:alpaca/routers/router_mine.dart';
 import 'package:alpaca/routers/router_msg.dart';
 import 'package:alpaca/routers/router_robot.dart';
 import 'package:alpaca/routers/router_wallet.dart';
+import 'package:alpaca/routers/router_moment.dart';
 
 List<GetPage> getRouterPage = getMainPages +
     getDemoPages +
@@ -19,4 +20,5 @@ List<GetPage> getRouterPage = getMainPages +
     getMsgPages +
     getFriendPages +
     getGroupPages +
-    getRobotPages;
+    getRobotPages +
+    getMomentPages; // 

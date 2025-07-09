@@ -13,15 +13,17 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://192.168.124.18:8080';
+    AppConfig.requestHost = 'http://110.42.56.25:8080';
     // socket地址
-    AppConfig.requestSocket = 'ws://192.168.124.18:8888';
+    AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
+    // 添加朋友圈API请求地址
+    AppConfig.commentHost = 'http://110.42.56.25:8088';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://baidu.com/privacy.html';
     // 请求服务协议
     AppConfig.serviceHost = 'https://baidu.com/service.html';
     // 高德地图
-    AppConfig.amapAndroid = 'ee2e45bee9d61b3a73e3b5696efa374c';
+    AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
     AppConfig.amapIos = '79cdb4bfa052409bdfd386dd252b4ec6';
     // 个推推送
     AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';
@@ -48,7 +50,7 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://192.168.124.18:8080';
+    AppConfig.requestHost = 'http://110.42.56.25:8080';
     // socket地址
     AppConfig.requestSocket = 'ws://192.168.124.18:8888';
     // 请求隐私协议
@@ -56,7 +58,7 @@ class AppSetting {
     // 请求服务协议
     AppConfig.serviceHost = 'https://baidu.com/service.html';
     // 高德地图
-    AppConfig.amapAndroid = 'ee2e45bee9d61b3a73e3b5696efa374c';
+    AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
     AppConfig.amapIos = '79cdb4bfa052409bdfd386dd252b4ec6';
     // 个推推送
     AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';

@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 // 字体库库
 class AppFonts {
   static const String _fontFamily = 'iconfont';
+  static const String _fontFamilya = 'iconfonta';
   static const bool _matchText = true;
 
   // 首页-好友
   static const IconData e689 =
-      IconData(59017, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(58890, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 首页-我的
   static const IconData e70f =
       IconData(59151, fontFamily: _fontFamily, matchTextDirection: _matchText);
   // 首页-聊天
   static const IconData e67e =
-      IconData(59006, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(58896, fontFamily: _fontFamilya, matchTextDirection: _matchText);
+  // 首页-圈子
+  static const IconData qz01 =
+      IconData(58926, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 电脑
   static const IconData e605 =
       IconData(58885, fontFamily: _fontFamily, matchTextDirection: _matchText);
@@ -46,7 +50,7 @@ class AppFonts {
       IconData(58988, fontFamily: _fontFamily, matchTextDirection: _matchText);
   // 群聊通知
   static const IconData e629 =
-      IconData(58921, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(59272, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 好友通知
   static const IconData e6f6 =
       IconData(59126, fontFamily: _fontFamily, matchTextDirection: _matchText);
@@ -55,7 +59,7 @@ class AppFonts {
       IconData(58907, fontFamily: _fontFamily, matchTextDirection: _matchText);
   // 官方服务
   static const IconData e62f =
-      IconData(58927, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(58911, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 帮助中心
   static const IconData e603 =
       IconData(58883, fontFamily: _fontFamily, matchTextDirection: _matchText);
@@ -124,7 +128,7 @@ class AppFonts {
       IconData(58932, fontFamily: _fontFamily, matchTextDirection: _matchText);
   // 客服
   static const IconData e681 =
-      IconData(59009, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(58888, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 选中
   static const IconData e60e =
       IconData(58894, fontFamily: _fontFamily, matchTextDirection: _matchText);
@@ -173,4 +177,15 @@ class AppFonts {
   // 键盘切换
   static const IconData e618 =
       IconData(58904, fontFamily: _fontFamily, matchTextDirection: _matchText);
+
+  // USDT
+  static const IconData e7f8 =
+      IconData(59384, fontFamily: _fontFamilya, matchTextDirection: _matchText);
+  // USDT1
+  static const IconData e886 =
+      IconData(59526, fontFamily: _fontFamilya, matchTextDirection: _matchText);
+  // 字体图标常量
+  static const IconData like = IconData(0xe601, fontFamily: 'AppIcon');
+  static const IconData likeFill = IconData(0xe602, fontFamily: 'AppIcon');
+  static const IconData comment = IconData(0xe603, fontFamily: 'AppIcon');
 }

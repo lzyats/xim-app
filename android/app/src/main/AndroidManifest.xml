@@ -68,11 +68,11 @@
         <!-- 个推配置 abcdefg -->
         <meta-data
             android:name="GETUI_APPID"
-            android:value="PAwNNOUaZ21EYtiLkBr8EA" />
+            android:value="0RbcZP7qpW85LeTKqhtDw1" />
         <!-- 高德配置 abcdefg -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="ee2e45bee9d61b3a73e3b5696efa374c"/>
+            android:value="b88f06525690d65c776f102243bde5e4"/>
     </application>
     <queries>
         <intent>

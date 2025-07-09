@@ -42,6 +42,8 @@ class AppConfig {
   static late String appSecret;
   // secret
   static late String secret;
+  // 朋友圈接口请求地址
+  static late String commentHost;
   // 接口请求地址
   static late String requestHost;
   // socket地址
