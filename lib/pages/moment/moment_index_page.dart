@@ -1,12 +1,19 @@
+import 'package:alpaca/config/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:alpaca/pages/moment/moment_index_controller.dart';
 import 'package:alpaca/pages/moment/momnet_add_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:flutter_swiper_null_safety_flutter3/flutter_swiper_null_safety_flutter3.dart';
+
+import 'package:alpaca/tools/tools_perms.dart';
+import 'package:alpaca/config/app_config.dart';
+import 'package:amap_map_fluttify/amap_map_fluttify.dart';
+
+import 'dart:io';
+//导入地图
 
 class MomentIndexPage extends StatefulWidget {
   static const routeName = "/moment_index";
@@ -97,10 +104,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     Get.to(() => const MomentAddPage())?.then((_) {
       _onRefresh();
     });
-
-    // 方式2：先注册控制器再跳转（适用于复杂场景）
-    // Get.lazyPut(() => MomentAddController());
-    // Get.toNamed(MomentAddPage.routeName)?.then((_) => _onRefresh());
   }
 
   Widget _buildMomentItem(MomentModel moment) {
@@ -122,7 +125,8 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                   child: _buildMomentContent(moment),
                 ),
                 const SizedBox(height: 10),
-                _buildImageList(moment.images ?? []),
+                // 关键修改：传入媒体资源列表
+                _buildImageList(moment.images ?? const []),
                 _buildMomentFooter(moment),
                 if (moment.comments != null)
                   _renderComments(moment.comments ?? []),
@@ -137,10 +141,20 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   Widget _buildAvatar(String url) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
-      child: _buildImageWithStatusCodeCheck(
-        url: url,
+      child: CachedNetworkImage(
+        imageUrl: url,
         width: 40,
         height: 40,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        errorWidget: (context, url, error) => Image.asset(
+          'assets/image/error.png',
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
@@ -169,34 +183,184 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
-  Widget _buildImageList(List<String> picList) {
+  // 关键修改：参数类型改为List<FriendMediaResourceModel>
+  // 关键修改：参数类型改为List<FriendMediaResourceModel>
+  Widget _buildImageList(List<Media> picList) {
+    // 先检查列表是否为null
     if (picList.isEmpty) return const SizedBox.shrink();
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      crossAxisSpacing: 8.0,
-      mainAxisSpacing: 8.0,
-      children: picList.asMap().entries.map((entry) {
-        int index = entry.key;
-        String picUrl = entry.value;
-        return GestureDetector(
-          onTap: () {
-            _showImageViewer(picList, index);
-          },
-          child: _buildImageWithStatusCodeCheck(
-            url: picUrl,
-            width: double.infinity,
-            height: double.infinity,
+    final List<Widget> mediaWidgets = [];
+
+    if (picList.length == 2) {
+      final rowWidgets = <Widget>[];
+      for (int j = 0; j < 2; j++) {
+        final media = picList[j];
+        // 检查media对象是否为null
+        if (media == null) {
+          rowWidgets.add(const SizedBox.shrink());
+          continue;
+        }
+        // 检查media的type属性是否为null
+        if (media.type == null) {
+          print("警告：媒体资源type为null，跳过处理");
+          rowWidgets.add(const SizedBox.shrink());
+          continue;
+        }
+        if (media.type == 0) {
+          // 固定高度和宽度
+          const double width = 150;
+          const double height = 150;
+          // 优化：根据媒体资源宽高计算适配比例
+          BoxFit fit;
+          if (media.width != null && media.height != null) {
+            final ratio = media.width! / media.height!;
+            fit = ratio > 1 ? BoxFit.cover : BoxFit.contain;
+          } else {
+            fit = BoxFit.cover;
+          }
+          rowWidgets.add(
+            GestureDetector(
+              onTap: () {
+                _showImageViewer(picList, j);
+              },
+              child: CachedNetworkImage(
+                imageUrl: media.url,
+                width: width,
+                height: height,
+                fit: fit,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Image.asset(
+                  'assets/image/error.png',
+                  width: width,
+                  height: height,
+                  fit: fit,
+                ),
+              ),
+            ),
+          );
+        } else if (media.type == 1) {
+          const double width = 150;
+          const double height = 150;
+          rowWidgets.add(
+            GestureDetector(
+              onTap: () {
+                _playVideo(media.url);
+              },
+              child: _buildVideoPlayerPlaceholder(media.url, width, height),
+            ),
+          );
+        }
+      }
+      mediaWidgets.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: rowWidgets,
+        ),
+      );
+    } else {
+      for (int i = 0; i < picList.length; i += 3) {
+        // 如果不是第一行，添加一个高度为10的SizedBox
+        if (i != 0) {
+          mediaWidgets.add(const SizedBox(height: 10));
+        }
+        final rowWidgets = <Widget>[];
+        for (int j = 0; j < 3 && i + j < picList.length; j++) {
+          final media = picList[i + j];
+          // 检查media对象是否为null
+          if (media == null) {
+            rowWidgets.add(const SizedBox.shrink());
+            continue;
+          }
+          // 检查media的type属性是否为null
+          if (media.type == null) {
+            print("警告：媒体资源type为null，跳过处理");
+            rowWidgets.add(const SizedBox.shrink());
+            continue;
+          }
+          if (media.type == 0) {
+            // 固定高度和宽度
+            const double width = 150;
+            const double height = 150;
+            // 优化：根据媒体资源宽高计算适配比例
+            BoxFit fit;
+            if (media.width != null && media.height != null) {
+              final ratio = media.width! / media.height!;
+              fit = ratio > 1 ? BoxFit.cover : BoxFit.contain;
+            } else {
+              fit = BoxFit.cover;
+            }
+            rowWidgets.add(
+              GestureDetector(
+                onTap: () {
+                  _showImageViewer(picList, i + j);
+                },
+                child: CachedNetworkImage(
+                  imageUrl: media.url,
+                  width: width,
+                  height: height,
+                  fit: fit,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/image/error.png',
+                    width: width,
+                    height: height,
+                    fit: fit,
+                  ),
+                ),
+              ),
+            );
+          } else if (media.type == 1) {
+            const double width = 150;
+            const double height = 150;
+            rowWidgets.add(
+              GestureDetector(
+                onTap: () {
+                  _playVideo(media.url);
+                },
+                child: _buildVideoPlayerPlaceholder(media.url, width, height),
+              ),
+            );
+          }
+        }
+        mediaWidgets.add(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: rowWidgets,
           ),
         );
-      }).toList(),
+      }
+    }
+
+    return Column(
+      children: mediaWidgets,
     );
   }
 
-  // 图片浏览及缩放
-  void _showImageViewer(List<String> picList, int initialIndex) {
+// 视频播放器占位符，可根据需求自定义样式
+  Widget _buildVideoPlayerPlaceholder(
+      String videoUrl, double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      color: Colors.grey,
+      child: Center(
+        child: Icon(Icons.play_circle_outline, color: Colors.white, size: 50),
+      ),
+    );
+  }
+
+  // 播放视频的方法，这里只是简单示例，需要根据实际情况实现
+  void _playVideo(String videoUrl) {
+    // 这里可以使用 video_player 等库来实现视频播放
+    print('Playing video: $videoUrl');
+  }
+
+  // 图片浏览及缩放（优化：支持媒体资源元数据）
+  void _showImageViewer(List<Media> picList, int initialIndex) {
     final RxInt currentIndex = initialIndex.obs;
 
     showDialog(
@@ -365,7 +529,9 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
-  void _openGaodeMap(double? longitude, double? latitude, String locationName) {
+// 打开地图显示位置
+  void _openGaodeMap(
+      double? longitude, double? latitude, String locationName) async {
     if (longitude == null || latitude == null) {
       Get.snackbar(
         '位置导航',
@@ -374,8 +540,26 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
       );
       return;
     }
+    //修改后的打开地图
+    // 权限
+    bool result = await ToolsPerms.location();
+    if (!result) {
+      return;
+    }
+    //拼接content信息
+    Map<String, dynamic> content = {
+      'title': locationName,
+      'address': locationName,
+      'longitude': longitude,
+      'latitude': latitude
+    };
+    //Map<String, dynamic> reply = jsonDecode(content['content']);
 
-    final url =
+    // 使用 ?.then 进行空安全调用
+    await Get.toNamed('/momnet_location', arguments: content)?.then((_) {
+      _onRefresh();
+    });
+    /* final url =
         'amapuri://route/plan/?dlat=$latitude&dlon=$longitude&dname=$locationName&dev=0&t=0';
 
     launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
@@ -386,7 +570,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
         duration: const Duration(seconds: 2),
       );
       print('地图跳转失败: $e');
-    });
+    }); */
   }
 
   Widget _buildMenuItem(String text, IconData icon, VoidCallback onTap) {
@@ -409,28 +593,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
-  Widget _buildImageWithStatusCodeCheck({
-    required String url,
-    required double width,
-    required double height,
-  }) {
-    return CachedNetworkImage(
-      imageUrl: url,
-      width: width,
-      height: height,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      errorWidget: (context, url, error) => Image.asset(
-        'assets/image/error.png',
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-
   Widget _renderComments(List<FriendCommentModel> comments) {
     return Container(
       margin: const EdgeInsets.only(top: 2, bottom: 20),
@@ -441,7 +603,10 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
         children: comments.map((comment) {
           return Text.rich(
             TextSpan(
-              style: const TextStyle(fontSize: 14, color: Color(0xFF333333)),
+              style: const TextStyle(
+                fontSize: 15,
+                color: Color(0xFF333333),
+              ),
               children: [
                 TextSpan(
                   text: comment.fromUser,
@@ -453,16 +618,18 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                 TextSpan(text: '：${comment.content}'),
               ]..insertAll(
                   1,
-                  [
-                    const TextSpan(text: ' 回复1 '),
-                    TextSpan(
-                      text: comment.toUser,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF636F80),
-                      ),
-                    ),
-                  ],
+                  comment.source ?? true
+                      ? [const TextSpan()]
+                      : [
+                          const TextSpan(text: ' 回复 '),
+                          TextSpan(
+                            text: comment.toUser,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF636F80),
+                            ),
+                          ),
+                        ],
                 ),
             ),
           );
@@ -502,7 +669,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
 }
 
 class PhotoViewContainer extends StatelessWidget {
-  final List<String> picList;
+  final List<Media> picList;
   final int initialIndex;
   final RxInt currentIndex;
 
@@ -519,30 +686,153 @@ class PhotoViewContainer extends StatelessWidget {
       child: Swiper(
         itemCount: picList.length,
         index: initialIndex,
-        loop: false,
-        viewportFraction: 1.0,
         onIndexChanged: (index) {
           currentIndex.value = index;
         },
         itemBuilder: (context, index) {
-          String picUrl = picList[index];
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            alignment: Alignment.center,
-            child: PhotoView(
-              imageProvider: CachedNetworkImageProvider(picUrl),
-              backgroundDecoration: const BoxDecoration(color: Colors.black),
-              initialScale: PhotoViewComputedScale.contained,
-              minScale: PhotoViewComputedScale.contained * 0.5,
-              maxScale: PhotoViewComputedScale.contained * 3.0,
-              tightMode: true,
-              enableRotation: false,
-              basePosition: Alignment.center,
-            ),
+          final media = picList[index];
+          return PhotoView(
+            imageProvider: CachedNetworkImageProvider(media.url),
+            minScale: PhotoViewComputedScale.contained * 0.8,
+            maxScale: PhotoViewComputedScale.covered * 2,
           );
         },
       ),
     );
+  }
+}
+
+class ChatMessageLocationItem extends StatefulWidget {
+  const ChatMessageLocationItem({super.key});
+
+  @override
+  createState() => _ChatMessageLocationItemState();
+}
+
+class _ChatMessageLocationItemState extends State<ChatMessageLocationItem> {
+  // 控制器
+  late AmapController _controller;
+  List<MarkerOption>? _markers;
+
+  Map<String, dynamic> content = Get.arguments;
+  bool _isAmapLocationInitialized = false; // 添加标志位
+  bool _isReceiverRegistered = false; // 新增标志位
+
+  @override
+  void initState() {
+    super.initState();
+    initdt();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (_isAmapLocationInitialized) {
+      // 检查是否已经初始化
+      try {
+        if (_isReceiverRegistered) {
+          // 检查接收器是否已注册
+          AmapLocation.instance.dispose();
+        }
+      } catch (e) {
+        print('Error disposing AmapLocation: $e');
+      }
+    }
+    _controller.dispose();
+  }
+
+  initdt() async {
+    await AmapLocation.instance.updatePrivacyShow(true);
+    await AmapLocation.instance.updatePrivacyAgree(true);
+    if (Platform.isIOS) {
+      await AmapLocation.instance.init(iosKey: AppConfig.amapIos);
+      await AmapCore.init(AppConfig.amapIos);
+    }
+    _isAmapLocationInitialized = true; // 初始化完成后设置标志位
+    _isReceiverRegistered = true; // 设置接收器已注册标志位
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String title = content['title'];
+    String address = content['address'];
+    double latitude = double.parse(content['latitude'].toString());
+    double longitude = double.parse(content['longitude'].toString());
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text('位置'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                AmapView(
+                  showZoomControl: false,
+                  markers: _markers,
+                  zoomLevel: 17,
+                  onMapCreated: (controller) async {
+                    _controller = controller;
+                    _onMapMoveEnd(LatLng(latitude, longitude));
+                  },
+                ),
+                Positioned(
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    foregroundColor: AppTheme.color,
+                    mini: true,
+                    onPressed: () {
+                      _onTapMove();
+                    },
+                    child: const Icon(Icons.gps_fixed),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 100,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: ListTile(
+                    title: Text(title),
+                    subtitle: Text(address),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  //移动搜索周边，并在地图中心打点
+  _onMapMoveEnd(LatLng move) {
+    _controller.setCameraPosition(
+      coordinate: move,
+      zoom: 17,
+    );
+    MarkerOption markerOption = MarkerOption(coordinate: move);
+    _controller.clear();
+    _controller.addMarker(markerOption);
+    setState(() {});
+  }
+
+  // 地图初始化，移动定位地点
+  _onTapMove({LatLng? latLng}) async {
+    if (latLng == null) {
+      await _controller.showMyLocation(
+        MyLocationOption(
+          myLocationType: MyLocationType.Locate,
+        ),
+      );
+    }
   }
 }

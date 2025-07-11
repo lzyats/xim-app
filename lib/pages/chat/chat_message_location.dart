@@ -1,8 +1,9 @@
 import 'dart:io';
 
+import 'package:alpaca/config/app_config.dart';
 import 'package:amap_map_fluttify/amap_map_fluttify.dart';
 import 'package:flutter/material.dart';
-import 'package:alpaca/config/app_config.dart';
+
 import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_perms.dart';
 

@@ -90,7 +90,7 @@ class MomentAddPage extends GetView<MomentAddController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          '图片(最多9张)',
+          '图片或视频(最多9张)',
           style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8.0),

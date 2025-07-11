@@ -84,6 +84,7 @@ class FriendMomentModel {
 }
 
 /// 朋友圈评论模型
+/// 朋友圈评论模型
 class FriendCommentModel {
   final int? commentId; // 评论ID（改为可选）
   final int? momentId; // 关联动态ID（改为可选）
@@ -95,6 +96,7 @@ class FriendCommentModel {
 
   final String? fromUser; // 评论者
   final String? toUser; // 被评论者（可为空）
+  final bool? source; // 新增字段：是否为发起人，bool类型，非必填
 
   FriendCommentModel({
     this.commentId, // 改为可选
@@ -106,6 +108,7 @@ class FriendCommentModel {
     this.isDeleted = 0, // 设置默认值
     this.fromUser,
     this.toUser,
+    this.source, // 新增source参数，默认值为null
   });
 
   // 从JSON创建实例
@@ -122,6 +125,7 @@ class FriendCommentModel {
       isDeleted: json['is_deleted'] ?? 0, // 设置默认值
       fromUser: json['from_user'],
       toUser: json['to_user'],
+      source: json['source'], // 解析source字段，JSON中为同名
     );
   }
 
@@ -137,6 +141,7 @@ class FriendCommentModel {
       'is_deleted': isDeleted,
       'from_user': fromUser,
       'to_user': toUser,
+      if (source != null) 'source': source, // 仅当非null时包含
     };
   }
 
@@ -151,6 +156,7 @@ class FriendCommentModel {
     int? isDeleted,
     String? fromUser,
     String? toUser,
+    bool? source, // 新增source参数支持更新
   }) {
     return FriendCommentModel(
       commentId: commentId ?? this.commentId,
@@ -162,10 +168,12 @@ class FriendCommentModel {
       isDeleted: isDeleted ?? this.isDeleted,
       fromUser: fromUser ?? this.fromUser,
       toUser: toUser ?? this.toUser,
+      source: source ?? this.source, // 默认值使用原实例值
     );
   }
 }
 
+/// 朋友圈媒体资源模型
 /// 朋友圈媒体资源模型
 class FriendMediaResourceModel {
   final int? mediaId; // 媒体资源ID
@@ -177,6 +185,7 @@ class FriendMediaResourceModel {
   final int? height; // 高度（图片/视频）
   final int? duration; // 时长（视频/音频，单位：秒）
   final DateTime? createTime; // 创建时间
+  final String? thumbnail; // 新增：缩略图URL，非必需字符串参数
 
   FriendMediaResourceModel({
     this.mediaId,
@@ -188,6 +197,7 @@ class FriendMediaResourceModel {
     this.height,
     this.duration,
     this.createTime,
+    this.thumbnail, // 新增参数，默认null
   });
 
   // 从JSON创建实例
@@ -201,7 +211,10 @@ class FriendMediaResourceModel {
       width: json['width'],
       height: json['height'],
       duration: json['duration'],
-      createTime: DateTime.parse(json['create_time']),
+      createTime: json['create_time'] != null
+          ? DateTime.parse(json['create_time'])
+          : null,
+      thumbnail: _parseString(json['thumbnail']), // 解析thumbnail字段
     );
   }
 
@@ -217,6 +230,7 @@ class FriendMediaResourceModel {
       'height': height,
       'duration': duration,
       if (createTime != null) 'create_time': createTime?.toIso8601String(),
+      if (thumbnail != null) 'thumbnail': thumbnail,
     };
   }
 
@@ -231,6 +245,7 @@ class FriendMediaResourceModel {
     int? height,
     int? duration,
     DateTime? createTime,
+    String? thumbnail, // 支持更新thumbnail
   }) {
     return FriendMediaResourceModel(
       mediaId: mediaId ?? this.mediaId,
@@ -242,7 +257,14 @@ class FriendMediaResourceModel {
       height: height ?? this.height,
       duration: duration ?? this.duration,
       createTime: createTime ?? this.createTime,
+      thumbnail: thumbnail ?? this.thumbnail, // 默认使用原实例值
     );
+  }
+
+  // 辅助方法：解析String类型，处理null值
+  static String? _parseString(dynamic value) {
+    if (value == null) return null;
+    return value.toString().trim().isNotEmpty ? value.toString() : null;
   }
 }
 
@@ -302,6 +324,85 @@ class FriendLikeModel {
   }
 }
 
+/// 媒体资源简化模型
+/// 仅包含类型和URL字段
+/// 媒体资源简化模型
+/// 仅包含类型、URL、宽高字段
+class Media {
+  final int? type; // 媒体类型：0-图片，1-视频，2-音频
+  final String url; // 媒体资源URL
+  final int? width; // 媒体宽度（可选）
+  final int? height; // 媒体高度（可选）
+
+  /// 构造函数
+  /// - type: 可选的媒体类型，默认null
+  /// - url: 必需的资源URL
+  /// - width: 可选的宽度，默认null
+  /// - height: 可选的高度，默认null
+  Media({
+    this.type,
+    required this.url,
+    this.width,
+    this.height,
+  });
+
+  /// 从JSON创建实例
+  factory Media.fromJson(Map<String, dynamic> json) {
+    return Media(
+      type: json['type'],
+      url: json['url'] ?? '',
+      width: json['width'],
+      height: json['height'],
+    );
+  }
+
+  /// 转换为JSON格式
+  Map<String, dynamic> toJson() {
+    return {
+      if (type != null) 'type': type,
+      'url': url,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+    };
+  }
+
+  /// 复制实例（支持字段更新）
+  Media copyWith({
+    int? type,
+    String? url,
+    int? width,
+    int? height,
+  }) {
+    return Media(
+      type: type ?? this.type,
+      url: url ?? this.url,
+      width: width ?? this.width,
+      height: height ?? this.height,
+    );
+  }
+
+  /// 重写toString方法用于调试
+  @override
+  String toString() {
+    return 'Media(type: $type, url: $url, width: $width, height: $height)';
+  }
+
+  /// 重写hashCode用于对象比较
+  @override
+  int get hashCode => Object.hash(type, url, width, height);
+
+  /// 重写equals方法用于对象相等性判断
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Media &&
+        other.type == type &&
+        other.url == url &&
+        other.width == width &&
+        other.height == height;
+  }
+}
+
 /// 新添加的 Moment 类模型
 /// 朋友圈动态模型，支持空值判断和可选字段
 class MomentModel {
@@ -312,7 +413,7 @@ class MomentModel {
   final String? content; // 动态正文，改为可选类型
   final String? location; // 新增：位置信息，字符类型，可为空
   final String? createTime; // 发布时间，改为可选类型
-  final List<String>? images; // 图片列表，改为可选类型
+  final List<Media>? images; // 图片列表，改为可选类型
   final List<FriendCommentModel>? comments; // 评论内容，改为可选类型
   final List<String>? likes; // 点赞列表，改为可选类型
 
@@ -325,7 +426,8 @@ class MomentModel {
     this.content = '',
     this.createTime,
     this.location, // 新增字段在构造函数中声明
-    List<String>? images,
+    // 关键修改：从字符串列表改为媒体资源对象列表
+    List<Media>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
   })  : images = images ?? const [], // 列表类型设置默认空列表
@@ -342,7 +444,7 @@ class MomentModel {
       content: _parseString(json['content']),
       createTime: _parseString(json['createTime']),
       location: _parseString(json['location']), // 新增字段的JSON解析
-      images: _parseStringList(json['images']),
+      images: _parseMediaResourceList(json['images']),
       comments: _parseCommentList(json['comments']),
       likes: _parseStringList(json['likes']),
     );
@@ -362,7 +464,9 @@ class MomentModel {
       if (createTime != null) 'createTime': createTime,
       if (location != null && location != '')
         'location': location, // 新增字段的JSON输出
-      if (localImages != null && localImages.isNotEmpty) 'images': images,
+      // 序列化媒体资源列表
+      if (localImages != null && localImages.isNotEmpty)
+        'images': localImages.map((img) => img.toJson()).toList(),
       if (localcomments != null && localcomments.isNotEmpty)
         'comments': localcomments.map((comment) => comment.toJson()).toList(),
       if (locallikes != null && locallikes.isNotEmpty) 'likes': likes,
@@ -378,7 +482,7 @@ class MomentModel {
     String? content,
     String? createTime,
     String? location, // 新增字段在copyWith中支持更新
-    List<String>? images,
+    List<Media>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
   }) {
@@ -394,6 +498,50 @@ class MomentModel {
       comments: comments ?? this.comments,
       likes: likes ?? this.likes,
     );
+  }
+
+  // 新增：解析媒体资源列表的辅助方法
+  static List<Media> _parseMediaResourceList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((item) {
+        if (item is Map<String, dynamic>) {
+          try {
+            // 调用FriendMediaResourceModel的fromJson方法
+            return Media.fromJson(item);
+          } catch (e) {
+            print('媒体资源解析失败: $e');
+            // 解析失败时返回默认媒体资源（URL为空）
+            return Media(url: '');
+          }
+        }
+        print('无效的媒体资源数据: $item');
+        return Media(url: '');
+      }).toList();
+    }
+    print('无效的媒体资源列表类型: $value');
+    return [];
+  }
+
+  // 辅助方法：解析评论列表（保持不变）
+  static List<FriendCommentModel> _parseCommentList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((item) {
+        if (item is Map<String, dynamic>) {
+          try {
+            return FriendCommentModel.fromJson(item);
+          } catch (e) {
+            print('评论解析失败: $e');
+            return FriendCommentModel(content: '解析失败的评论');
+          }
+        }
+        print('无效的评论数据: $item');
+        return FriendCommentModel(content: '无效的评论数据');
+      }).toList();
+    }
+    print('无效的评论列表类型: $value');
+    return [];
   }
 
   // 辅助方法：解析int类型，处理null值
@@ -425,27 +573,6 @@ class MomentModel {
       return value.map((item) => _parseString(item) ?? '').toList();
     }
     print('无效的列表类型: $value');
-    return [];
-  }
-
-  // 辅助方法：解析评论列表，处理null值
-  static List<FriendCommentModel> _parseCommentList(dynamic value) {
-    if (value == null) return [];
-    if (value is List) {
-      return value.map((item) {
-        if (item is Map<String, dynamic>) {
-          try {
-            return FriendCommentModel.fromJson(item);
-          } catch (e) {
-            print('评论解析失败: $e');
-            return FriendCommentModel(content: '解析失败的评论');
-          }
-        }
-        print('无效的评论数据: $item');
-        return FriendCommentModel(content: '无效的评论数据');
-      }).toList();
-    }
-    print('无效的评论列表类型: $value');
     return [];
   }
 }

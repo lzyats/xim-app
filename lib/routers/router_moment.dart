@@ -10,4 +10,8 @@ List<GetPage> getMomentPages = [
     name: MomentIndexPage.routeName,
     page: () => const MomentIndexPage(),
   ),
+  GetPage(
+    name: '/momnet_location',
+    page: () => const ChatMessageLocationItem(),
+  ),
 ];

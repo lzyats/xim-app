@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:alpaca/widgets/widget_upload.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'dart:math';
+import 'package:alpaca/widgets/widget_image_picker.dart'; // 导入图片选择组件的控制器
 
 class MomentAddController extends GetxController {
   // 文本输入控制器
@@ -16,6 +17,10 @@ class MomentAddController extends GetxController {
   RxInt textLength = 0.obs;
 
   LocalUser localUser = ToolsStorage().local();
+
+  // 获取 ImagePickerController 实例
+  final ImagePickerController imageController =
+      Get.find<ImagePickerController>();
 
   // 图片选择控制器
   // 图片选择控制器（改为 XFile 类型）
@@ -38,6 +43,8 @@ class MomentAddController extends GetxController {
   //  getter 方法应返回 _currentPermission.value
   String get currentPermission => _currentPermission.value;
 
+  String momId = generate20DigitRandomNumber();
+
   //  更新方法应修改 _currentPermission.value
   void updatePermission(String permission) {
     _currentPermission.value = permission;
@@ -52,18 +59,6 @@ class MomentAddController extends GetxController {
   // 检查是否可以发表
   bool isPublishable() {
     return text.isNotEmpty || selectedImages.isNotEmpty;
-  }
-
-  // 添加图片时直接存储 XFile 对象
-  void addImage(XFile image) {
-    if (selectedImages.length < 9) {
-      _selectedImages.add(image);
-    }
-  }
-
-  // 移除图片时直接删除 XFile 对象
-  void removeImage(XFile image) {
-    _selectedImages.remove(image);
   }
 
   // 发表朋友圈
@@ -81,8 +76,6 @@ class MomentAddController extends GetxController {
     LocalUser localUser = ToolsStorage().local();
 
     try {
-      LocalUser localUser = ToolsStorage().local();
-      String momId = generate20DigitRandomNumber();
       // 创建朋友圈模型
       final moment = FriendMomentModel(
           momId: int.parse(momId),
@@ -95,8 +88,19 @@ class MomentAddController extends GetxController {
           updateTime: DateTime.now(),
           isDeleted: 0);
       print('发布到这里了');
+
       // 构建附件库模型
-      //final media = FriendMediaResourceModel(url: selectedImages);
+      //final List<FriendMediaResourceModel> media = [];
+      // 从 ImagePickerController 中获取 selectedImages
+      final selectedImages = imageController.getSelectedImages;
+      final List<FriendMediaResourceModel> getselectedImagesinfo =
+          imageController.getselectedImagesinfo;
+      //遍历媒体文件，修改momId
+      final List<FriendMediaResourceModel> newfrendinfo = [];
+      for (var element in getselectedImagesinfo) {
+        print(element.toJson());
+        newfrendinfo.add(element);
+      }
       return;
       // 调用发表服务
       //await MomentService.publishMoment(moment);
@@ -125,24 +129,6 @@ class MomentAddController extends GetxController {
     }
   }
 
-  // 生成20位随机数，且首位不为0
-  String generate20DigitRandomNumber() {
-    Random random = Random();
-    // 生成首位，范围是 1 到 9
-    int firstDigit = random.nextInt(9) + 1;
-
-    // 生成剩余的 19 位数字
-    String remainingDigits = '';
-    for (int i = 0; i < 19; i++) {
-      // 生成 0 到 9 的随机数字
-      int digit = random.nextInt(10);
-      remainingDigits += digit.toString();
-    }
-
-    // 拼接首位和剩余的 19 位数字
-    return firstDigit.toString() + remainingDigits;
-  }
-
   // 新增的判断方法
   int getPermissionValue(String permission) {
     switch (permission) {
@@ -161,4 +147,22 @@ class MomentAddController extends GetxController {
   void onInit() {
     super.onInit();
   }
+}
+
+// 生成20位随机数，且首位不为0
+String generate20DigitRandomNumber() {
+  Random random = Random();
+  // 生成首位，范围是 1 到 9
+  int firstDigit = random.nextInt(9) + 1;
+
+  // 生成剩余的 19 位数字
+  String remainingDigits = '';
+  for (int i = 0; i < 18; i++) {
+    // 生成 0 到 9 的随机数字
+    int digit = random.nextInt(10);
+    remainingDigits += digit.toString();
+  }
+
+  // 拼接首位和剩余的 19 位数字
+  return firstDigit.toString() + remainingDigits;
 }
