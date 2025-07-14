@@ -3,11 +3,8 @@ import 'package:alpaca/pages/base/base_controller.dart';
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 //添加通用网络请求
-//import 'package:alpaca/request/request_moment.dart';
+import 'package:alpaca/request/request_moment.dart';
 
-import 'package:alpaca/config/app_config.dart';
-
-import 'package:dio/dio.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 
 class MomentIndexController extends BaseController {
@@ -50,6 +47,7 @@ class MomentIndexController extends BaseController {
     momentList.clear(); // 清空当前数据
     // 调用 API 重新加载数据
     // 示例代码，需要根据实际情况修改
+    currentPage = 1;
     final newData = await getMoments(1, 10);
     momentList.addAll(newData);
     isLoading.value = false;
@@ -62,10 +60,11 @@ class MomentIndexController extends BaseController {
     update();
 
     try {
-      currentPage++;
       List<MomentModel> newMoments = await getMoments(currentPage, pageSize);
       if (newMoments.isNotEmpty) {
         momentList.addAll(newMoments);
+      } else {
+        currentPage--;
       }
     } catch (e) {
       print('Error loading more moments: $e');
@@ -89,41 +88,40 @@ class MomentIndexController extends BaseController {
       update();
     });
   }
-}
 
-// 模拟API请求（确保参数正确）
-Future<List<MomentModel>> getMoments(int page, int pageSize) async {
-  print('朋友圈信息0：');
-  LocalUser localUser = ToolsStorage().local();
-  print('朋友圈信息2：' + localUser.userId);
-  dynamic responseData =
-      await getData('/t.php', page, pageSize, localUser.userId);
-  print('朋友圈信息1：' + responseData.toString());
-  if (responseData != null && responseData is List) {
-    List<MomentModel> list =
-        responseData.map((item) => MomentModel.fromJson(item)).toList();
-    print('朋友圈信息1：' + list.toString());
-    return list;
+  /**
+   * 发起点赞
+   */
+  Future<bool> likeMoment(int momentId) async {
+    print('点赞开始');
+    // 假设 API 调用成功后返回 true
+    await RequestMoment.likeMoment(momentId);
+    return true;
   }
-  return [];
-}
 
-// 定义get方法
-Future<dynamic> getData(
-    String url, int page, int pageSize, String user_id) async {
-  Dio dio = Dio();
-  try {
-    Response response = await dio.get(
-      AppConfig.commentHost + url,
-      data: {'user_id': user_id, 'page': page, 'page_size': pageSize},
-      options: Options(
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      ),
-    );
-    print(response.data);
-    return response.data;
-  } catch (e) {
-    print('Error: $e');
-    return null;
+  //发起评论
+  Future<bool> addComment(int momentId, int replyTo, String content) async {
+    print('评论开始');
+    // 假设 API 调用成功后返回 true
+    await RequestMoment.addComment(momentId, replyTo, content);
+    return true;
+  }
+
+  // 模拟API请求（确保参数正确）
+  Future<List<MomentModel>> getMoments(int page, int pageSize) async {
+    print('当前请求页：' + page.toString());
+    dynamic responseDataa = await RequestMoment.getMomentList(page, pageSize);
+    // 处理分页信息
+    List<dynamic> responseData = responseDataa['list'];
+    //判断是否存在下一页
+    if (responseDataa['hasNextPage']) {
+      currentPage++;
+    }
+    if (responseData != null && responseData is List) {
+      List<MomentModel> list =
+          responseData.map((item) => MomentModel.fromJson(item)).toList();
+      return list;
+    }
+    return [];
   }
 }

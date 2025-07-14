@@ -53,8 +53,36 @@ class MsgIndexPage extends GetView<MsgIndexController> {
                 enablePullDown: true,
                 controller: controller.refreshController,
                 onRefresh: () {
+                  print('onRefresh method called');
                   controller.onRefresh();
                 },
+                // 更新后的 WaterDropHeader 参数配置
+                header: WaterDropHeader(
+                  key: null, // 可根据需要设置 key
+                  refresh: Container(
+                    height: 80,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '正在刷新...',
+                      style: TextStyle(
+                        color: AppTheme.color,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  complete: const SizedBox.shrink(), // 完成状态组件（此处为空）
+                  completeDuration: const Duration(milliseconds: 600),
+                  failed: const SizedBox.shrink(), // 失败状态组件（此处为空）
+                  waterDropColor: AppTheme.color,
+                  idleIcon: Icon(
+                    Icons.autorenew,
+                    size: 15,
+                    color: AppTheme.color,
+                  ),
+                ),
+                // 移除不支持的 onRefreshCompleted 参数
+                // 刷新完成逻辑移至控制器中处理
                 child: _buildContent(),
               );
             }),
@@ -103,31 +131,18 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     }
     return SlidableAutoCloseBehavior(
       child: GroupedListView(
-        // 数据列表
         elements: controller.refreshList,
-        // 分组类型
-        groupBy: (element) {
-          return element.top.toString();
-        },
-        // 分组间隔
-        groupSeparatorBuilder: (value) {
-          return Container();
-        },
-        // 分组排序
+        groupBy: (element) => element.top.toString(),
+        groupSeparatorBuilder: (value) => Container(),
         order: GroupedListOrder.DESC,
-        // 单条排序
-        itemComparator: (item1, item2) {
-          return item1.createTime.compareTo(item2.createTime);
-        },
-        // 单条数据
-        indexedItemBuilder: (context, element, index) {
-          return _slidable(element);
-        },
+        itemComparator: (item1, item2) =>
+            item1.createTime.compareTo(item2.createTime),
+        indexedItemBuilder: (context, element, index) => _slidable(element),
       ),
     );
   }
 
-  // 滑动组件
+  // 滑动组件（保持不变）
   _slidable(ChatMsg chatMsg) {
     String chatId = chatMsg.chatId;
     int badger = ToolsBadger().get(chatId);
@@ -208,7 +223,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     );
   }
 
-  // 消息
+  // 消息项（保持不变）
   _buildItem(ChatMsg chatMsg, int badger) {
     return Container(
       color: chatMsg.top ? Colors.grey[100] : Colors.white,
@@ -217,25 +232,19 @@ class MsgIndexPage extends GetView<MsgIndexController> {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            leading: WidgetCommon.showAvatar(
-              chatMsg.portrait,
-            ),
+            leading: WidgetCommon.showAvatar(chatMsg.portrait),
             title: RichText(
               text: TextSpan(
                 children: [
                   if (ChatTalk.group == chatMsg.chatTalk)
                     const TextSpan(
                       text: '[群] ',
-                      style: TextStyle(
-                        color: Colors.red,
-                      ),
+                      style: TextStyle(color: Colors.red),
                     ),
                   if (ChatTalk.robot == chatMsg.chatTalk)
                     const TextSpan(
                       text: '[官] ',
-                      style: TextStyle(
-                        color: Colors.red,
-                      ),
+                      style: TextStyle(color: Colors.red),
                     ),
                   TextSpan(
                     text: chatMsg.nickname,
@@ -292,21 +301,18 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     );
   }
 
+  // 内容格式化（保持不变）
   _formatContent(ChatMsg chatMsg) {
     String content;
     MsgType msgType = chatMsg.msgType;
-    // @类型
     if (MsgType.at == msgType) {
       content = chatMsg.content['data'];
       return ToolsRegex.parsedAt(content, controller.userId);
     }
-    // 草稿类型
-    if (ToolsStorage().draft(chatMsg.chatId, read: true).isNotEmpty) {
-      msgType = MsgType.draft;
-    } else if (ToolsStorage().reply(chatMsg.chatId, read: true).isNotEmpty) {
+    if (ToolsStorage().draft(chatMsg.chatId, read: true).isNotEmpty ||
+        ToolsStorage().reply(chatMsg.chatId, read: true).isNotEmpty) {
       msgType = MsgType.draft;
     }
-    // 内容
     switch (msgType) {
       case MsgType.text:
       case MsgType.tips:

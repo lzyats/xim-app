@@ -92,8 +92,6 @@ class FriendCommentModel {
   final int? replyTo; // 回复的评论ID（可为空）
   final String? content; // 评论内容（保持必填）
   final DateTime? createTime; // 创建时间（改为可选）
-  final int? isDeleted; // 逻辑删除标记（根据需求调整）
-
   final String? fromUser; // 评论者
   final String? toUser; // 被评论者（可为空）
   final bool? source; // 新增字段：是否为发起人，bool类型，非必填
@@ -105,7 +103,6 @@ class FriendCommentModel {
     this.replyTo,
     this.content, // 保持必填
     this.createTime, // 改为可选
-    this.isDeleted = 0, // 设置默认值
     this.fromUser,
     this.toUser,
     this.source, // 新增source参数，默认值为null
@@ -119,12 +116,11 @@ class FriendCommentModel {
       userId: json['user_id'],
       replyTo: json['reply_to'],
       content: json['content'],
+      fromUser: json['fromUser'],
+      toUser: json['toUser'],
       createTime: json['create_time'] != null
           ? DateTime.parse(json['create_time'])
           : null, // 可选时间解析
-      isDeleted: json['is_deleted'] ?? 0, // 设置默认值
-      fromUser: json['from_user'],
-      toUser: json['to_user'],
       source: json['source'], // 解析source字段，JSON中为同名
     );
   }
@@ -138,7 +134,6 @@ class FriendCommentModel {
       'reply_to': replyTo,
       'content': content,
       if (createTime != null) 'create_time': createTime?.toIso8601String(),
-      'is_deleted': isDeleted,
       'from_user': fromUser,
       'to_user': toUser,
       if (source != null) 'source': source, // 仅当非null时包含
@@ -153,7 +148,6 @@ class FriendCommentModel {
     int? replyTo,
     String? content,
     DateTime? createTime,
-    int? isDeleted,
     String? fromUser,
     String? toUser,
     bool? source, // 新增source参数支持更新
@@ -165,7 +159,6 @@ class FriendCommentModel {
       replyTo: replyTo ?? this.replyTo,
       content: content ?? this.content,
       createTime: createTime ?? this.createTime,
-      isDeleted: isDeleted ?? this.isDeleted,
       fromUser: fromUser ?? this.fromUser,
       toUser: toUser ?? this.toUser,
       source: source ?? this.source, // 默认值使用原实例值
@@ -333,17 +326,20 @@ class Media {
   final String url; // 媒体资源URL
   final int? width; // 媒体宽度（可选）
   final int? height; // 媒体高度（可选）
+  final String? thumbnail; // 新增：缩略图URL，非必需字符串
 
   /// 构造函数
   /// - type: 可选的媒体类型，默认null
   /// - url: 必需的资源URL
   /// - width: 可选的宽度，默认null
   /// - height: 可选的高度，默认null
+  /// - thumbnail: 可选的缩略图URL，默认null
   Media({
     this.type,
     required this.url,
     this.width,
     this.height,
+    this.thumbnail, // 新增字段
   });
 
   /// 从JSON创建实例
@@ -353,6 +349,7 @@ class Media {
       url: json['url'] ?? '',
       width: json['width'],
       height: json['height'],
+      thumbnail: json['thumbnail'], // 解析缩略图字段
     );
   }
 
@@ -363,6 +360,7 @@ class Media {
       'url': url,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
+      if (thumbnail != null) 'thumbnail': thumbnail, // 仅在非空时包含
     };
   }
 
@@ -372,26 +370,28 @@ class Media {
     String? url,
     int? width,
     int? height,
+    String? thumbnail, // 支持更新缩略图
   }) {
     return Media(
       type: type ?? this.type,
       url: url ?? this.url,
       width: width ?? this.width,
       height: height ?? this.height,
+      thumbnail: thumbnail ?? this.thumbnail, // 新增字段的默认值处理
     );
   }
 
   /// 重写toString方法用于调试
   @override
   String toString() {
-    return 'Media(type: $type, url: $url, width: $width, height: $height)';
+    return 'Media(type: $type, url: $url, width: $width, height: $height, thumbnail: $thumbnail)';
   }
 
-  /// 重写hashCode用于对象比较
+  /// 重写hashCode用于对象比较（包含thumbnail）
   @override
-  int get hashCode => Object.hash(type, url, width, height);
+  int get hashCode => Object.hash(type, url, width, height, thumbnail);
 
-  /// 重写equals方法用于对象相等性判断
+  /// 重写equals方法用于对象相等性判断（包含thumbnail）
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -399,7 +399,8 @@ class Media {
         other.type == type &&
         other.url == url &&
         other.width == width &&
-        other.height == height;
+        other.height == height &&
+        other.thumbnail == thumbnail; // 新增字段的相等性判断
   }
 }
 

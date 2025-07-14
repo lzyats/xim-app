@@ -209,6 +209,7 @@ class MsgIndexController extends BaseController {
   void onRefresh() {
     // 获取配置
     RequestCommon.getConfig();
+    print('onRefresh method called');
     // 获取消息
     superRefresh(
       RequestMessage.pullMsg(),
