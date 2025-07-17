@@ -23,13 +23,14 @@ class MomentAddPage extends GetView<MomentAddController> {
             child: Obx(() {
               return TextButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                  // 使用 WidgetStateProperty 替代 MaterialStateProperty
+                  backgroundColor: WidgetStateProperty.resolveWith<Color>(
                     (states) => states.contains(MaterialState.disabled)
                         ? Colors.grey
                         : Colors.green,
                   ),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                  shape: MaterialStateProperty.all(
+                  foregroundColor: WidgetStateProperty.all(Colors.white),
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5.0)),
                   ),

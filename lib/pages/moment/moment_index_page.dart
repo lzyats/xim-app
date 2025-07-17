@@ -83,15 +83,25 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
+              // 核心修改：无论数据是否为空，都使用ListView确保可下拉
               return ListView.separated(
                 controller: _scrollController,
-                itemCount: controller.momentList.length +
-                    (controller.isLoadingMore.value ? 1 : 0),
+                // 数据为空时，设置itemCount为1（显示空状态）；否则为实际数据量+加载更多项
+                itemCount: controller.momentList.isEmpty
+                    ? 1 // 空列表时显示1个占位项
+                    : controller.momentList.length +
+                        (controller.isLoadingMore.value ? 1 : 0),
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
                   color: Colors.grey.withOpacity(0.2),
                 ),
                 itemBuilder: (context, index) {
+                  // 数据为空时，显示空状态提示
+                  if (controller.momentList.isEmpty) {
+                    return _buildEmptyState();
+                  }
+
+                  // 加载更多时的占位项
                   if (index == controller.momentList.length &&
                       controller.isLoadingMore.value) {
                     return Container(
@@ -100,6 +110,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                     );
                   }
 
+                  // 正常数据项
                   final moment = controller.momentList[index];
                   return _buildMomentItem(moment);
                 },
@@ -307,6 +318,45 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  // 新增：空状态显示组件
+  Widget _buildEmptyState() {
+    return Container(
+      // 高度占满屏幕，确保可下拉
+      height: MediaQuery.of(context).size.height -
+          kToolbarHeight -
+          MediaQuery.of(context).padding.top,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 空状态图标
+          Icon(
+            Icons.photo_library_outlined,
+            size: 60,
+            color: Colors.grey[300],
+          ),
+          const SizedBox(height: 20),
+          // 空状态文本
+          Text(
+            '暂无朋友圈内容',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 10),
+          // 提示文本
+          Text(
+            '下拉可以刷新内容',
+            style: TextStyle(
+              color: Colors.grey[300],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // 正确的页面跳转方式
   void _openMomentAddPage() {
     // 方式1：直接创建页面实例（确保页面中已注册控制器）
@@ -315,11 +365,12 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     });
   }
 
+  //朋友圈列表项
   Widget _buildMomentItem(MomentModel moment) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -353,9 +404,10 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  //朋友圈头像
   Widget _buildAvatar(String url) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(4),
       child: CachedNetworkImage(
         imageUrl: url,
         width: 40,
@@ -374,6 +426,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  // 朋友圈信息正文
   Widget _buildMomentContent(MomentModel moment) {
     return Container(
       width: double.infinity,
@@ -384,8 +437,8 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
             moment.nickname ?? '',
             style: const TextStyle(
               color: Color.fromARGB(255, 92, 104, 141),
-              fontWeight: FontWeight.bold,
-              fontSize: 17,
+              //fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
           const SizedBox(height: 2),
@@ -517,12 +570,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
 
   // 全屏播放视频（实现点击退出）
   void _playVideoFullscreen(String videoUrl) {
-    // 使用video_player和chewie实现全屏播放（需先添加依赖）
-    // 1. 添加依赖到pubspec.yaml:
-    // dependencies:
-    //   video_player: ^2.8.1
-    //   chewie: ^1.7.0
-
     // 2. 全屏播放实现
     Navigator.push(
       context,
@@ -590,8 +637,21 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   }
 
   // 图片浏览及缩放（优化：支持媒体资源元数据）
+  // 图片浏览及缩放（优化：支持媒体资源元数据）
   void _showImageViewer(List<Media> picList, int initialIndex) {
-    final RxInt currentIndex = initialIndex.obs;
+    // 过滤掉视频资源，只保留图片资源
+    final List<Media> imageList =
+        picList.where((media) => media.type == 0).toList();
+
+    // 调整初始索引，确保在图片列表中的索引有效
+    int adjustedInitialIndex = 0;
+    for (int i = 0; i < initialIndex; i++) {
+      if (picList[i].type == 0) {
+        adjustedInitialIndex++;
+      }
+    }
+
+    final RxInt currentIndex = adjustedInitialIndex.obs;
 
     showDialog(
       context: context,
@@ -610,8 +670,8 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                   children: [
                     // 每次打开时创建新的 PhotoViewContainer 实例
                     PhotoViewContainer(
-                      picList: picList,
-                      initialIndex: initialIndex,
+                      picList: imageList, // 使用过滤后的图片列表
+                      initialIndex: adjustedInitialIndex, // 使用调整后的初始索引
                       currentIndex: currentIndex,
                     ),
                     // 关闭按钮（提升层级至顶部）
@@ -633,7 +693,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                       child: Obx(() {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: picList.asMap().entries.map((entry) {
+                          children: imageList.asMap().entries.map((entry) {
                             int index = entry.key;
                             return Container(
                               width: 8.0,
@@ -679,8 +739,8 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
           }
         }
 
-        if (locationText.length > 30) {
-          locationText = '${locationText.substring(0, 28)}..';
+        if (locationText.length > 20) {
+          locationText = '${locationText.substring(0, 19)}.';
         }
       }
     }

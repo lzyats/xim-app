@@ -178,7 +178,8 @@ class FriendMediaResourceModel {
   final int? height; // 高度（图片/视频）
   final int? duration; // 时长（视频/音频，单位：秒）
   final DateTime? createTime; // 创建时间
-  final String? thumbnail; // 新增：缩略图URL，非必需字符串参数
+  final String? thumbnail; // 缩略图URL，非必需字符串参数
+  final int? momId; // 新增：动态额外ID（非必需，int类型）
 
   FriendMediaResourceModel({
     this.mediaId,
@@ -190,7 +191,8 @@ class FriendMediaResourceModel {
     this.height,
     this.duration,
     this.createTime,
-    this.thumbnail, // 新增参数，默认null
+    this.thumbnail,
+    this.momId, // 新增参数，默认值为null
   });
 
   // 从JSON创建实例
@@ -207,7 +209,8 @@ class FriendMediaResourceModel {
       createTime: json['create_time'] != null
           ? DateTime.parse(json['create_time'])
           : null,
-      thumbnail: _parseString(json['thumbnail']), // 解析thumbnail字段
+      thumbnail: _parseString(json['thumbnail']),
+      momId: json['mom_id'], // 解析JSON中的mom_id字段（下划线命名）
     );
   }
 
@@ -224,6 +227,7 @@ class FriendMediaResourceModel {
       'duration': duration,
       if (createTime != null) 'create_time': createTime?.toIso8601String(),
       if (thumbnail != null) 'thumbnail': thumbnail,
+      if (momId != null) 'mom_id': momId, // 仅当非null时包含mom_id字段
     };
   }
 
@@ -238,7 +242,8 @@ class FriendMediaResourceModel {
     int? height,
     int? duration,
     DateTime? createTime,
-    String? thumbnail, // 支持更新thumbnail
+    String? thumbnail,
+    int? momId, // 支持更新momId字段
   }) {
     return FriendMediaResourceModel(
       mediaId: mediaId ?? this.mediaId,
@@ -250,7 +255,8 @@ class FriendMediaResourceModel {
       height: height ?? this.height,
       duration: duration ?? this.duration,
       createTime: createTime ?? this.createTime,
-      thumbnail: thumbnail ?? this.thumbnail, // 默认使用原实例值
+      thumbnail: thumbnail ?? this.thumbnail,
+      momId: momId ?? this.momId, // 新增字段的默认值处理
     );
   }
 
@@ -417,6 +423,7 @@ class MomentModel {
   final List<Media>? images; // 图片列表，改为可选类型
   final List<FriendCommentModel>? comments; // 评论内容，改为可选类型
   final List<String>? likes; // 点赞列表，改为可选类型
+  final int? visibility; // 新增：可见性（非必需，int类型）0-公开，1-私密，2-部分可见，3-不给谁看
 
   // 构造函数使用可选参数，并设置默认值
   MomentModel({
@@ -427,6 +434,7 @@ class MomentModel {
     this.content = '',
     this.createTime,
     this.location, // 新增字段在构造函数中声明
+    this.visibility, // 新增可见性字段（非必需，无默认值）
     // 关键修改：从字符串列表改为媒体资源对象列表
     List<Media>? images,
     List<FriendCommentModel>? comments,
@@ -445,6 +453,7 @@ class MomentModel {
       content: _parseString(json['content']),
       createTime: _parseString(json['createTime']),
       location: _parseString(json['location']), // 新增字段的JSON解析
+      visibility: _parseInt(json['visibility']), // 新增可见性字段的JSON解析
       images: _parseMediaResourceList(json['images']),
       comments: _parseCommentList(json['comments']),
       likes: _parseStringList(json['likes']),
@@ -465,6 +474,8 @@ class MomentModel {
       if (createTime != null) 'createTime': createTime,
       if (location != null && location != '')
         'location': location, // 新增字段的JSON输出
+      if (visibility != null)
+        'visibility': visibility, // 新增可见性字段的JSON输出（非null时才包含）
       // 序列化媒体资源列表
       if (localImages != null && localImages.isNotEmpty)
         'images': localImages.map((img) => img.toJson()).toList(),
@@ -483,6 +494,7 @@ class MomentModel {
     String? content,
     String? createTime,
     String? location, // 新增字段在copyWith中支持更新
+    int? visibility, // 新增可见性字段的复制更新支持
     List<Media>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
@@ -495,6 +507,7 @@ class MomentModel {
       content: content ?? this.content,
       createTime: createTime ?? this.createTime,
       location: location ?? this.location, // 新增字段的默认值使用原实例值
+      visibility: visibility ?? this.visibility, // 可见性字段的默认值处理
       images: images ?? this.images,
       comments: comments ?? this.comments,
       likes: likes ?? this.likes,

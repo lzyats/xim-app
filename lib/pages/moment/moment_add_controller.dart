@@ -4,10 +4,9 @@ import 'package:alpaca/tools/tools_storage.dart';
 // 导入 material.dart 库
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:alpaca/widgets/widget_upload.dart';
-import 'package:alpaca/tools/tools_submit.dart';
 import 'dart:math';
 import 'package:alpaca/widgets/widget_image_picker.dart'; // 导入图片选择组件的控制器
+import 'package:alpaca/request/request_moment.dart';
 
 class MomentAddController extends GetxController {
   // 文本输入控制器
@@ -74,11 +73,11 @@ class MomentAddController extends GetxController {
     );
 
     LocalUser localUser = ToolsStorage().local();
-
+    print('发布到这里了');
+    // 创建朋友圈模型
     try {
       // 创建朋友圈模型
       final moment = FriendMomentModel(
-          momId: int.parse(momId),
           content: text,
           userId: int.parse(localUser.userId),
           //images: selectedImages,
@@ -89,32 +88,35 @@ class MomentAddController extends GetxController {
           isDeleted: 0);
       print('发布到这里了');
 
+      print(moment.toJson());
       // 构建附件库模型
       //final List<FriendMediaResourceModel> media = [];
       // 从 ImagePickerController 中获取 selectedImages
-      final selectedImages = imageController.getSelectedImages;
-      final List<FriendMediaResourceModel> getselectedImagesinfo =
-          imageController.getselectedImagesinfo;
-      //遍历媒体文件，修改momId
-      final List<FriendMediaResourceModel> newfrendinfo = [];
-      for (var element in getselectedImagesinfo) {
-        print(element.toJson());
-        newfrendinfo.add(element);
-      }
-      return;
-      // 调用发表服务
-      //await MomentService.publishMoment(moment);
+      final selectedImages = imageController.getSelectedMediasInfo;
+      final List<Media> getselectedImagesinfo =
+          imageController.getSelectedMediasInfo;
 
-      // 发表成功，返回上一页
-      Get.back(result: true);
-      Get.showSnackbar(
-        GetSnackBar(
-          title: '成功',
-          message: '你的朋友圈已发表',
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      final moments = MomentModel(
+          content: moment.content,
+          userId: moment.userId,
+          location: moment.location,
+          visibility: moment.visibility,
+          images: getselectedImagesinfo);
+
+      // 调用发表服务
+      bool post = await RequestMoment.postMoment(moments);
+      if (post) {
+        // 发表成功，返回上一页
+        Get.offNamed('/moment_index');
+        Get.showSnackbar(
+          GetSnackBar(
+            title: '成功',
+            message: '你的朋友圈已发表',
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     } catch (e) {
       // 发表失败
       Get.showSnackbar(

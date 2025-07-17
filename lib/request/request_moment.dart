@@ -27,20 +27,25 @@ class RequestMoment {
   }
 
   // 发布朋友圈
-  static Future<dynamic> postMoment(String content, List<String> images) async {
-    // 获取当前用户的 user_id
-    String userId = ToolsStorage().local().userId;
-
+  static Future<dynamic> postMoment(MomentModel moment) async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
-      '$_prefix/post',
+      '$_prefix/admomnet',
       data: {
-        'user_id': userId,
-        'content': content,
-        'images': images,
+        'userId': moment.userId,
+        'content': moment.content,
+        'location': moment.location,
+        'visibility': moment.visibility,
+        'images': moment.images
       },
     );
-    return ajaxData.result['code'];
+    // 可以添加提示信息
+    if (ajaxData.result['code'] == 200) {
+      //EasyLoading.showToast('评论发布成功');
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // 点赞朋友圈
@@ -77,21 +82,13 @@ class RequestMoment {
         'replyTo': replyTo,
       },
     );
-    return ajaxData.result['code'];
-  }
-
-  // 定义 postComment 方法
-  static Future<void> postComment(
-      String momentId, String commentContent) async {
-    // 执行
-    await ToolsRequest().post(
-      '$_prefix/postComment',
-      data: {
-        "momentId": momentId,
-        "commentContent": commentContent,
-      },
-    );
     // 可以添加提示信息
-    EasyLoading.showToast('评论发布成功');
+    if (ajaxData.result['code'] == 200) {
+      EasyLoading.showToast('评论发布成功');
+      return true;
+    } else {
+      return false;
+    }
+    return ajaxData.result['code'];
   }
 }

@@ -58,7 +58,6 @@ class MomentIndexController extends BaseController {
     if (isLoadingMore.value) return;
     isLoadingMore.value = true;
     update();
-
     try {
       List<MomentModel> newMoments = await getMoments(currentPage, pageSize);
       if (newMoments.isNotEmpty) {
@@ -116,6 +115,8 @@ class MomentIndexController extends BaseController {
     //判断是否存在下一页
     if (responseDataa['hasNextPage']) {
       currentPage++;
+    } else {
+      isLoadingMore.value = true;
     }
     if (responseData != null && responseData is List) {
       List<MomentModel> list =
