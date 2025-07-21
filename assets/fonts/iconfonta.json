@@ -6,6 +6,13 @@
   "description": "myim",
   "glyphs": [
     {
+      "icon_id": "11519538",
+      "name": "麦克风",
+      "font_class": "maikefeng",
+      "unicode": "e73b",
+      "unicode_decimal": 59195
+    },
+    {
       "icon_id": "6062694",
       "name": "官方客服",
       "font_class": "guanfangkefu1",

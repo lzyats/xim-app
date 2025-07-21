@@ -18,9 +18,7 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 import 'package:alpaca/widgets/widget_button.dart';
 import 'package:alpaca/widgets/widget_image.dart';
 
-// 登录页面
 class LoginIndexPage extends GetView<LoginIndexController> {
-  // 路由地址
   static const String routeName = '/login';
   // 路由编码
   static const int routeCode = 401;
@@ -30,276 +28,244 @@ class LoginIndexPage extends GetView<LoginIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => LoginIndexController());
-    return KeyboardDismissOnTap(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: AnimateGradient(
-            primaryColors: const [
-              Colors.pink,
-              Colors.pinkAccent,
-              Colors.white,
-            ],
-            secondaryColors: [
-              AppTheme.color,
-              Colors.blueAccent,
-              Colors.white,
-            ],
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          // 使用背景图片
+          Image.asset(
+            AppImage.appbg,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+          Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildLogo(),
-                _buildProject(),
-                _buildPhone(),
-                Obx(
-                  () => controller.isPass.isTrue ? _buildPass() : _buildCode(),
+                _buildLogo(), // 将 logo 移动到背景框上方
+                const SizedBox(height: 44),
+                SingleChildScrollView(
+                  child: Container(
+                    width: 340,
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      // 使用原背景渐变色
+                      gradient: LinearGradient(
+                        colors: const [
+                          Color(0xFFF4F9FE),
+                          Color(0xFFECF4FF),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x1A000000),
+                          blurRadius: 12,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 移除 _buildLogo()
+                        _buildAccountField(),
+                        _buildPasswordField(),
+                        _buildLoginButton(),
+                        _buildRegisterAndForgotPassword(),
+                      ],
+                    ),
+                  ),
                 ),
-                _buildSubmit(),
-                _buildPath(),
-                _buildPrivacy(),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  _buildLogo() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 100),
-      child: ClipOval(
-        child: WidgetImage(
-          AppImage.logo,
-          ImageType.asset,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
-  _buildProject() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        AppConfig.appName,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  _buildPhone() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 30, right: 20),
-      child: TextField(
-        keyboardType: TextInputType.phone,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(
-            ToolsRegex.regExpNumber,
-          ),
-          LengthLimitingTextInputFormatter(11),
         ],
-        controller: controller.phoneController,
-        decoration: const InputDecoration(
-          hintText: '请输入手机号码',
-          prefixIcon: Icon(Icons.phone_iphone),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Container(
+      width: 110,
+      height: 110,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16), // 设置圆角
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000), // 阴影颜色，调整透明度可以改变阴影的深浅
+            blurRadius: 12, // 阴影模糊程度，数值越大越模糊
+            spreadRadius: 2, // 阴影扩散程度，正值会使阴影变大
+            offset: Offset(0, 6), // 阴影偏移量
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16), // 确保图片也有圆角
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Image.asset(
+            AppImage.logo,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
   }
 
-  _buildPass() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
-      child: TextField(
-        obscureText: true,
-        controller: controller.passController,
-        decoration: const InputDecoration(
-          hintText: '请输入密码',
-          prefixIcon: Icon(Icons.lock),
+  Widget _buildAccountField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '手机号',
+          style: TextStyle(color: Color(0xFF333333)),
         ),
-      ),
-    );
-  }
-
-  _buildCode() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 20, right: 20),
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          TextField(
-            keyboardType: TextInputType.number,
+        const SizedBox(height: 4),
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: TextField(
+            keyboardType: TextInputType.phone,
+            controller: controller.phoneController,
             inputFormatters: [
               FilteringTextInputFormatter.allow(
                 ToolsRegex.regExpNumber,
               ),
-              LengthLimitingTextInputFormatter(6),
+              LengthLimitingTextInputFormatter(11),
             ],
-            controller: controller.codeController,
-            decoration: const InputDecoration(
-              hintText: '请输入验证码',
-              prefixIcon: Icon(Icons.lock),
-            ),
-          ),
-          Positioned(
-            right: 10,
-            child: GestureDetector(
-              onTap: () {
-                // 校验
-                _checkPhone();
-                // 校验
-                bool result = _checkPrivacy();
-                if (!result) {
-                  return;
-                }
-                // 提交
-                controller.sendCode();
-              },
-              child: Obx(
-                () => Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20,
-                    horizontal: 20,
-                  ),
-                  color: Colors.grey[200],
-                  child: Text(
-                    controller.toolsTimer.sendText.value,
-                    style: TextStyle(
-                      color: AppTheme.color,
-                    ),
-                  ),
-                ),
+            decoration: InputDecoration(
+              hintText: '请输入手机号',
+              prefixIcon: Icon(Icons.phone_iphone),
+              hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(35),
+                borderSide: BorderSide.none, // 无边框
               ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(35),
+                borderSide: BorderSide.none, // 焦点时无边框
+              ),
+              /* suffixIcon: IconButton(
+                icon: Obx(() => Icon(
+                      Icons.clear,
+                      color:
+                          controller.phoneController.value?.isNotEmpty == true
+                              ? Colors.blue
+                              : const Color(0xFF999999),
+                    )),
+                onPressed: clearAccount,
+              ), */
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  _buildSubmit() {
-    return Obx(
-      () => WidgetButton(
-        label: controller.isPass.isTrue
-            ? '密码登录'
-            : (AppConfig.register ? '登  录' : '登录/注册'),
-        onTap: () {
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '密码',
+          style: TextStyle(color: Color(0xFF333333)),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: TextField(
+            controller: controller.passController,
+            obscureText: true,
+            decoration: InputDecoration(
+              hintText: '请输入密码',
+              hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(35),
+                borderSide: BorderSide.none, // 无边框
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(35),
+                borderSide: BorderSide.none, // 焦点时无边框
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              filled: true,
+              prefixIcon: Icon(Icons.lock),
+              fillColor: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return Container(
+      width: double.infinity,
+      height: 48,
+      margin: const EdgeInsets.only(bottom: 20),
+      child: ElevatedButton(
+        onPressed: () {
+          // 校验
+          _checkPhone();
+          // 校验
+          // 提交
           _submit();
         },
-      ),
-    );
-  }
-
-  _buildPath() {
-    if (!AppConfig.loginPwd) {
-      return Container();
-    }
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, top: 16, right: 20),
-      child: Obx(() {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TDLink(
-              label: controller.isPass.isFalse ? '使用密码登录' : '使用验证码登录',
-              style: TDLinkStyle.primary,
-              linkClick: (uri) {
-                _changePass();
-              },
-            ),
-            if (controller.isPass.isTrue)
-              TDLink(
-                label: '找回密码',
-                style: TDLinkStyle.primary,
-                linkClick: (uri) {
-                  Get.toNamed(LoginForgotPage.routeName);
-                },
-              ),
-            if (controller.isPass.isFalse)
-              TDLink(
-                label: '注册账号',
-                style: TDLinkStyle.primary,
-                linkClick: (uri) {
-                  Get.toNamed(LoginRegisterPage.routeName);
-                },
-              ),
-          ],
-        );
-      }),
-    );
-  }
-
-  _buildPrivacy() {
-    return GestureDetector(
-      onTap: () {
-        controller.isPrivacy.value = !controller.isPrivacy.value;
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, top: 30, right: 20),
-        child: Row(
-          children: [
-            Obx(
-              () => WidgetCheckbox(
-                value: controller.isPrivacy.isTrue,
-                size: 22,
-                onChanged: (bool? value) {
-                  controller.isPrivacy.value = !controller.isPrivacy.value;
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            const Text('已阅读并同意'),
-            TDLink(
-              label: '《服务协议》',
-              style: TDLinkStyle.primary,
-              type: TDLinkType.withUnderline,
-              uri: Uri(),
-              linkClick: (uri) {
-                Get.toNamed(
-                  ViewPage.routeName,
-                  arguments: ViewData(
-                    title: '服务协议',
-                    AppConfig.serviceHost,
-                    warn: false,
-                  ),
-                );
-              },
-            ),
-            const Text('与'),
-            TDLink(
-              label: '《隐私协议》',
-              style: TDLinkStyle.primary,
-              type: TDLinkType.withUnderline,
-              uri: Uri(),
-              linkClick: (uri) {
-                Get.toNamed(
-                  ViewPage.routeName,
-                  arguments: ViewData(
-                    title: '隐私协议',
-                    AppConfig.privacyHost,
-                    warn: false,
-                  ),
-                );
-              },
-            ),
-          ],
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF0463F7),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+        child: const Text(
+          '会员登录',
+          style: TextStyle(fontSize: 16),
         ),
       ),
     );
   }
 
-  // 改变隐私协议
-  _changePrivacy(value) {
-    controller.isPrivacy.value = value;
-  }
-
-  // 改变密码
-  _changePass() {
-    controller.isPass.value = !controller.isPass.value;
+  Widget _buildRegisterAndForgotPassword() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            const Text(
+              '没有账号？',
+              style: TextStyle(color: Color(0xFF333333)),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.toNamed(LoginRegisterPage.routeName);
+              },
+              child: const Text(
+                '立即注册',
+                style: TextStyle(color: Color(0xFF0463F7)),
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () {
+            Get.toNamed(LoginForgotPage.routeName);
+          },
+          child: const Text(
+            '忘记密码',
+            style: TextStyle(color: Color(0xFF0463F7)),
+          ),
+        ),
+      ],
+    );
   }
 
   // 校验
@@ -318,61 +284,13 @@ class LoginIndexPage extends GetView<LoginIndexController> {
     }
   }
 
-  // 校验
-  _checkCode() {
-    var code = controller.codeController.text.trim();
-    if (code.isEmpty) {
-      throw Exception('请输入验证码');
-    }
-  }
-
-  // 校验
-  _checkPrivacy() {
-    if (controller.isPrivacy.isFalse) {
-      showCupertinoDialog(
-        context: AppConfig.navigatorKey.currentState!.context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            content: const Text(
-              '是否同意隐私协议',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('拒绝'),
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-              CupertinoDialogAction(
-                child: const Text('同意'),
-                onPressed: () {
-                  // 返回
-                  Get.back();
-                  _changePrivacy(true);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-    return controller.isPrivacy.value;
-  }
-
   // 提交
   _submit() {
     // 校验
-    bool result = _checkPrivacy();
-    if (!result) {
-      return;
-    }
     // 校验
     _checkPhone();
     // 密码
-    if (controller.isPass.isTrue) {
+    if (controller.isPass.isFalse) {
       _loginPass();
     }
     // 验证码
@@ -391,6 +309,14 @@ class LoginIndexPage extends GetView<LoginIndexController> {
     if (ToolsSubmit.call()) {
       // 提交
       controller.loginPass();
+    }
+  }
+
+  // 校验
+  _checkCode() {
+    var code = controller.codeController.text.trim();
+    if (code.isEmpty) {
+      throw Exception('请输入验证码');
     }
   }
 

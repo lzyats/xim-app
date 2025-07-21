@@ -16,7 +16,7 @@ class WidgetPopup extends StatelessWidget {
       itemList.add(_popupItem(data));
     }
     return PopupMenuButton(
-      color: Colors.white,
+      color: Color(0xFF0463F7),
       offset: const Offset(0, 50),
       icon: const Icon(
         AppFonts.e625,
@@ -31,19 +31,22 @@ class WidgetPopup extends StatelessWidget {
   _popupItem(PopupModel popupModel) {
     return PopupMenuItem(
       onTap: popupModel.onTap,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              popupModel.icon,
-              const SizedBox(width: 10),
-              Text(
-                popupModel.label,
-                style: TextStyle(fontSize: 16, color: Colors.grey[800]),
-              ),
-            ],
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15), // 添加左边距15
+        child: Column(
+          children: [
+            Row(
+              children: [
+                popupModel.icon,
+                const SizedBox(width: 10),
+                Text(
+                  popupModel.label,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

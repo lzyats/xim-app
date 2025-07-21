@@ -12,19 +12,12 @@ class RequestAuth {
   // 0=注册
   // 1=登录
   // 2=忘记
-  static Future<String> sendCode(
-    String phone,
-    String type, {
-    String? email,
-  }) async {
+  static Future<String> sendCode(String phone, String type,
+      {String? email, String? safe}) async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/sendCode',
-      data: {
-        'phone': phone,
-        'email': email,
-        'type': type,
-      },
+      data: {'phone': phone, 'email': email, 'type': type, 'safestr': safe},
     );
     EasyLoading.showToast(ajaxData.getData((data) => data['msg']));
     // 转换
@@ -63,7 +56,9 @@ class RequestAuth {
   static Future<AuthModel02> register(
     String phone,
     String email,
+    String? pass,
     String code,
+    String safe,
   ) async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
@@ -71,7 +66,9 @@ class RequestAuth {
       data: {
         'phone': phone,
         'email': email,
+        'pass': pass,
         'code': code,
+        'safe': safe,
       },
     );
     return ajaxData.getData((data) => AuthModel02.fromJson(data));

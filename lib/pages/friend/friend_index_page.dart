@@ -1,3 +1,7 @@
+import 'package:alpaca/config/app_config.dart';
+import 'package:alpaca/tools/tools_enum.dart';
+import 'package:alpaca/tools/tools_route.dart';
+import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_fonts.dart';
@@ -17,17 +21,46 @@ double _iconSize = 40;
 class FriendIndexPage extends GetView<FriendIndexController> {
   const FriendIndexPage({super.key});
 
+  // 定义顶部导航栏的渐变颜色
+  // 修改为上下方向的渐变
+  final Gradient _appBarGradient = const LinearGradient(
+    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)], // 调整颜色顺序增强垂直感
+    begin: Alignment.topCenter, // 从上到下
+    end: Alignment.bottomCenter,
+    stops: [0.0, 1.0], // 颜色分布点
+  );
+
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => FriendIndexController());
     return GetBuilder<FriendIndexController>(builder: (builder) {
       return Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: Text('好友(${builder.dataList.length})'),
-          actions: [
-            WidgetCommon.buildAction(),
-          ],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 10),
+          child: Container(
+            decoration: BoxDecoration(gradient: _appBarGradient),
+            child: Column(
+              children: [
+                // 状态栏区域
+                Container(
+                  height: MediaQuery.of(context).padding.top,
+                  color: Colors.transparent,
+                ),
+                Expanded(
+                  child: AppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    title: Text('好友(${builder.dataList.length})'),
+                    centerTitle: true,
+                    actions: [
+                      WidgetCommon.buildAction(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
         body: WidgetContact(
           header: _buildHeader(),
@@ -99,8 +132,15 @@ class FriendIndexPage extends GetView<FriendIndexController> {
             size: _iconSize,
           ),
           arrow: false,
-          onTap: () {
-            Get.toNamed(RobotIndexPage.routeName);
+          onTap: () async {
+            ChatRobot chatRobot =
+                await ToolsSqlite().robot.getById(AppConfig.robotId);
+            ToolsRoute().chatPage(
+              chatId: chatRobot.robotId,
+              nickname: chatRobot.nickname,
+              portrait: chatRobot.portrait,
+              chatTalk: ChatTalk.robot,
+            );
           },
           divider: false,
         ),

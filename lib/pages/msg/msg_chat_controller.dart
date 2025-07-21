@@ -445,7 +445,7 @@ class MsgChatController extends BaseController {
               text: '[群] ',
               style: TextStyle(
                 color: Colors.red,
-                fontSize: 16,
+                fontSize: 18,
               ),
             ),
           if (ChatTalk.robot == chatTalk)
@@ -453,14 +453,14 @@ class MsgChatController extends BaseController {
               text: '[官] ',
               style: TextStyle(
                 color: Colors.red,
-                fontSize: 16,
+                fontSize: 18,
               ),
             ),
           TextSpan(
             text: title,
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 16,
+              fontSize: 18,
             ),
           ),
         ],

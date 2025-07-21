@@ -35,9 +35,24 @@ class MainPage extends GetView<MainController> {
                 border: Border(
                   top: BorderSide(
                     color: Color.fromARGB(255, 219, 217, 217),
-                    width: 0.8,
+                    width: 0.2,
                   ),
                 ),
+                // 新增渐变阴影效果
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFEBF3FF), // 阴影起始色（淡黑）
+                    blurRadius: 8, // 模糊半径
+                    spreadRadius: 0, // 扩散半径
+                    offset: Offset(0, -2), // 阴影偏移（向上2px）
+                  ),
+                  BoxShadow(
+                    color: Color.fromARGB(5, 0, 0, 0), // 阴影过渡色（更淡）
+                    blurRadius: 12, // 更大的模糊半径
+                    spreadRadius: 0,
+                    offset: Offset(0, -4), // 向上偏移更多
+                  ),
+                ],
               ),
               child: BottomNavigationBar(
                 currentIndex: builder.currentIndex,
@@ -45,7 +60,7 @@ class MainPage extends GetView<MainController> {
                     ? BottomNavigationBarType.fixed
                     : null,
                 backgroundColor: Colors.white,
-                fixedColor: AppTheme.color,
+                fixedColor: Color(0xFF0463F7),
                 items: builder.items,
                 onTap: (int index) {
                   builder.currentIndex = index;

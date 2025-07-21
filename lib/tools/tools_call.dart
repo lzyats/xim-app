@@ -45,6 +45,7 @@ class _ToolsCallState extends State<ToolsCall> {
   Timer? _timer;
   bool _trigger = false;
   bool _back = false;
+  String value = '';
   final AudioPlayer audioPlayer = AudioPlayer();
   late StreamSubscription _subscription;
   @override
@@ -68,6 +69,10 @@ class _ToolsCallState extends State<ToolsCall> {
       if (channel != model.primary) {
         return;
       }
+      if (value == model.value) {
+        return;
+      }
+      value = model.value;
       // 转换
       Map<String, dynamic> content = jsonDecode(model.value);
       CallStatus status = CallStatus.init(content['callStatus']);
@@ -85,12 +90,12 @@ class _ToolsCallState extends State<ToolsCall> {
         default:
           return;
       }
-      // 提醒
-      EasyLoading.showToast(status.label);
       // 返回
       if (!_back) {
         Get.back();
       }
+      // 提醒
+      EasyLoading.showToast(status.label);
     });
   }
 
@@ -122,13 +127,15 @@ class _ToolsCallState extends State<ToolsCall> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(
+        // 多重渐变背景
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            stops: [0.1, 0.6],
-            colors: [Color(0xffFF6347), Color(0xff000000)],
+            colors: [
+              Color(0xFF808080), // 浅灰色
+              Color(0xFF404040), // 深灰色
+            ],
           ),
         ),
         child: Column(
@@ -160,10 +167,7 @@ class _ToolsCallState extends State<ToolsCall> {
   _buildPortrait() {
     return Column(
       children: [
-        WidgetCommon.showAvatar(
-          widget.portrait,
-          size: 100,
-        ),
+        WidgetCommon.showAvatar(widget.portrait, size: 100, yj: 55),
         const SizedBox(
           height: 20,
         ),
@@ -183,25 +187,46 @@ class _ToolsCallState extends State<ToolsCall> {
     if (isCall && widget.request) {
       return Container();
     }
-    return RawMaterialButton(
-      onPressed: () {
-        if (isCall) {
-          _startCall(isCall);
-          // 计数器
-          ToolsBadger().subtraction(widget.chatId);
-        } else {
-          _endCall(auto: false);
-        }
-      },
-      shape: const CircleBorder(),
-      elevation: 2.0,
-      fillColor: isCall ? Colors.green : Colors.redAccent,
-      padding: const EdgeInsets.all(15.0),
-      child: Icon(
-        isCall ? Icons.call : Icons.call_end,
-        color: Colors.white,
-        size: 35.0,
-      ),
+    return Column(
+      children: [
+        RawMaterialButton(
+          onPressed: () {
+            if (isCall) {
+              _startCall(isCall);
+              // 计数器
+              ToolsBadger().subtraction(widget.chatId);
+            } else {
+              _endCall(auto: false);
+            }
+          },
+          shape: const CircleBorder(),
+          elevation: 2.0,
+          fillColor: isCall ? Colors.green : Colors.redAccent,
+          padding: const EdgeInsets.all(15.0),
+          child: Icon(
+            isCall ? Icons.call : Icons.call_end,
+            color: Colors.white,
+            size: 35.0,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (!isCall)
+          Text(
+            '挂断',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14.0,
+            ),
+          ),
+        if (isCall)
+          Text(
+            '接听',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14.0,
+            ),
+          ),
+      ],
     );
   }
 
@@ -231,20 +256,28 @@ class _ToolsCallState extends State<ToolsCall> {
     // 取消响铃
     audioPlayer.stop();
     // 跳转
-    Get.off(
-      () => ToolsCallVideo(
-        portrait: widget.portrait,
-        nickname: widget.nickname,
-        video: widget.video,
-        channel: channel,
-        token: token,
-        chatId: widget.chatId,
-      ),
+    ToolsCallVideo _toolsCallVideo = ToolsCallVideo(
+      portrait: widget.portrait,
+      nickname: widget.nickname,
+      video: widget.video,
+      channel: channel,
+      token: token,
+      chatId: widget.chatId,
     );
+    // 发起者
+    if (widget.request) {
+      Get.off(_toolsCallVideo);
+    }
+    // 接收者
+    else {
+      Get.to(_toolsCallVideo);
+    }
   }
 
   // 挂断
   _endCall({bool auto = true}) async {
+    // 返回
+    Get.back();
     // 判断
     if (widget.request) {
       // 请求
@@ -260,7 +293,6 @@ class _ToolsCallState extends State<ToolsCall> {
       ToolsBadger().subtraction(widget.chatId);
     }
     _back = true;
-    Get.back();
   }
 }
 
@@ -294,6 +326,7 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   bool _mutedAudio = false;
   bool _mutedVideo = false;
   int _second = 0;
+  bool _speakerOn = false; // 新增：免提状态（默认关闭）
 
   @override
   void initState() {
@@ -354,6 +387,15 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     }
   }
 
+  // 免提开关（新增方法）
+  void _onToggleSpeaker() {
+    setState(() {
+      _speakerOn = !_speakerOn;
+    });
+    // 通过Agora引擎切换音频路由（扬声器/听筒）
+    _engine?.setDefaultAudioRouteToSpeakerphone(_speakerOn);
+  }
+
   // 摄像头反转
   _onToggleCamera() {
     _engine?.switchCamera().then((value) {
@@ -403,7 +445,9 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
           second: _second,
         );
         // 返回
-        Get.back();
+        if ('/ToolsCallVideo' == Get.currentRoute) {
+          Get.back();
+        }
       },
     ));
   }
@@ -419,7 +463,7 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
                   child: _switch ? _localVideo() : _remoteVideo(),
                 ),
                 _timerView(),
-                _cancelView(),
+                //_cancelView(),
                 _cameraView(),
                 _bottomView(),
               ]
@@ -467,13 +511,16 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   _timerView() {
     return Positioned(
       top: 45,
-      left: 25.0,
-      child: Opacity(
-        opacity: 1,
-        child: ToolsTimerView(
-          onChange: (int second) {
-            _second = second;
-          },
+      left: 0,
+      right: 0,
+      child: Center(
+        child: Opacity(
+          opacity: 1,
+          child: ToolsTimerView(
+            onChange: (int second) {
+              _second = second;
+            },
+          ),
         ),
       ),
     );
@@ -482,8 +529,8 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   // 本地摄像头
   _cameraView() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 75.0, horizontal: 20.0),
-      alignment: Alignment.bottomRight,
+      padding: const EdgeInsets.only(top: 75.0, right: 20.0),
+      alignment: Alignment.topRight,
       child: FractionallySizedBox(
         child: Container(
           width: 110.0,
@@ -510,42 +557,261 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     return Container(
       margin: const EdgeInsets.all(20.0),
       alignment: Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          if (widget.video)
-            RawMaterialButton(
-              onPressed: _onToggleCamera,
-              elevation: 2.0,
-              child: const Icon(
-                Icons.cached,
-                color: Colors.white,
-                size: 35,
-              ),
+      child: widget.video
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 第一行：麦克风、免提
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // 麦克风开关按钮（带文字）
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RawMaterialButton(
+                          onPressed: _onToggleMuteAudio,
+                          elevation: 2.0,
+                          fillColor:
+                              _mutedAudio ? Colors.grey : Color(0xFF4E4E4E),
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(7.5),
+                          child: Icon(
+                            _mutedAudio ? Icons.mic_off : Icons.mic,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _mutedAudio ? "关闭麦克风" : "开启麦克风",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 免提按钮
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RawMaterialButton(
+                          onPressed: _onToggleSpeaker,
+                          elevation: 2.0,
+                          fillColor: _speakerOn
+                              ? Colors.blue
+                              : const Color(0xFF4E4E4E),
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(7.5),
+                          child: Icon(
+                            _speakerOn ? Icons.volume_up : Icons.volume_down,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _speakerOn ? "关闭免提" : "开启免提",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20), // 两行之间的间距
+                // 第二行：摄像头、挂断、摄像头翻转
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // 视频开关按钮（带文字）
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RawMaterialButton(
+                          onPressed: _onToggleMuteVideo,
+                          elevation: 2.0,
+                          padding: const EdgeInsets.all(15.0),
+                          shape: const CircleBorder(),
+                          // 修改这里，使用 _mutedVideo 状态来设置颜色
+                          fillColor: _mutedVideo
+                              ? Colors.grey
+                              : const Color(0xFF4E4E4E),
+                          child: Icon(
+                            _mutedVideo ? Icons.videocam_off : Icons.videocam,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _mutedVideo ? "摄像头已关" : "摄像头已开",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 挂断按钮
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RawMaterialButton(
+                          onPressed: () {
+                            _engine?.leaveChannel();
+                            RequestMessage.callKit(
+                              widget.channel,
+                              CallStatus.finish,
+                              second: _second,
+                            );
+                            Get.back();
+                          },
+                          elevation: 2.0,
+                          fillColor: Colors.redAccent,
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(15.0),
+                          child: const Icon(
+                            Icons.call_end,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "挂断",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 摄像头翻转按钮（带文字）
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RawMaterialButton(
+                          onPressed: _onToggleCamera,
+                          elevation: 2.0,
+                          fillColor: const Color(0xFF4E4E4E),
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(15.0),
+                          child: const Icon(
+                            Icons.cached,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "切换摄像头",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // 麦克风开关按钮（带文字）
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RawMaterialButton(
+                      onPressed: _onToggleMuteAudio,
+                      elevation: 2.0,
+                      fillColor: _mutedAudio ? Colors.grey : Color(0xFF4E4E4E),
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(15.0),
+                      child: Icon(
+                        _mutedAudio ? Icons.mic_off : Icons.mic,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _mutedAudio ? "关闭麦克风" : "开启麦克风",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                // 挂断按钮
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RawMaterialButton(
+                      onPressed: () {
+                        _engine?.leaveChannel();
+                        RequestMessage.callKit(
+                          widget.channel,
+                          CallStatus.finish,
+                          second: _second,
+                        );
+                        Get.back();
+                      },
+                      elevation: 2.0,
+                      fillColor: Colors.redAccent,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(15.0),
+                      child: const Icon(
+                        Icons.call_end,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "挂断",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                // 免提按钮
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RawMaterialButton(
+                      onPressed: _onToggleSpeaker,
+                      elevation: 2.0,
+                      fillColor:
+                          _speakerOn ? Colors.blue : const Color(0xFF4E4E4E),
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(15.0),
+                      child: Icon(
+                        _speakerOn ? Icons.volume_up : Icons.volume_down,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _speakerOn ? "关闭免提" : "开启免提",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          if (widget.video)
-            RawMaterialButton(
-              onPressed: _onToggleMuteVideo,
-              elevation: 2.0,
-              padding: const EdgeInsets.all(15.0),
-              child: Icon(
-                _mutedVideo ? Icons.videocam_off : Icons.videocam,
-                color: Colors.white,
-                size: 35,
-              ),
-            ),
-          RawMaterialButton(
-            onPressed: _onToggleMuteAudio,
-            elevation: 2.0,
-            padding: const EdgeInsets.all(15.0),
-            child: Icon(
-              _mutedAudio ? Icons.mic_off : Icons.mic,
-              color: Colors.white,
-              size: 35,
-            ),
-          ),
-        ],
-      ),
     );
   }
 

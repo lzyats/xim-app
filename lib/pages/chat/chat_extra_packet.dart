@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
@@ -23,7 +24,13 @@ class ChatExtraPacket extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '红包',
-      icon: AppFonts.e679,
+      icon: Image.asset(
+        AppImage.chathb, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
+      color: Color(0xFFFFCECE),
       onTap: () {
         Get.to(const ChatExtraPacketItem());
       },

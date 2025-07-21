@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
@@ -12,6 +13,7 @@ class LoginForgotController extends BaseController {
   TextEditingController phoneController = TextEditingController();
   TextEditingController codeController = TextEditingController();
   TextEditingController passController = TextEditingController();
+  TextEditingController safePassController = TextEditingController();
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
 
@@ -19,12 +21,13 @@ class LoginForgotController extends BaseController {
   Future<void> sendCode() async {
     // 获取手机号
     var phone = phoneController.text.trim();
+    var safe = safePassController.text.trim();
     // 定时任务
     if (toolsTimer.start()) {
       return;
     }
     // 执行
-    String code = await RequestAuth.sendCode(phone, '2');
+    String code = await RequestAuth.sendCode(phone, '2', safe: safe);
     // 验证码回填
     codeController.text = code;
   }
@@ -49,6 +52,7 @@ class LoginForgotController extends BaseController {
     phoneController.dispose();
     codeController.dispose();
     passController.dispose();
+    safePassController.dispose();
     super.onClose();
   }
 }

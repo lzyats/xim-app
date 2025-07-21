@@ -1,3 +1,4 @@
+import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,7 +19,13 @@ class ChatExtraCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '名片',
-      icon: AppFonts.e62c,
+      icon: Image.asset(
+        AppImage.chatmp, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
+      color: Color(0xFFF1FBFF),
       onTap: () {
         _event();
       },

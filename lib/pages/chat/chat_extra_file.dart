@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:alpaca/event/event_message.dart';
@@ -20,7 +21,13 @@ class ChatExtraFile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '文件',
-      icon: Icons.insert_drive_file,
+      icon: Image.asset(
+        AppImage.chatwj, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
+      color: Color(0xFFF1FBFF),
       onTap: () async {
         // 权限
         bool result = await ToolsPerms.storage();

@@ -1,3 +1,4 @@
+import 'package:alpaca/config/app_resource.dart';
 import 'package:amap_map_fluttify/amap_map_fluttify.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -20,7 +21,13 @@ class ChatExtraLocation extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '位置',
-      icon: AppFonts.e8ff,
+      icon: Image.asset(
+        AppImage.chatwz, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
+      color: Color(0xFFE7F9FF),
       onTap: () async {
         // 权限
         bool result = await ToolsPerms.location();

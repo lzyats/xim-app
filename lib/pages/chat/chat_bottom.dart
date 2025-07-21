@@ -18,6 +18,7 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:flutter_sound_record/flutter_sound_record.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 // 聊天=底部
 class ChatBottom extends StatefulWidget {
@@ -161,11 +162,11 @@ class _ChatBottomState extends State<ChatBottom> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 241, 238, 238),
+        color: Color(0xFFF8F8F8),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5), // 阴影颜色
-            blurRadius: 1, // 模糊半径
+            blurRadius: 3, // 模糊半径
           )
         ],
       ),

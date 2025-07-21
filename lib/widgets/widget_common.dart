@@ -46,7 +46,7 @@ class WidgetCommon {
           '添加好友',
           Icon(
             AppFonts.ec84,
-            color: Colors.indigo,
+            color: Colors.white,
             size: _iconSize,
           ),
           onTap: () {
@@ -57,7 +57,7 @@ class WidgetCommon {
           '搜索群聊',
           Icon(
             AppFonts.e601,
-            color: Colors.purple,
+            color: Colors.white,
             size: _iconSize,
           ),
           onTap: () {
@@ -68,7 +68,7 @@ class WidgetCommon {
           '新建群聊',
           Icon(
             AppFonts.e630,
-            color: Colors.green,
+            color: Colors.white,
             size: _iconSize,
           ),
           onTap: () {
@@ -79,7 +79,7 @@ class WidgetCommon {
           '扫一扫',
           Icon(
             AppFonts.e60c,
-            color: Colors.orange,
+            color: Colors.white,
             size: _iconSize,
           ),
           onTap: () async {
@@ -94,7 +94,7 @@ class WidgetCommon {
           '收款码',
           Icon(
             AppFonts.e66c,
-            color: Colors.blue,
+            color: Colors.white,
             size: _iconSize,
           ),
           onTap: () {
@@ -363,7 +363,7 @@ class WidgetCommon {
   }
 
   // 显示头像
-  static showAvatar(String avatar, {double size = 50}) {
+  static showAvatar(String avatar, {double size = 50, double yj = 30}) {
     if (avatar.isEmpty) {
       return SizedBox(
         height: size + 10,
@@ -371,7 +371,7 @@ class WidgetCommon {
       );
     }
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10.0),
+      borderRadius: BorderRadius.circular(yj),
       child: WidgetImage(
         avatar,
         ImageType.network,

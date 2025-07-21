@@ -203,11 +203,14 @@ class _ExtraContainerState extends State<ExtraContainer> {
 // 扩展详情
 class ExtraItem extends InkWell {
   final String label;
-  final IconData icon;
-
+  //final IconData icon;
+  final Widget? icon; // 改为 Widget 类型，支持任何图标组件
+  final Color? color;
   const ExtraItem({
     this.label = '',
-    this.icon = Icons.add,
+    //this.icon = Icons.add,
+    this.icon,
+    this.color,
     super.key,
     super.onTap,
   });
@@ -220,14 +223,11 @@ class ExtraItem extends InkWell {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 248, 246, 246),
+              color: color != null ? color : Color(0xFFF7F1FF),
               borderRadius: BorderRadius.circular(7.0),
             ),
             padding: const EdgeInsets.all(12.0),
-            child: Icon(
-              icon,
-              size: 40,
-            ),
+            child: icon,
           ),
           const SizedBox(
             height: 10,

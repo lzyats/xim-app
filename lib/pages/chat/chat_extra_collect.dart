@@ -1,3 +1,4 @@
+import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,13 @@ class ChatExtraCollect extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '收藏',
-      icon: AppFonts.e60d,
+      icon: Image.asset(
+        AppImage.chatsc, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
+      color: Color(0xFFFFF0E7),
       onTap: () {
         Get.to(const ChatExtraCollectItem());
       },

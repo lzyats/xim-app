@@ -173,7 +173,7 @@ class AppFonts {
       IconData(58948, fontFamily: _fontFamily, matchTextDirection: _matchText);
   // 语音切换
   static const IconData e664 =
-      IconData(58980, fontFamily: _fontFamily, matchTextDirection: _matchText);
+      IconData(59195, fontFamily: _fontFamilya, matchTextDirection: _matchText);
   // 键盘切换
   static const IconData e618 =
       IconData(58904, fontFamily: _fontFamily, matchTextDirection: _matchText);

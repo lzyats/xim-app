@@ -44,11 +44,12 @@ class ToolsRegex {
   }
 
   // 转换消息
-  static ParsedText parsedText(String text) {
+  static ParsedText parsedText(String text, {bool self = false}) {
     TextStyle style = TextStyle(color: AppTheme.color, fontSize: 16);
     return ParsedText(
       text: text,
-      style: const TextStyle(color: Colors.black, fontSize: 16),
+      style:
+          TextStyle(color: !self ? Colors.white : Colors.black, fontSize: 16),
       parse: [
         // 邮箱
         MatchText(

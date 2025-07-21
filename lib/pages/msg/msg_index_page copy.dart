@@ -23,12 +23,10 @@ class MsgIndexPage extends GetView<MsgIndexController> {
   const MsgIndexPage({super.key});
 
   // 定义顶部导航栏的渐变颜色
-  // 修改为上下方向的渐变
   final Gradient _appBarGradient = const LinearGradient(
-    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)], // 调整颜色顺序增强垂直感
-    begin: Alignment.topCenter, // 从上到下
-    end: Alignment.bottomCenter,
-    stops: [0.0, 1.0], // 颜色分布点
+    colors: [Color(0xFF4A6FE3), Color(0xFF6B4EE6)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   @override
@@ -36,31 +34,12 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     Get.lazyPut<MsgIndexController>(() => MsgIndexController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 10),
-        child: Container(
-          decoration: BoxDecoration(gradient: _appBarGradient),
-          child: Column(
-            children: [
-              // 状态栏区域
-              Container(
-                height: MediaQuery.of(context).padding.top,
-                color: Colors.transparent,
-              ),
-              Expanded(
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: const Text('消息'),
-                  centerTitle: false,
-                  actions: [
-                    WidgetCommon.buildAction(),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text('消息'),
+        actions: [
+          WidgetCommon.buildAction(),
+        ],
       ),
       drawer: AppConfig.mini ? const UniIndexPage() : null,
       body: Column(
@@ -121,7 +100,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
       context: controller.notice.value,
       prefixIcon: TDIcons.sound,
       style: TDNoticeBarStyle(
-        backgroundColor: Color(0xFF0463F7),
+        backgroundColor: AppTheme.color,
         textStyle: const TextStyle(
           color: Colors.white,
           fontSize: 15,

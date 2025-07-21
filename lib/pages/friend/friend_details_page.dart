@@ -1,3 +1,7 @@
+import 'package:alpaca/config/app_resource.dart';
+import 'package:alpaca/event/event_message.dart';
+import 'package:alpaca/tools/tools_storage.dart';
+import 'package:alpaca/tools/tools_submit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,11 +20,23 @@ import 'package:alpaca/widgets/widget_common.dart';
 import 'package:alpaca/widgets/widget_image.dart';
 import 'package:alpaca/widgets/widget_line.dart';
 
+//拔打语音
+import 'package:alpaca/pages/chat/chat_extra_call.dart';
+
 // 好友详情
 class FriendDetailsPage extends GetView<FriendDetailsController> {
   // 路由地址
   static const String routeName = '/friend_details';
   const FriendDetailsPage({super.key});
+
+  // 定义顶部导航栏的渐变颜色
+  // 修改为上下方向的渐变
+  final Gradient _appBarGradient = const LinearGradient(
+    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)], // 调整颜色顺序增强垂直感
+    begin: Alignment.topCenter, // 从上到下
+    end: Alignment.bottomCenter,
+    stops: [0.0, 1.0], // 颜色分布点
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -30,20 +46,40 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
         ChatFriend chatFriend = controller.refreshData;
         return Scaffold(
           resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            title: const Text('好友详情'),
-            actions: [
-              if (FriendType.friend == chatFriend.friendType)
-                WidgetAction(
-                  icon: const Icon(Icons.more_horiz),
-                  onTap: () {
-                    Get.toNamed(
-                      FriendSettingPage.routeName,
-                      arguments: chatFriend,
-                    );
-                  },
-                ),
-            ],
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight + 10),
+            child: Container(
+              decoration: BoxDecoration(gradient: _appBarGradient),
+              child: Column(
+                children: [
+                  // 状态栏区域
+                  Container(
+                    height: MediaQuery.of(context).padding.top,
+                    color: Colors.transparent,
+                  ),
+                  Expanded(
+                    child: AppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      title: Text('好友详情'),
+                      centerTitle: true,
+                      actions: [
+                        if (FriendType.friend == chatFriend.friendType)
+                          WidgetAction(
+                            icon: const Icon(Icons.more_horiz),
+                            onTap: () {
+                              Get.toNamed(
+                                FriendSettingPage.routeName,
+                                arguments: chatFriend,
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           body: Column(
             children: [
@@ -68,18 +104,6 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
               ),
               WidgetCommon.border(
                 enable: FriendType.friend == chatFriend.friendType,
-              ),
-              WidgetLineCenter(
-                '举报用户',
-                enable: FriendType.friend == chatFriend.friendType,
-                divider: false,
-                color: Colors.red,
-                onTap: () {
-                  Get.toNamed(
-                    FriendInformPage.routeName,
-                    arguments: controller.userId,
-                  );
-                },
               ),
               WidgetCommon.border(
                 enable: FriendType.friend == chatFriend.friendType,
@@ -111,6 +135,19 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
               ),
               WidgetCommon.border(),
               WidgetLineCenter(
+                '举报用户',
+                enable: FriendType.friend == chatFriend.friendType,
+                divider: false,
+                color: Colors.amber,
+                onTap: () {
+                  Get.toNamed(
+                    FriendInformPage.routeName,
+                    arguments: controller.userId,
+                  );
+                },
+              ),
+              WidgetCommon.border(),
+              WidgetLineCenter(
                 '清空消息',
                 divider: false,
                 color: Colors.red,
@@ -119,6 +156,74 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                 },
               ),
               WidgetCommon.border(),
+              // 新增图形按钮区域
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // 发起聊天按钮
+                    GestureDetector(
+                      onTap: () {
+                        // 复用原有发起聊天逻辑
+                        ToolsRoute().chatPage(
+                          chatId: chatFriend.userId,
+                          nickname: chatFriend.nickname,
+                          portrait: chatFriend.portrait,
+                          remark: chatFriend.remark,
+                          chatTalk: ChatTalk.friend,
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          // 聊天图标
+                          WidgetImage(
+                            AppImage.hyfxx, // 使用指定图标
+                            ImageType.asset, // 假设第二个参数是图片类型枚举
+
+                            width: 64,
+                            height: 64,
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            '发起聊天',
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 拨打语音按钮
+                    GestureDetector(
+                      onTap: () {
+                        // 语音通话逻辑可在此处实现
+                        _even('voice');
+                      },
+                      child: Column(
+                        children: [
+                          // 语音图标
+                          WidgetImage(
+                            AppImage.hxfyy, // 使用指定图标
+                            ImageType.asset, // 假设第二个参数是图片类型枚举
+
+                            width: 64,
+                            height: 64,
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            '拨打语音',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
@@ -127,53 +232,59 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
   }
 
   // 顶部头像
+  // 顶部头像及信息区域
   _buildHeader(ChatFriend chatFriend) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              child: WidgetCommon.showAvatar(
-                chatFriend.portrait,
-                size: 65,
-              ),
-              onTap: () {
-                Get.to(
-                  ShowImage(chatFriend.portrait),
-                  transition: Transition.topLevel,
-                );
-              },
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  chatFriend.remark.isNotEmpty
-                      ? chatFriend.remark
-                      : chatFriend.nickname,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+    return Column(
+      children: [
+        // 原有头部信息
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  child: WidgetCommon.showAvatar(
+                    chatFriend.portrait,
+                    size: 65,
                   ),
-                  overflow: TextOverflow.clip,
+                  onTap: () {
+                    Get.to(
+                      ShowImage(chatFriend.portrait),
+                      transition: Transition.topLevel,
+                    );
+                  },
                 ),
-                Text('ID：${chatFriend.userNo}'),
-                Text(
-                  '昵称：${chatFriend.nickname}',
-                  overflow: TextOverflow.visible,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      chatFriend.remark.isNotEmpty
+                          ? chatFriend.remark
+                          : chatFriend.nickname,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.clip,
+                    ),
+                    Text('ID：${chatFriend.userNo}'),
+                    Text(
+                      '昵称：${chatFriend.nickname}',
+                      overflow: TextOverflow.visible,
+                    ),
+                    Text(
+                      '签名：${chatFriend.intro}',
+                    ),
+                  ],
                 ),
-                Text(
-                  '签名：${chatFriend.intro}',
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -213,5 +324,23 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
         );
       },
     );
+  }
+
+  Future<void> _even(String callType) async {
+    // 组装对象
+    EventChatModel model = EventChatModel(
+      ToolsStorage().chat(),
+      MsgType.call,
+      {
+        "callStatus": CallStatus.none.value,
+        "callType": callType,
+        "callTime": '0',
+      },
+      handle: false,
+    );
+    // 发布消息
+    EventMessage().listenSend.add(model);
+    // 转圈
+    ToolsSubmit.call();
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/event/event_message.dart';
@@ -21,7 +22,12 @@ class ChatExtraPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '相册',
-      icon: Icons.image,
+      icon: Image.asset(
+        AppImage.chatimg, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
       onTap: () async {
         // 权限
         bool result = await ToolsPerms.photos();

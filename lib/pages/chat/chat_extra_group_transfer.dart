@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
@@ -27,7 +28,12 @@ class ChatExtraGroupTransfer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExtraItem(
       label: '转账',
-      icon: AppFonts.e686,
+      icon: Image.asset(
+        AppImage.chatimg, // 直接使用图片路径
+        width: 24, // 调整图标大小
+        height: 24,
+        fit: BoxFit.contain, // 保持图片比例
+      ),
       onTap: () {
         Get.to(const ChatExtraTransferItem());
       },

@@ -14,8 +14,12 @@ import 'package:alpaca/tools/tools_timer.dart';
 
 class LoginRegisterController extends BaseController {
   TextEditingController phoneController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
+  TextEditingController emailController =
+      TextEditingController(text: 'qq@qq.com');
   TextEditingController codeController = TextEditingController();
+  TextEditingController passController = TextEditingController();
+  TextEditingController confirmPassController = TextEditingController();
+  TextEditingController safePassController = TextEditingController();
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
 
@@ -39,8 +43,11 @@ class LoginRegisterController extends BaseController {
     String phone = phoneController.text.trim();
     String email = emailController.text.trim();
     String code = codeController.text.trim();
+    String pass = passController.text.trim();
+    String safe = safePassController.text.trim();
     // 执行
-    AuthModel02 model = await RequestAuth.register(phone, email, code);
+    AuthModel02 model =
+        await RequestAuth.register(phone, email, pass, code, safe);
     // 取消
     ToolsSubmit.cancel();
     // 取消
