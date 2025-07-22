@@ -26,8 +26,25 @@ class MineSafetyPage extends GetView<MineSafetyController> {
     Get.lazyPut(() => MineSafetyController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('账号安全'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '账号安全',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<MineSafetyController>(builder: (context) {
         LocalUser localUser = controller.localUser;
@@ -209,8 +226,25 @@ class MineDeletedPage extends GetView<MineSafetyController> {
     controller.textEditingController.text = '';
     return KeyboardDismissOnTap(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('注销账号'),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text(
+                '注销账号',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -333,15 +367,6 @@ class MineDeletedPage extends GetView<MineSafetyController> {
               child: const Text('取消'),
               onPressed: () {
                 Get.back();
-              },
-            ),
-            CupertinoDialogAction(
-              child: const Text('确认'),
-              onPressed: () {
-                if (ToolsSubmit.call()) {
-                  // 提交
-                  controller.deleted();
-                }
               },
             ),
           ],

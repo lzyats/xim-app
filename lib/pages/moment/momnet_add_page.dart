@@ -11,37 +11,69 @@ class MomentAddPage extends GetView<MomentAddController> {
   static const routeName = "/moment_add";
   const MomentAddPage({super.key});
 
+  // 定义顶部导航栏的渐变颜色
+  final Gradient _appBarGradient = const LinearGradient(
+    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: [0.0, 1.0],
+  );
+
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MomentAddController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('发表朋友圈'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: Obx(() {
-              return TextButton(
-                style: ButtonStyle(
-                  // 使用 WidgetStateProperty 替代 MaterialStateProperty
-                  backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                    (states) => states.contains(MaterialState.disabled)
-                        ? Colors.grey
-                        : Colors.green,
-                  ),
-                  foregroundColor: WidgetStateProperty.all(Colors.white),
-                  shape: WidgetStateProperty.all(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0)),
-                  ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 10),
+        child: Container(
+          decoration: BoxDecoration(gradient: _appBarGradient),
+          child: Column(
+            children: [
+              // 状态栏区域
+              Container(
+                height: MediaQuery.of(context).padding.top,
+                color: Colors.transparent,
+              ),
+              Expanded(
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  title: const Text('发表朋友圈'),
+                  // 在原有 AppBar 的 actions 区域中修改
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: 15, bottom: 5), // 新增 bottom: 10 外下边距
+                      child: Obx(() {
+                        return TextButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.resolveWith<Color>(
+                              (states) =>
+                                  states.contains(MaterialState.disabled)
+                                      ? Colors.grey
+                                      : Colors.green,
+                            ),
+                            foregroundColor:
+                                WidgetStateProperty.all(Colors.white),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0)),
+                            ),
+                          ),
+                          onPressed: controller.isPublishable()
+                              ? controller.publish
+                              : null,
+                          child: const Text('发表'),
+                        );
+                      }),
+                    ),
+                  ],
                 ),
-                onPressed:
-                    controller.isPublishable() ? controller.publish : null,
-                child: const Text('发表'),
-              );
-            }),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

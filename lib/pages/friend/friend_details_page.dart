@@ -84,8 +84,15 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
           body: Column(
             children: [
               _buildHeader(chatFriend),
-              WidgetCommon.border(
-                enable: FriendType.other == chatFriend.friendType,
+              WidgetLineRow(
+                '昵称',
+                value: chatFriend.nickname,
+                divider: false,
+              ),
+              WidgetLineRow(
+                '签名',
+                value: chatFriend.intro,
+                divider: false,
               ),
               WidgetLineCenter(
                 '加为好友',
@@ -102,13 +109,7 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                   );
                 },
               ),
-              WidgetCommon.border(
-                enable: FriendType.friend == chatFriend.friendType,
-              ),
-              WidgetCommon.border(
-                enable: FriendType.friend == chatFriend.friendType,
-              ),
-              WidgetLineCenter(
+              WidgetLineRow(
                 '好友备注',
                 enable: FriendType.friend == chatFriend.friendType,
                 divider: false,
@@ -116,10 +117,7 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                   Get.toNamed(FriendRemarkPage.routeName);
                 },
               ),
-              WidgetCommon.border(
-                enable: FriendType.other != chatFriend.friendType,
-              ),
-              WidgetLineCenter(
+              WidgetLineRow(
                 '发起聊天',
                 divider: false,
                 enable: FriendType.other != chatFriend.friendType,
@@ -156,74 +154,68 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                 },
               ),
               WidgetCommon.border(),
-              // 新增图形按钮区域
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    // 发起聊天按钮
-                    GestureDetector(
-                      onTap: () {
-                        // 复用原有发起聊天逻辑
-                        ToolsRoute().chatPage(
-                          chatId: chatFriend.userId,
-                          nickname: chatFriend.nickname,
-                          portrait: chatFriend.portrait,
-                          remark: chatFriend.remark,
-                          chatTalk: ChatTalk.friend,
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          // 聊天图标
-                          WidgetImage(
-                            AppImage.hyfxx, // 使用指定图标
-                            ImageType.asset, // 假设第二个参数是图片类型枚举
-
-                            width: 64,
-                            height: 64,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            '发起聊天',
-                            style: TextStyle(fontSize: 16, color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // 拨打语音按钮
-                    GestureDetector(
-                      onTap: () {
-                        // 语音通话逻辑可在此处实现
-                        _even('voice');
-                      },
-                      child: Column(
-                        children: [
-                          // 语音图标
-                          WidgetImage(
-                            AppImage.hxfyy, // 使用指定图标
-                            ImageType.asset, // 假设第二个参数是图片类型枚举
-
-                            width: 64,
-                            height: 64,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            '拨打语音',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
+              // 仅当是好友时显示图形按钮区域
+              if (FriendType.friend == chatFriend.friendType)
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // 发起聊天按钮
+                      GestureDetector(
+                        onTap: () {
+                          ToolsRoute().chatPage(
+                            chatId: chatFriend.userId,
+                            nickname: chatFriend.nickname,
+                            portrait: chatFriend.portrait,
+                            remark: chatFriend.remark,
+                            chatTalk: ChatTalk.friend,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            WidgetImage(
+                              AppImage.hyfxx,
+                              ImageType.asset,
+                              width: 64,
+                              height: 64,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 6),
+                            const Text(
+                              '发起聊天',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+
+                      // 拨打语音按钮
+                      GestureDetector(
+                        onTap: () {
+                          _even('voice');
+                        },
+                        child: Column(
+                          children: [
+                            WidgetImage(
+                              AppImage.hxfyy,
+                              ImageType.asset,
+                              width: 64,
+                              height: 64,
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              '拨打语音',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         );
@@ -271,13 +263,6 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                       overflow: TextOverflow.clip,
                     ),
                     Text('ID：${chatFriend.userNo}'),
-                    Text(
-                      '昵称：${chatFriend.nickname}',
-                      overflow: TextOverflow.visible,
-                    ),
-                    Text(
-                      '签名：${chatFriend.intro}',
-                    ),
                   ],
                 ),
               ),

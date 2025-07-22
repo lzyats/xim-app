@@ -17,8 +17,25 @@ class MinePrivacyPage extends GetView<MinePrivacyController> {
     Get.lazyPut(() => MinePrivacyController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('账号隐私'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '账号隐私',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<MinePrivacyController>(
         builder: (builder) {

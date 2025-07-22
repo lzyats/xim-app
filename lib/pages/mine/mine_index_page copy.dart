@@ -45,13 +45,13 @@ class MineIndexPage extends GetView<MineIndexController> {
             elevation: 0,
             title: const Text(
               '我的',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             actions: [
               WidgetAction(
                 icon: const Icon(
                   AppFonts.e681,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
                 onTap: () async {
                   ChatRobot chatRobot =

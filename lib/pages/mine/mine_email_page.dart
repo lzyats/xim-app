@@ -18,26 +18,43 @@ class MineEmailPage extends GetView<MineEmailController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => MineEmailController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('我的邮箱'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.progress()) {
-                return;
-              }
-              // 校验
-              _checkCode();
-              // 校验
-              _checkEmail();
-              // 提交
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.setEmail();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '我的邮箱',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.progress()) {
+                    return;
+                  }
+                  // 校验
+                  _checkCode();
+                  // 校验
+                  _checkEmail();
+                  // 提交
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.setEmail();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
@@ -55,8 +72,22 @@ class MineEmailPage extends GetView<MineEmailController> {
   _buildPhone() {
     return TextField(
       controller: controller.phoneController,
-      decoration: const InputDecoration(
-        prefixIcon: Icon(Icons.phone_iphone),
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.phone_iphone),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
       ),
       readOnly: true,
     );
@@ -65,43 +96,52 @@ class MineEmailPage extends GetView<MineEmailController> {
   _buildCode() {
     return Container(
       padding: const EdgeInsets.only(top: 16),
-      child: Stack(
-        alignment: AlignmentDirectional.center,
+      child: Row(
         children: [
-          TextField(
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(
-                ToolsRegex.regExpNumber,
+          Expanded(
+            child: TextField(
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  ToolsRegex.regExpNumber,
+                ),
+                LengthLimitingTextInputFormatter(6),
+              ],
+              controller: controller.codeController,
+              decoration: InputDecoration(
+                hintText: '请输入验证码',
+                prefixIcon: const Icon(Icons.lock),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(
+                    color: Colors.blue,
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: const BorderSide(
+                    color: Colors.blue,
+                    width: 1,
+                  ),
+                ),
               ),
-              LengthLimitingTextInputFormatter(6),
-            ],
-            controller: controller.codeController,
-            decoration: const InputDecoration(
-              hintText: '请输入验证码',
-              prefixIcon: Icon(Icons.lock),
             ),
           ),
-          Positioned(
-            right: 10,
-            child: GestureDetector(
-              onTap: () {
+          const SizedBox(width: 10),
+          Obx(
+            () => ElevatedButton(
+              onPressed: () {
                 // 提交
                 controller.sendCode();
               },
-              child: Obx(
-                () => Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20,
-                    horizontal: 20,
-                  ),
-                  color: Colors.grey[200],
-                  child: Text(
-                    controller.toolsTimer.sendText.value,
-                    style: TextStyle(
-                      color: AppTheme.color,
-                    ),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+              child: Text(
+                controller.toolsTimer.sendText.value,
+                style: TextStyle(
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -120,9 +160,23 @@ class MineEmailPage extends GetView<MineEmailController> {
           LengthLimitingTextInputFormatter(200),
         ],
         controller: controller.emailController,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: '请输入邮箱地址',
-          prefixIcon: Icon(Icons.email),
+          prefixIcon: const Icon(Icons.email),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 1,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 1,
+            ),
+          ),
         ),
       ),
     );

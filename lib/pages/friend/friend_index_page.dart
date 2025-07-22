@@ -80,71 +80,74 @@ class FriendIndexPage extends GetView<FriendIndexController> {
 
   // 组装头部
   _buildHeader() {
-    return Column(
-      children: [
-        Obx(
-          () => WidgetLineRow(
-            "好友通知",
+    return Container(
+      color: Color(0xFFFEFEFF), // 添加背景色
+      child: Column(
+        children: [
+          Obx(
+            () => WidgetLineRow(
+              "好友通知",
+              leading: Icon(
+                AppFonts.e6f6,
+                color: Colors.green,
+                size: _iconSize,
+              ),
+              badger: controller.badger1.value,
+              arrow: false,
+              onTap: () {
+                Get.toNamed(FriendApprovePage.routeName);
+              },
+            ),
+          ),
+          Obx(
+            () => WidgetLineRow(
+              "群聊通知",
+              leading: Icon(
+                AppFonts.e629,
+                color: Colors.purple,
+                size: _iconSize,
+              ),
+              badger: controller.badger2.value,
+              arrow: false,
+              onTap: () {
+                Get.toNamed(GroupApprovePage.routeName);
+              },
+            ),
+          ),
+          WidgetLineRow(
+            "我的群聊",
             leading: Icon(
-              AppFonts.e6f6,
-              color: Colors.green,
+              AppFonts.e61b,
+              color: Colors.orange,
               size: _iconSize,
             ),
-            badger: controller.badger1.value,
             arrow: false,
             onTap: () {
-              Get.toNamed(FriendApprovePage.routeName);
+              Get.toNamed(GroupIndexPage.routeName);
             },
           ),
-        ),
-        Obx(
-          () => WidgetLineRow(
-            "群聊通知",
+          WidgetLineRow(
+            "官方服务",
             leading: Icon(
-              AppFonts.e629,
-              color: Colors.purple,
+              AppFonts.e62f,
+              color: Colors.blue,
               size: _iconSize,
             ),
-            badger: controller.badger2.value,
             arrow: false,
-            onTap: () {
-              Get.toNamed(GroupApprovePage.routeName);
+            onTap: () async {
+              ChatRobot chatRobot =
+                  await ToolsSqlite().robot.getById(AppConfig.robotId);
+              ToolsRoute().chatPage(
+                chatId: chatRobot.robotId,
+                nickname: chatRobot.nickname,
+                portrait: chatRobot.portrait,
+                chatTalk: ChatTalk.robot,
+              );
             },
+            divider: false,
           ),
-        ),
-        WidgetLineRow(
-          "我的群聊",
-          leading: Icon(
-            AppFonts.e61b,
-            color: Colors.orange,
-            size: _iconSize,
-          ),
-          arrow: false,
-          onTap: () {
-            Get.toNamed(GroupIndexPage.routeName);
-          },
-        ),
-        WidgetLineRow(
-          "官方服务",
-          leading: Icon(
-            AppFonts.e62f,
-            color: Colors.blue,
-            size: _iconSize,
-          ),
-          arrow: false,
-          onTap: () async {
-            ChatRobot chatRobot =
-                await ToolsSqlite().robot.getById(AppConfig.robotId);
-            ToolsRoute().chatPage(
-              chatId: chatRobot.robotId,
-              nickname: chatRobot.nickname,
-              portrait: chatRobot.portrait,
-              chatTalk: ChatTalk.robot,
-            );
-          },
-          divider: false,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

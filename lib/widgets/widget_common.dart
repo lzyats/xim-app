@@ -383,23 +383,46 @@ class WidgetCommon {
   }
 
   // 显示二维码
-  static showQrCode({required String data, required String avatar}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40),
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-      child: PrettyQrView.data(
-        data: data,
-        errorCorrectLevel: QrErrorCorrectLevel.Q,
-        decoration: PrettyQrDecoration(
-          image: PrettyQrDecorationImage(
-            image: WidgetImage.provider(avatar),
-            padding: const EdgeInsets.all(10),
-            fit: BoxFit.cover,
-            onError: (exception, stackTrace) => Image.asset(AppImage.error),
+  static showQrCode(
+      {required String data,
+      required String avatar,
+      double? width,
+      double? height}) {
+    if (width != null) {
+      return Container(
+        //margin: const EdgeInsets.symmetric(horizontal: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        child: PrettyQrView.data(
+          data: data,
+          errorCorrectLevel: QrErrorCorrectLevel.Q,
+          decoration: PrettyQrDecoration(
+            image: PrettyQrDecorationImage(
+              image: WidgetImage.provider(avatar),
+              padding: const EdgeInsets.all(10),
+              fit: BoxFit.cover,
+              onError: (exception, stackTrace) => Image.asset(AppImage.error),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        child: PrettyQrView.data(
+          data: data,
+          errorCorrectLevel: QrErrorCorrectLevel.Q,
+          decoration: PrettyQrDecoration(
+            image: PrettyQrDecorationImage(
+              image: WidgetImage.provider(avatar),
+              padding: const EdgeInsets.all(10),
+              fit: BoxFit.cover,
+              onError: (exception, stackTrace) => Image.asset(AppImage.error),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   // 显示安全键盘

@@ -16,23 +16,37 @@ class MinePasswordPage extends GetView<MinePasswordController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => MinePasswordController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('修改密码'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.progress()) {
-                return;
-              }
-              // 校验
-              _checkPass();
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.submit();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text('修改密码'), // 标题文本颜色默认黑色
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.progress()) {
+                    return;
+                  }
+                  // 校验
+                  _checkPass();
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.submit();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),

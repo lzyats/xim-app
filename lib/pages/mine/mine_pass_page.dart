@@ -17,23 +17,40 @@ class MinePassPage extends GetView<MinePassController> {
     Get.lazyPut(() => MinePassController());
     return KeyboardDismissOnTap(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('设置密码'),
-          actions: [
-            WidgetAction(
-              onTap: () {
-                if (ToolsSubmit.progress()) {
-                  return;
-                }
-                // 校验
-                _checkPass();
-                if (ToolsSubmit.call()) {
-                  // 提交
-                  controller.submit();
-                }
-              },
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-          ],
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text(
+                '设置密码',
+                style: TextStyle(color: Colors.white),
+              ),
+              actions: [
+                WidgetAction(
+                  onTap: () {
+                    if (ToolsSubmit.progress()) {
+                      return;
+                    }
+                    // 校验
+                    _checkPass();
+                    if (ToolsSubmit.call()) {
+                      // 提交
+                      controller.submit();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         body: SingleChildScrollView(
           child: Column(

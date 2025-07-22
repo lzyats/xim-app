@@ -29,8 +29,25 @@ class MineSettingPage extends GetView<MineSettingController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => MineSettingController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('个人设置'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '个人设置',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<MineSettingController>(
         builder: (builder) {

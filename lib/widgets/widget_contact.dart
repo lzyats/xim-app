@@ -166,7 +166,7 @@ class _WidgetContactState extends State<WidgetContact> {
         softWrap: false,
         style: const TextStyle(
           fontSize: 14.0,
-          color: Color(0xFF666666),
+          color: Colors.blue, // 将颜色改为蓝色,
         ),
       ),
     );

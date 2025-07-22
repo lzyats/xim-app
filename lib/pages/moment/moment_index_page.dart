@@ -35,6 +35,14 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   bool _isCommentInputVisible = false; // 新增标志位，用于控制输入框的显示和隐藏
   bool _isEmojiPickerVisible = false; // 新增标志位，用于控制表情符号选择器的显示和隐藏
 
+  // 定义顶部导航栏的渐变颜色
+  final Gradient _appBarGradient = const LinearGradient(
+    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    stops: [0.0, 1.0],
+  );
+
   @override
   void initState() {
     super.initState();
@@ -65,14 +73,33 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('朋友圈'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.camera_alt),
-            onPressed: _openMomentAddPage,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + 10),
+        child: Container(
+          decoration: BoxDecoration(gradient: _appBarGradient),
+          child: Column(
+            children: [
+              // 状态栏区域
+              Container(
+                height: MediaQuery.of(context).padding.top,
+                color: Colors.transparent,
+              ),
+              Expanded(
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  title: const Text('朋友圈'),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt),
+                      onPressed: _openMomentAddPage,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: Stack(
         children: [
