@@ -15,9 +15,12 @@ class AppImage {
   static String get chatsc => '$_path/sc.webp'; //收藏
   static String get chatzz => '$_path/zz.webp'; //收藏
   static String get chatmp => '$_path/wj.webp'; //收藏
-
+  //好友部分
   static String get hyfxx => '$_path/hyfxx.webp'; //好友发信息
   static String get hxfyy => '$_path/hxfyy.webp'; //好友发语音
+  //个人中心部分
+  static String get hltj => '$_path/hltj.webp'; //推荐
+  static String get mrqd => '$_path/mrqd.webp'; //每日签到
 }
 
 // 资源文件

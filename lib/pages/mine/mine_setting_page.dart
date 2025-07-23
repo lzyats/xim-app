@@ -83,8 +83,15 @@ class MineSettingPage extends GetView<MineSettingController> {
                       Get.toNamed(MineNicknamePage.routeName);
                     },
                   ),
+                  WidgetLineContent(
+                    '签名',
+                    localUser.intro,
+                    onTap: () {
+                      Get.toNamed(MineIntroPage.routeName);
+                    },
+                  ),
                   WidgetLineRow(
-                    '我的ID',
+                    'ID号',
                     value: localUser.userNo,
                     arrow: false,
                     onLongPress: () {
@@ -133,19 +140,13 @@ class MineSettingPage extends GetView<MineSettingController> {
                       Get.toNamed(MineCityPage.routeName);
                     },
                   ),
-                  WidgetLineContent(
-                    '我的签名',
-                    localUser.intro,
-                    onTap: () {
-                      Get.toNamed(MineIntroPage.routeName);
-                    },
-                  ),
-                  WidgetLineRow(
-                    '账号隐私',
-                    onTap: () {
-                      Get.toNamed(MinePrivacyPage.routeName);
-                    },
-                  ),
+
+                  // WidgetLineRow(
+                  //   '账号隐私',
+                  //   onTap: () {
+                  //     Get.toNamed(MinePrivacyPage.routeName);
+                  //   },
+                  // ),
                 ],
               ),
             ),

@@ -68,7 +68,7 @@ class RequestAuth {
         'email': email,
         'pass': pass,
         'code': code,
-        'safe': safe,
+        'safestr': safe,
       },
     );
     return ajaxData.getData((data) => AuthModel02.fromJson(data));

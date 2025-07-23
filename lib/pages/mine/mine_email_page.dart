@@ -35,8 +35,23 @@ class MineEmailPage extends GetView<MineEmailController> {
               '我的邮箱',
               style: TextStyle(color: Colors.black),
             ),
-            actions: [
-              WidgetAction(
+            // 移除顶部导航栏中的完成按钮
+            actions: [],
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            _buildPhone(),
+            _buildCode(),
+            _buildEmail(),
+            // 在_buildEmail下方添加完成按钮
+            Padding(
+              padding: const EdgeInsets.only(top: 30), // 增加顶部间距，优化布局
+              child: WidgetAction(
+                label1: '立即修改',
                 onTap: () {
                   if (ToolsSubmit.progress()) {
                     return;
@@ -52,17 +67,7 @@ class MineEmailPage extends GetView<MineEmailController> {
                   }
                 },
               ),
-            ],
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            _buildPhone(),
-            _buildCode(),
-            _buildEmail(),
+            ),
           ],
         ),
       ),
@@ -136,7 +141,7 @@ class MineEmailPage extends GetView<MineEmailController> {
                 controller.sendCode();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Color(0xFF0463F7),
               ),
               child: Text(
                 controller.toolsTimer.sendText.value,

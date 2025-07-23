@@ -32,7 +32,7 @@ class MineCityPage extends GetView<MineCityController> {
             elevation: 0,
             title: const Text(
               '修改地区',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
             actions: [
               WidgetAction(
@@ -82,6 +82,42 @@ class MineCityPage extends GetView<MineCityController> {
     return TextField(
       enabled: false,
       controller: controller.cityController,
+      decoration: InputDecoration(
+        // 基础边框（未聚焦时）
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 启用状态边框（未聚焦时）
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 聚焦状态边框
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 输入框内边距，调整内容与边框的距离
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 12.0,
+        ),
+        // 提示文本样式（当输入框为空时显示）
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+        ),
+        hintText: "请选择生日", // 添加提示文本，增强用户引导
+      ),
     );
   }
 }

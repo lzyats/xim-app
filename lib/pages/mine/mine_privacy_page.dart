@@ -32,7 +32,7 @@ class MinePrivacyPage extends GetView<MinePrivacyController> {
             elevation: 0,
             title: const Text(
               '账号隐私',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),
