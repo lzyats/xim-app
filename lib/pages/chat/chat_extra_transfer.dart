@@ -89,9 +89,24 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '发送转账',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '发送转账',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
         ),
       ),
       body: KeyboardDismissOnTap(
@@ -164,7 +179,7 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
       ],
       textAlign: TextAlign.right,
       controller: _amountController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: '¥ 0.00',
         prefixIcon: Padding(
           padding: EdgeInsets.all(10.0),
@@ -175,6 +190,18 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
           ),
         ),
         prefixIconConstraints: BoxConstraints(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
       ),
     );
   }
@@ -186,7 +213,7 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
       textAlign: TextAlign.right,
       maxLines: null,
       controller: _remarkController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: '请输入转账说明',
         prefixIcon: Padding(
           padding: EdgeInsets.all(10.0),
@@ -197,6 +224,18 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
           ),
         ),
         prefixIconConstraints: BoxConstraints(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
       ),
       maxLength: 15,
     );

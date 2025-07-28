@@ -13,24 +13,33 @@ class WalletCashController extends BaseController {
   AuthType auth = ToolsStorage().local().auth;
   // 余额
   String balance = '0.00';
-  double amount = 0.00;
+  double amount = 50.0;
   double charge = 0.00;
+  double rates = 0.00;
   WalletModel01 select = WalletModel01.init();
   // 获取配置
   getConfig() async {
     refreshData = WalletModel02.init();
     refreshData = await RequestWallet.getCashConfig();
+    rates = refreshData.rates;
     update();
   }
 
-  // 钱包详情
-  getInfo() async {
-    if (Get.isRegistered<WalletIndexController>()) {
-      WalletIndexController controller = Get.find<WalletIndexController>();
-      balance = await controller.getInfo();
-      update();
-    }
+  // 查询钱包
+  Future<String> getInfo() async {
+    String value = await RequestWallet.getWalletInfo();
+    balance = value;
+    return value;
   }
+
+  // // 钱包详情
+  // getInfo() async {
+  //   if (Get.isRegistered<WalletIndexController>()) {
+  //     WalletIndexController controller = Get.find<WalletIndexController>();
+  //     balance = await controller.getInfo();
+  //     update();
+  //   }
+  // }
 
   // 钱包列表
   void getBankList() async {

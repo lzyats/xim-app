@@ -53,7 +53,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
       ),
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 55),
+          padding: const EdgeInsets.symmetric(horizontal: 45),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -294,7 +294,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
               // 协议勾选（保持不变）
               Row(
                 children: [
-                  const Text('我已阅读并同意'),
+                  const Text('已阅读并同意'),
                   GestureDetector(
                     child: const Text(
                       '《用户协议》',

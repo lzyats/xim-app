@@ -316,10 +316,10 @@ class WidgetCommon {
   }
 
   // 提醒文字
-  static Widget tips(
-    String value, {
-    TextAlign textAlign = TextAlign.center,
-  }) {
+  static Widget tips(String value,
+      {TextAlign textAlign = TextAlign.center,
+      Color color = const Color(0xFF969695)}) {
+    // 参数名统一为 color，默认值合法
     if (value.isEmpty) {
       return Container();
     }
@@ -333,8 +333,9 @@ class WidgetCommon {
       alignment: alignment,
       child: Text(
         value,
-        style: const TextStyle(
-          color: ui_.Color.fromARGB(255, 150, 150, 149),
+        style: TextStyle(
+          // 移除 const 修饰，允许引用变量
+          color: color,
         ),
         textAlign: textAlign,
       ),

@@ -43,7 +43,7 @@ class MineCollectPage extends GetView<MineCollectController> {
             elevation: 0,
             title: const Text(
               '我的收藏',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ),

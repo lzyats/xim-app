@@ -241,98 +241,105 @@ class MineDeletedPage extends GetView<MineSafetyController> {
               elevation: 0,
               title: const Text(
                 '注销账号',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             ),
           ),
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                Text(
-                  '注销账号请输入 ($tips)',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 5,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextField(
-                  controller: controller.textEditingController,
-                  decoration: const InputDecoration(
-                    hintText: '请输入注销内容',
+                  const Text(
+                    '注销账号注意事宜',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TDLink(
-                    label: '一键输入',
-                    style: TDLinkStyle.primary,
-                    uri: Uri(),
-                    linkClick: (uri) {
-                      controller.textEditingController.text = tips;
-                    },
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text(
-                  '注销账号注意事宜',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  width: double.infinity,
-                  color: const Color.fromARGB(255, 234, 234, 232),
-                  padding: const EdgeInsets.all(10),
-                  child: RichText(
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '1、确认注销代表您本人同意注销账号\n',
-                        ),
-                        TextSpan(
-                          text: '2、注销前请确定您的账号财产已经进行结算或转移\n',
-                        ),
-                        TextSpan(
-                          text: '3、注销后您的账号所有权限将会自行解除\n',
-                        ),
-                        TextSpan(
-                          text: '4、注销后您的账号财产和记录将会全部删除\n',
-                        ),
-                        TextSpan(
-                          text: '5、注销后您的账号发布的公开信息将会进行匿名化处理或转移\n',
-                        ),
-                        TextSpan(
-                          text: '6、成功注销后如需重新注册，需要重新等待7天',
-                        ),
-                      ],
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      //color: const Color.fromARGB(255, 234, 234, 232),
+                      borderRadius: BorderRadius.circular(22.0), // 添加圆角
+                    ),
+                    child: const Text(
+                      '1、确认注销代表您本人同意注销账号\n'
+                      '2、注销前请确定您的账号财产已经进行结算或转移\n'
+                      '3、注销后您的账号所有权限将会自行解除\n'
+                      '4、注销后您的账号财产和记录将会全部删除\n'
+                      '5、注销后您的账号发布的公开信息将会进行匿名化处理或转移\n'
+                      '6、成功注销后如需重新注册，需要重新等待7天',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.black,
                       ),
                     ),
                   ),
-                ),
-                WidgetButton(
-                  label: '确认注销',
-                  onTap: () {
-                    _deleted();
-                  },
-                ),
-              ],
-            ),
-          ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '注销账号请输入 ($tips)',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextField(
+                    controller: controller.textEditingController,
+                    decoration: InputDecoration(
+                      hintText: '请输入注销内容',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(color: Colors.blue),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(color: Colors.blue),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide:
+                            const BorderSide(color: Colors.blue, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TDLink(
+                      label: '一键输入',
+                      style: TDLinkStyle.primary,
+                      uri: Uri(),
+                      linkClick: (uri) {
+                        controller.textEditingController.text = tips;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  WidgetButton(
+                    label: '确认注销',
+                    onTap: () {
+                      _deleted();
+                    },
+                  ),
+                ],
+              )),
         ),
       ),
     );

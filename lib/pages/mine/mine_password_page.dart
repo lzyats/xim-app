@@ -66,9 +66,24 @@ class MinePasswordPage extends GetView<MinePasswordController> {
       child: TextField(
         obscureText: true,
         controller: controller.oldPassController,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: '请输入旧密码',
           prefixIcon: Icon(Icons.lock),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color: Colors.blue, // 聚焦时边框颜色
+              width: 1,
+            ),
+          ),
+          // 聚焦状态边框
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color: Colors.blue, // 聚焦时边框颜色
+              width: 1,
+            ),
+          ),
         ),
       ),
     );
@@ -80,10 +95,25 @@ class MinePasswordPage extends GetView<MinePasswordController> {
       child: TextField(
         obscureText: true,
         controller: controller.newPwdController,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: '请输入新密码',
           counterText: AppConfig.passText,
           prefixIcon: Icon(Icons.lock),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color: Colors.blue, // 聚焦时边框颜色
+              width: 1,
+            ),
+          ),
+          // 聚焦状态边框
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color: Colors.blue, // 聚焦时边框颜色
+              width: 1,
+            ),
+          ),
         ),
       ),
     );

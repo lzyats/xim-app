@@ -95,7 +95,7 @@ class MineQrCodePage extends GetView<MineQrCodeController> {
                   // 蓝色背景框（改为上下渐变色）
                   Container(
                     margin: const EdgeInsets.only(top: 50),
-                    width: 400,
+                    width: 350,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       // 移除color，使用gradient

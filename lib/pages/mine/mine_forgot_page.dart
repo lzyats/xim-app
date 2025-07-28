@@ -35,7 +35,7 @@ class MineForgotPage extends GetView<MineForgotController> {
               elevation: 0,
               title: const Text(
                 '找回密码',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
               actions: [
                 WidgetAction(
@@ -83,8 +83,22 @@ class MineForgotPage extends GetView<MineForgotController> {
   _buildPhone() {
     return TextField(
       controller: controller.phoneController,
-      decoration: const InputDecoration(
-        prefixIcon: Icon(Icons.phone_iphone),
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.phone_iphone),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
       ),
       readOnly: true,
     );
@@ -103,29 +117,46 @@ class MineForgotPage extends GetView<MineForgotController> {
             LengthLimitingTextInputFormatter(6),
           ],
           controller: controller.codeController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: '请输入验证码',
-            prefixIcon: Icon(Icons.lock),
+            prefixIcon: const Icon(Icons.lock),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: const BorderSide(
+                color: Colors.blue,
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: const BorderSide(
+                color: Colors.blue,
+                width: 1,
+              ),
+            ),
           ),
         ),
         Positioned(
-          right: 10,
+          right: 18,
+          // 限制验证码按钮上下不超过外容器
+          top: 2,
+          bottom: 2,
           child: GestureDetector(
             onTap: () {
-              // 提交
               controller.sendCode();
             },
             child: Obx(
               () => Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 20,
-                ),
+                // 取消垂直内边距，改用居中对齐
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 color: Colors.grey[200],
-                child: Text(
-                  controller.toolsTimer.sendText.value,
-                  style: TextStyle(
-                    color: AppTheme.color,
+                child: Center(
+                  // 文字垂直居中
+                  child: Text(
+                    controller.toolsTimer.sendText.value,
+                    style: TextStyle(
+                      color: AppTheme.color,
+                    ),
                   ),
                 ),
               ),
@@ -140,10 +171,24 @@ class MineForgotPage extends GetView<MineForgotController> {
     return TextField(
       obscureText: true,
       controller: controller.passController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: '请输入密码',
-        prefixIcon: Icon(Icons.lock),
+        prefixIcon: const Icon(Icons.lock),
         counterText: AppConfig.passText,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
       ),
     );
   }

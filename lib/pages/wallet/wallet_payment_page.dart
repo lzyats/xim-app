@@ -5,7 +5,6 @@ import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/pages/wallet/wallet_payment_controller.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/tools/tools_submit.dart';
-
 import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 
@@ -19,26 +18,43 @@ class WalletPaymentPage extends GetView<WalletPaymentController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => WalletPaymentController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('支付密码'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.progress()) {
-                return;
-              }
-              // 校验
-              _checkCode();
-              // 校验
-              _checkPass();
-              // 提交
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.setPass();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '支付密码',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.progress()) {
+                    return;
+                  }
+                  // 校验
+                  _checkCode();
+                  // 校验
+                  _checkPass();
+                  // 提交
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.setPass();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),

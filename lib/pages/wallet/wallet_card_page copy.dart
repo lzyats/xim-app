@@ -53,7 +53,10 @@ class WalletCardPage extends GetView<WalletCardController> {
           return Column(
             children: [
               Expanded(
-                child: _buildWalletCardSection(context),
+                child: _buildWallet(context),
+              ),
+              WidgetCommon.tips(
+                '钱包不能超过 1 张',
               ),
               const SizedBox(
                 height: 30,
@@ -62,149 +65,6 @@ class WalletCardPage extends GetView<WalletCardController> {
           );
         },
       ),
-    );
-  }
-
-  // 与_buildWallet保持一致的ListView.separated模式
-  Widget _buildWalletCardSection(BuildContext context) {
-    // 空状态判断（与_buildWallet逻辑一致）
-    if (controller.refreshList.isEmpty) {
-      return WidgetCommon.none();
-    }
-
-    // 使用ListView.separated展示内容（结构与_buildWallet完全一致）
-    return ListView.separated(
-      // 禁用列表滚动（避免与父级滚动冲突，根据实际场景调整）
-      physics: const NeverScrollableScrollPhysics(),
-      // 自适应内容高度（避免无限高度问题）
-      shrinkWrap: true,
-      //  itemCount与_buildWallet保持一致（列表长度+1）
-      itemCount: controller.refreshList.length + 1,
-      // 分隔线与_buildWallet保持一致
-      separatorBuilder: (BuildContext context, int index) {
-        return WidgetCommon.divider();
-      },
-      // 列表项构建（核心修改：返回Column卡片结构，替代ListTile）
-      itemBuilder: (ctx, index) {
-        // 最后一项返回空容器（与_buildWallet逻辑一致）
-        if (controller.refreshList.length == index) {
-          return Container();
-        }
-
-        // 非最后一项：返回当前的Column卡片结构（替代ListTile）
-        // 可根据需要从model中获取数据（此处示例使用固定内容）
-        WalletModel01 model = controller.refreshList[index];
-        return _buildCardItem(
-            model, context); // 提取卡片项为独立方法，与_buildWallet的itemBuilder对应
-      },
-    );
-  }
-
-// 卡片列表项内容（替代原来的ListTile，使用当前的Column结构）
-  Widget _buildCardItem(WalletModel01 model, BuildContext context) {
-    return Column(
-      children: [
-        // 地址卡片（可根据model动态填充数据，此处示例保留固定内容）
-        Container(
-          width: double.infinity,
-          margin: const EdgeInsets.all(16.0),
-          padding: const EdgeInsets.symmetric(vertical: 35, horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0551E1), Colors.lightBlueAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                // 示例：从model中动态获取标题（根据实际需求调整）
-                '${model.name}USDT钱包地址',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8.0),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0489CF),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Text(
-                  // 示例：从model中动态获取地址（根据实际需求调整）
-                  model.wallet,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.0,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // 按钮区域（可根据model绑定事件，此处示例保留基础逻辑）
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                if (ToolsSubmit.progress()) {
-                  return;
-                }
-                showCupertinoDialog(
-                  context: context,
-                  builder: (builder) {
-                    return CupertinoAlertDialog(
-                      content: const Text(
-                        '确认删除此钱包吗？',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: const Text('取消'),
-                          onPressed: () {
-                            Get.back();
-                          },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text('确认'),
-                          onPressed: () {
-                            // 返回
-                            Get.back();
-                            if (ToolsSubmit.call()) {
-                              // 提交
-                              controller.delete(model);
-                            }
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
-                // 实际场景可调用删除方法：controller.delete(model)
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.blue,
-                side: const BorderSide(color: Colors.blue),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 34.0, vertical: 2.0),
-              ),
-              child: const Text('删除'),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -319,11 +179,11 @@ class WalletCardItemPage extends GetView<WalletCardController> {
                     // 验证
                     String name = controller.nameController.text.trim();
                     if (name.isEmpty) {
-                      throw Exception('请输入实名认证的姓名信息');
+                      throw Exception('请输入支付宝姓名');
                     }
                     String wallet = controller.walletController.text.trim();
                     if (wallet.isEmpty) {
-                      throw Exception('请输入钱包地址');
+                      throw Exception('请输入支付宝账户');
                     }
                     if (ToolsSubmit.call()) {
                       // 提交
@@ -344,7 +204,9 @@ class WalletCardItemPage extends GetView<WalletCardController> {
                 height: 10,
               ),
               _buildWallet(),
-              WidgetCommon.tips('说明：仅支持【TRC20协议】', color: Color(0xFFFF8600)),
+              WidgetCommon.tips(
+                '说明：仅支持【支付宝】',
+              ),
             ],
           ),
         ),
@@ -357,7 +219,7 @@ class WalletCardItemPage extends GetView<WalletCardController> {
       controller: controller.nameController,
       maxLength: 20,
       decoration: const InputDecoration(
-        hintText: '请输入实名认证的姓名信息',
+        hintText: '请输入支付宝姓名',
         icon: Text(
           '姓名:',
           style: TextStyle(fontSize: 16),
@@ -369,12 +231,11 @@ class WalletCardItemPage extends GetView<WalletCardController> {
   _buildWallet() {
     return TextField(
       controller: controller.walletController,
-      maxLength: 32,
-      maxLines: 3,
+      maxLength: 30,
       decoration: const InputDecoration(
-        hintText: '请输入你的TRC20钱包地址',
+        hintText: '请输入支付宝账户',
         icon: Text(
-          '地址:',
+          '账户:',
           style: TextStyle(fontSize: 16),
         ),
       ),

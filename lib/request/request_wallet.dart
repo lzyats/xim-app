@@ -276,6 +276,7 @@ class WalletModel01 {
 class WalletModel02 {
   double cost;
   double rate;
+  double rates;
   double max;
   double min;
   int count;
@@ -285,6 +286,7 @@ class WalletModel02 {
   WalletModel02(
     this.cost,
     this.rate,
+    this.rates,
     this.max,
     this.min,
     this.count,
@@ -296,6 +298,7 @@ class WalletModel02 {
     return WalletModel02(
       double.parse(data?['cost'] ?? '0.00'),
       double.parse(data?['rate'] ?? '0.00'),
+      double.parse(data?['rates'] ?? '0.00'),
       double.parse(data?['max'] ?? '0.00'),
       double.parse(data?['min'] ?? '0.00'),
       data?['count'] ?? 0,

@@ -32,7 +32,6 @@ class MineIndexPage extends GetView<MineIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MineIndexController());
-    LocalUser localUser = controller.localUser.value;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -102,37 +101,40 @@ class MineIndexPage extends GetView<MineIndexController> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       // 左侧：头像和用户名
-                      Row(
-                        children: <Widget>[
-                          CircleAvatar(
-                            radius: 40.0,
-                            backgroundImage: NetworkImage(
-                              localUser.portrait,
+                      Obx(() {
+                        final localUser = controller.localUser.value;
+                        return Row(
+                          children: <Widget>[
+                            CircleAvatar(
+                              radius: 40.0,
+                              backgroundImage: NetworkImage(
+                                localUser.portrait,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 16.0),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                localUser.nickname,
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
+                            SizedBox(width: 16.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  localUser.nickname,
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4.0),
-                              Text(
-                                'ID号: ${localUser.userNo}',
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.grey,
+                                SizedBox(height: 4.0),
+                                Text(
+                                  'ID号: ${localUser.userNo}',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
                       // 右侧：二维码图标和箭头（已移到最右边）
                       Row(
                         children: <Widget>[
@@ -277,8 +279,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 // 右侧：新增图片hltj
                                 Image.asset(
                                   AppImage.hltj,
-                                  width: 76,
-                                  height: 76,
+                                  width: 60,
+                                  height: 60,
                                   fit: BoxFit.contain,
                                 ),
                               ],
@@ -343,8 +345,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 // 右侧：新增图片hltj
                                 Image.asset(
                                   AppImage.mrqd,
-                                  width: 76,
-                                  height: 76,
+                                  width: 60,
+                                  height: 60,
                                   fit: BoxFit.contain,
                                 ),
                               ],
@@ -391,13 +393,13 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('关于我们'),
+                      leading: Icon(Icons.update),
+                      title: Text('账号安全'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
-                        // 关于我们点击事件
+                        // 版本更新点击事件
                         Get.toNamed(
-                          CommonAboutPage.routeName,
+                          MineSafetyPage.routeName,
                         );
                       },
                     ),
@@ -413,17 +415,6 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.update),
-                      title: Text('账号安全'),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        // 版本更新点击事件
-                        Get.toNamed(
-                          MineSafetyPage.routeName,
-                        );
-                      },
-                    ),
-                    ListTile(
                       leading: Icon(Icons.settings),
                       title: Text('软件设置'),
                       trailing: Icon(Icons.arrow_forward_ios),
@@ -431,6 +422,17 @@ class MineIndexPage extends GetView<MineIndexController> {
                         // 设置点击事件
                         Get.toNamed(
                           CommonSoftwarePage.routeName,
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.info),
+                      title: Text('关于我们'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        // 关于我们点击事件
+                        Get.toNamed(
+                          CommonAboutPage.routeName,
                         );
                       },
                     ),

@@ -6,7 +6,6 @@ import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/pages/wallet/wallet_auth_controller.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
-
 import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:alpaca/widgets/widget_image.dart';
@@ -24,37 +23,54 @@ class WalletAuthPage extends GetView<WalletAuthController> {
     bool holdCard = ToolsStorage().config().holdCard == 'Y';
     return KeyboardDismissOnTap(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('实名认证'),
-          actions: [
-            WidgetAction(
-              onTap: () {
-                if (ToolsSubmit.progress()) {
-                  return;
-                }
-                // 校验
-                if (controller.nameController.text.trim().isEmpty) {
-                  throw Exception('姓名不能为空');
-                }
-                if (controller.idCardController.text.trim().isEmpty) {
-                  throw Exception('身份证号码不能为空');
-                }
-                if (controller.identity1.isEmpty) {
-                  throw Exception('身份证人像面不能为空');
-                }
-                if (controller.identity2.isEmpty) {
-                  throw Exception('身份证国徽面不能为空');
-                }
-                if (holdCard && controller.holdCard.isEmpty) {
-                  throw Exception('手持身份证不能为空');
-                }
-                if (ToolsSubmit.call()) {
-                  // 提交
-                  controller.editAuth();
-                }
-              },
-            )
-          ],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text(
+                '实名认证',
+                style: TextStyle(color: Colors.black),
+              ),
+              actions: [
+                WidgetAction(
+                  onTap: () {
+                    if (ToolsSubmit.progress()) {
+                      return;
+                    }
+                    // 校验
+                    if (controller.nameController.text.trim().isEmpty) {
+                      throw Exception('姓名不能为空');
+                    }
+                    if (controller.idCardController.text.trim().isEmpty) {
+                      throw Exception('身份证号码不能为空');
+                    }
+                    if (controller.identity1.isEmpty) {
+                      throw Exception('身份证人像面不能为空');
+                    }
+                    if (controller.identity2.isEmpty) {
+                      throw Exception('身份证国徽面不能为空');
+                    }
+                    if (holdCard && controller.holdCard.isEmpty) {
+                      throw Exception('手持身份证不能为空');
+                    }
+                    if (ToolsSubmit.call()) {
+                      // 提交
+                      controller.editAuth();
+                    }
+                  },
+                )
+              ],
+            ),
+          ),
         ),
         body: GetBuilder<WalletAuthController>(builder: (builder) {
           return SingleChildScrollView(
@@ -145,7 +161,7 @@ class WalletAuthPage extends GetView<WalletAuthController> {
             child: image.isEmpty
                 ? Icon(
                     icon,
-                    color: AppTheme.color,
+                    color: Color(0xFFEAF2F0),
                     size: 150,
                   )
                 : WidgetImage(

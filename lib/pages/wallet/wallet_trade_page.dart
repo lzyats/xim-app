@@ -20,8 +20,25 @@ class WalletTradePage extends GetView<WalletTradeController> {
     Get.lazyPut(() => WalletTradeController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(controller.tradeType.title),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: Text(
+              controller.tradeType.title,
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<WalletTradeController>(builder: (builder) {
         return SlidableAutoCloseBehavior(
@@ -109,8 +126,25 @@ class WalletTradeInfoPage extends GetView<WalletTradeInfoController> {
     Get.lazyPut(() => WalletTradeInfoController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('账单详情'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '账单详情',
+              style: TextStyle(color: Colors.black), // 统一标题文字颜色
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<WalletTradeInfoController>(
         builder: (builder) {

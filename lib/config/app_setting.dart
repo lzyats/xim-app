@@ -16,7 +16,8 @@ class AppSetting {
     //AppConfig.requestHost = 'http://110.42.56.25:8080';
     AppConfig.requestHost = 'http://192.168.1.106:8080';
     // socket地址
-    AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
+    //AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
+    AppConfig.requestSocket = 'wss://110.42.56.25:8888';
     // 添加朋友圈API请求地址
     AppConfig.commentHost = 'http://110.42.56.25:8088';
     // 请求隐私协议
