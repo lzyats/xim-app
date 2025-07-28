@@ -28,8 +28,25 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => CommonSoftwareController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('软件设置'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '软件设置',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -70,7 +87,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   }
                 },
               ),
-              WidgetLineRow(
+              /* WidgetLineRow(
                 "分享应用",
                 onTap: () {
                   String content = '快来和我一起聊天吧${controller.sharePath}';
@@ -80,16 +97,16 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   Clipboard.setData(ClipboardData(text: controller.sharePath));
                   EasyLoading.showToast('文本已复制');
                 },
-              ),
-              WidgetLineRow(
+              ), */
+              /* WidgetLineRow(
                 "帮助中心",
                 onTap: () {
                   Get.toNamed(
                     CommonHelpPage.routeName,
                   );
                 },
-              ),
-              WidgetLineRow(
+              ), */
+              /* WidgetLineRow(
                 "建议反馈",
                 onTap: () {
                   Get.toNamed(
@@ -97,7 +114,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   );
                 },
                 divider: false,
-              ),
+              ), */
               WidgetCommon.border(),
               WidgetLineRow(
                 "消息声音",
@@ -153,7 +170,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   );
                 },
               ),
-              WidgetLineRow(
+              /* WidgetLineRow(
                 "信息收集",
                 onTap: () {
                   Get.toNamed(
@@ -161,7 +178,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   );
                 },
                 divider: false,
-              ),
+              ), */
               WidgetCommon.border(),
             ],
           ),

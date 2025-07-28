@@ -18,8 +18,25 @@ class CommonAboutPage extends GetView<CommonAboutController> {
     String beian = ToolsStorage().config().beian;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('关于我们'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '关于我们',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: SafeArea(
         child: Container(
@@ -37,9 +54,7 @@ class CommonAboutPage extends GetView<CommonAboutController> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  beian.isNotEmpty
-                      ? WidgetCommon.tips('ICP备案号：$beian')
-                      : Container(),
+                  beian.isNotEmpty ? WidgetCommon.tips('') : Container(),
                 ],
               )
             ],
@@ -53,13 +68,11 @@ class CommonAboutPage extends GetView<CommonAboutController> {
     return SizedBox(
       width: 96,
       height: 96,
-      child: ClipOval(
-        child: WidgetImage(
-          AppImage.logo,
-          ImageType.asset,
-          width: 120,
-          fit: BoxFit.cover,
-        ),
+      child: WidgetImage(
+        AppImage.logo,
+        ImageType.asset,
+        width: 120,
+        fit: BoxFit.cover,
       ),
     );
   }

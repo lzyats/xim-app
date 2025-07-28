@@ -32,7 +32,7 @@ class MinePassPage extends GetView<MinePassController> {
               elevation: 0,
               title: const Text(
                 '设置密码',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
               actions: [
                 WidgetAction(
