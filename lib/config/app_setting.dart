@@ -21,9 +21,9 @@ class AppSetting {
     // 添加朋友圈API请求地址
     AppConfig.commentHost = 'http://110.42.56.25:8088';
     // 请求隐私协议
-    AppConfig.privacyHost = 'https://baidu.com/privacy.html';
+    AppConfig.privacyHost = 'https://work.weixin.qq.com/nl/eula';
     // 请求服务协议
-    AppConfig.serviceHost = 'https://baidu.com/service.html';
+    AppConfig.serviceHost = 'https://work.weixin.qq.com/nl/eula';
     // 高德地图
     AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
     AppConfig.amapIos = '1d3634f089bad2aa2ace7176d29c6878';

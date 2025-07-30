@@ -56,23 +56,38 @@ class _ViewPageState extends State<ViewPage> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          actions: [
-            GestureDetector(
-              child: const Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 30,
-                ),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              onTap: () {
-                // 返回
-                Get.back();
-              },
             ),
-          ],
-          title: Obx(() => Text(title.value)),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                GestureDetector(
+                  child: const Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 30,
+                    ),
+                  ),
+                  onTap: () {
+                    // 返回
+                    Get.back();
+                  },
+                ),
+              ],
+              title: Obx(() =>
+                  Text(title.value, style: TextStyle(color: Colors.black))),
+            ),
+          ),
         ),
         body: Stack(
           children: [

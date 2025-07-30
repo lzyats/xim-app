@@ -18,8 +18,25 @@ class CommonNoticesPage extends GetView<CommonNoticesController> {
     Get.lazyPut(() => CommonNoticesController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('通知公告'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '通知公告',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<CommonNoticesController>(builder: (builder) {
         return SmartRefresher(
@@ -69,8 +86,25 @@ class CommonNoticesItemPage extends StatelessWidget {
     final CommonModel02 model = Get.arguments;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('详情'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '公告详情',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [

@@ -415,6 +415,19 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
+                      title: Text('通知公告'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      leading: Icon(
+                        AppFonts.e61a,
+                        size: _iconSize,
+                      ),
+                      onTap: () {
+                        Get.toNamed(
+                          CommonNoticesPage.routeName,
+                        );
+                      },
+                    ),
+                    ListTile(
                       leading: Icon(Icons.settings),
                       title: Text('软件设置'),
                       trailing: Icon(Icons.arrow_forward_ios),

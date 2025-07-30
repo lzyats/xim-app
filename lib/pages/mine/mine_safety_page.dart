@@ -60,7 +60,7 @@ class MineSafetyPage extends GetView<MineSafetyController> {
               _buildPass(localUser),
               WidgetLineRow(
                 "注销账号",
-                color: Colors.red,
+                //color: Colors.red,
                 divider: false,
                 onTap: () {
                   Get.toNamed(
@@ -71,7 +71,7 @@ class MineSafetyPage extends GetView<MineSafetyController> {
               WidgetCommon.border(),
               WidgetLineCenter(
                 "清空聊天",
-                color: Colors.red,
+                color: Color(0xFFFF8600),
                 onTap: () {
                   _clear();
                 },
@@ -81,7 +81,7 @@ class MineSafetyPage extends GetView<MineSafetyController> {
               WidgetLineCenter(
                 '退出登录',
                 divider: false,
-                color: Colors.red,
+                color: Color(0xFFFF8600),
                 onTap: () {
                   _logout();
                 },
