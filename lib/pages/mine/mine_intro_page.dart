@@ -23,6 +23,7 @@ class MineIntroPage extends GetView<MineIntroController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(

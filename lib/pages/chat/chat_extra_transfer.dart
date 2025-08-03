@@ -97,13 +97,14 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              '发送转账',
+              '发送转账1',
               style: TextStyle(color: Colors.black),
             ),
           ),
@@ -171,73 +172,157 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
     );
   }
 
+// 美化后的金额输入框
   _buildAmount() {
-    return TextField(
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        AmountFormatter(),
-      ],
-      textAlign: TextAlign.right,
-      controller: _amountController,
-      decoration: InputDecoration(
-        hintText: '¥ 0.00',
-        prefixIcon: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Text(
-            '转账金额',
-            style: TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+            spreadRadius: 2,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: TextField(
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          AmountFormatter(),
+        ],
+        textAlign: TextAlign.right,
+        controller: _amountController,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: '¥ 0.00',
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 18,
           ),
-        ),
-        prefixIconConstraints: BoxConstraints(),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              '转账金额',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          prefixIconConstraints: const BoxConstraints(minWidth: 0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 16,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.grey[200]!,
+              width: 1.5,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.grey[200]!,
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFF4285F4),
+              width: 2,
+            ),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          // 移除默认内边距
+          isDense: true,
         ),
       ),
     );
   }
 
-  // 说明
+// 美化后的备注输入框
   _buildRemark() {
-    return TextField(
-      keyboardType: TextInputType.text,
-      textAlign: TextAlign.right,
-      maxLines: null,
-      controller: _remarkController,
-      decoration: InputDecoration(
-        hintText: '请输入转账说明',
-        prefixIcon: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Text(
-            '转账说明',
-            style: TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        prefixIconConstraints: BoxConstraints(),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+            spreadRadius: 2,
+            offset: const Offset(0, 2),
+          )
+        ],
       ),
-      maxLength: 15,
+      child: TextField(
+        keyboardType: TextInputType.text,
+        textAlign: TextAlign.right,
+        maxLines: null,
+        controller: _remarkController,
+        style: const TextStyle(
+          fontSize: 16,
+        ),
+        decoration: InputDecoration(
+          hintText: '请输入转账说明',
+          hintStyle: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 16,
+          ),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              '转账说明',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          prefixIconConstraints: const BoxConstraints(minWidth: 0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 16,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.grey[200]!,
+              width: 1.5,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: Colors.grey[200]!,
+              width: 1.5,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFF4285F4),
+              width: 2,
+            ),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          counterText: '', // 隐藏字数计数器
+        ),
+        maxLength: 15,
+      ),
     );
   }
 

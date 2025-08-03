@@ -18,15 +18,33 @@ class GroupCreatePage extends GetView<GroupCreateController> {
     Get.lazyPut(() => GroupCreateController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('新建群聊'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              _submit(context);
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '新建群聊',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  _submit(context);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: GetBuilder<GroupCreateController>(builder: (builder) {
         return WidgetContact(

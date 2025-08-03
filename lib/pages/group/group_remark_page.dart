@@ -18,18 +18,36 @@ class GroupRemarkPage extends GetView<GroupRemarkController> {
     return KeyboardDismissOnTap(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: const Text('修改群内昵称'),
-          actions: [
-            WidgetAction(
-              onTap: () {
-                if (ToolsSubmit.call()) {
-                  // 提交
-                  controller.setRemark();
-                }
-              },
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 1.0],
+              ),
             ),
-          ],
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text(
+                '群二维码',
+                style: TextStyle(color: Colors.black),
+              ),
+              actions: [
+                WidgetAction(
+                  onTap: () {
+                    if (ToolsSubmit.call()) {
+                      // 提交
+                      controller.setRemark();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.all(10),
@@ -58,7 +76,24 @@ class GroupRemarkPage extends GetView<GroupRemarkController> {
   _buildNickname() {
     return TextField(
       controller: controller.nicknameController,
-      decoration: const InputDecoration(),
+      decoration: InputDecoration(
+        // 修改输入框样式
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
+        // 聚焦状态边框
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
+      ),
       readOnly: true,
     );
   }
@@ -67,8 +102,24 @@ class GroupRemarkPage extends GetView<GroupRemarkController> {
     return TextField(
       maxLength: 15,
       controller: controller.remarkController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: '请输入群内昵称',
+        // 修改输入框样式
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
+        // 聚焦状态边框
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide(
+            color: Colors.blue, // 聚焦时边框颜色
+            width: 1,
+          ),
+        ),
       ),
     );
   }

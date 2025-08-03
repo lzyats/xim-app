@@ -19,20 +19,38 @@ class GroupLevelPage extends GetView<GroupLevelController> {
     Get.lazyPut(() => GroupLevelController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('群聊扩容'),
-        actions: [
-          WidgetAction(
-            label: '确认',
-            onTap: () {
-              // 校验
-              if (controller.level == 0) {
-                throw Exception('请选择扩容套餐');
-              }
-              _showKeyboard(context);
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '群聊扩容',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                label: '确认',
+                onTap: () {
+                  // 校验
+                  if (controller.level == 0) {
+                    throw Exception('请选择扩容套餐');
+                  }
+                  _showKeyboard(context);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

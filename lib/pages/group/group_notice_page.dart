@@ -16,18 +16,36 @@ class GroupNoticePage extends GetView<GroupManageController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => GroupManageController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('修改公告'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.editNotice();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '修改公告',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.editNotice();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12.0),
@@ -48,7 +66,7 @@ class GroupNoticePage extends GetView<GroupManageController> {
       inputFormatters: [
         FilteringTextInputFormatter.deny(RegExp(r'\n')),
       ],
-      maxLength: 100,
+      maxLength: 1000,
       controller: controller.noticeController,
       decoration: const InputDecoration(
         hintText: '请输入公告',

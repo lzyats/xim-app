@@ -21,15 +21,6 @@ double _iconSize = 40;
 class FriendIndexPage extends GetView<FriendIndexController> {
   const FriendIndexPage({super.key});
 
-  // 定义顶部导航栏的渐变颜色
-  // 修改为上下方向的渐变
-  final Gradient _appBarGradient = const LinearGradient(
-    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)], // 调整颜色顺序增强垂直感
-    begin: Alignment.topCenter, // 从上到下
-    end: Alignment.bottomCenter,
-    stops: [0.0, 1.0], // 颜色分布点
-  );
-
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => FriendIndexController());
@@ -37,27 +28,23 @@ class FriendIndexPage extends GetView<FriendIndexController> {
       return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight + 10),
+          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: Container(
-            decoration: BoxDecoration(gradient: _appBarGradient),
-            child: Column(
-              children: [
-                // 状态栏区域
-                Container(
-                  height: MediaQuery.of(context).padding.top,
-                  color: Colors.transparent,
-                ),
-                Expanded(
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    title: Text('好友(${builder.dataList.length})'),
-                    centerTitle: true,
-                    actions: [
-                      WidgetCommon.buildAction(),
-                    ],
-                  ),
-                ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 1.0], // 颜色分布点
+              ),
+            ),
+            child: AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text('好友(${builder.dataList.length})'),
+              actions: [
+                WidgetCommon.buildAction(),
               ],
             ),
           ),

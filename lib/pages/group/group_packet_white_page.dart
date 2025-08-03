@@ -17,18 +17,36 @@ class GroupPacketWhitePage extends GetView<GroupPacketWhiteController> {
     Get.lazyPut(() => GroupPacketWhiteController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('红包白名单'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.editPacketWhite();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '红包白名单',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.editPacketWhite();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: GetBuilder<GroupPacketWhiteController>(builder: (builder) {
         return WidgetContact(

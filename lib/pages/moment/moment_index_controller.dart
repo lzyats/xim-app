@@ -9,7 +9,6 @@ import 'package:alpaca/tools/tools_storage.dart';
 
 class MomentIndexController extends BaseController {
   // 朋友圈列表
-  //List<Moment> momentList = [];
   final RxList<MomentModel> momentList = RxList<MomentModel>([]);
 
   // 数据加载状态
@@ -17,6 +16,7 @@ class MomentIndexController extends BaseController {
 
   // 下滑加载状态
   final Rx<bool> isLoadingMore = Rx<bool>(false);
+
   LocalUser localUser = ToolsStorage().local();
 
   // 当前页码
@@ -25,67 +25,66 @@ class MomentIndexController extends BaseController {
   // 每页数量
   int pageSize = 10;
 
+  // 记录已经加载过的页码
+  final Set<int> loadedPages = Set<int>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadMoments(1, isRefresh: true);
+  }
+
   // 刷新
   Future<void> _onRefresh() async {
-    currentPage = 1;
-    isLoading.value = true;
-    update();
-
-    try {
-      momentList.value = await getMoments(currentPage, pageSize);
-    } catch (e) {
-      print('Error loading moments: $e');
-    } finally {
-      isLoading.value = false;
-      update();
-    }
+    await _loadMoments(1, isRefresh: true);
   }
 
   // 重新加载数据
   Future<void> reloadData() async {
-    isLoading.value = true;
-    momentList.clear(); // 清空当前数据
-    // 调用 API 重新加载数据
-    // 示例代码，需要根据实际情况修改
-    currentPage = 1;
-    final newData = await getMoments(1, 10);
-    momentList.addAll(newData);
-    isLoading.value = false;
+    await _loadMoments(1, isRefresh: true);
   }
 
   // 下滑加载更多（确保此方法存在）
   Future<void> onLoadMore() async {
     if (isLoadingMore.value) return;
-    isLoadingMore.value = true;
-    update();
-    try {
-      List<MomentModel> newMoments = await getMoments(currentPage, pageSize);
-      if (newMoments.isNotEmpty) {
-        momentList.addAll(newMoments);
-      } else {
-        currentPage--;
-      }
-    } catch (e) {
-      print('Error loading more moments: $e');
-      currentPage--;
-    } finally {
-      isLoadingMore.value = false;
-      update();
-    }
+    await _loadMoments(currentPage, isRefresh: false);
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    isLoading.value = true;
+  // 统一的加载数据方法
+  Future<void> _loadMoments(int page, {bool isRefresh = false}) async {
+    if (isRefresh) {
+      currentPage = 1;
+      loadedPages.clear();
+      isLoading.value = true;
+      momentList.clear();
+    } else {
+      isLoadingMore.value = true;
+    }
     update();
-    _onRefresh();
-    print(momentList.isEmpty);
 
-    Future.delayed(Duration.zero, () {
-      isLoading.value = false;
+    try {
+      if (!loadedPages.contains(page)) {
+        List<MomentModel> newMoments = await getMoments(page, pageSize);
+        if (isRefresh) {
+          momentList.value = newMoments;
+        } else {
+          momentList.addAll(newMoments);
+        }
+        loadedPages.add(page);
+      }
+    } catch (e) {
+      print('Error loading moments: $e');
+      if (!isRefresh) {
+        currentPage--;
+      }
+    } finally {
+      if (isRefresh) {
+        isLoading.value = false;
+      } else {
+        isLoadingMore.value = false;
+      }
       update();
-    });
+    }
   }
 
   /**
@@ -106,23 +105,28 @@ class MomentIndexController extends BaseController {
     return true;
   }
 
-  // 模拟API请求（确保参数正确）
+  /**
+   * 模拟API请求（确保参数正确）
+   */
   Future<List<MomentModel>> getMoments(int page, int pageSize) async {
     print('当前请求页：' + page.toString());
     dynamic responseDataa = await RequestMoment.getMomentList(page, pageSize);
     // 处理分页信息
     List<dynamic> responseData = responseDataa['list'];
-    //判断是否存在下一页
-    if (responseDataa['hasNextPage']) {
-      currentPage++;
-    } else {
-      isLoadingMore.value = true;
-    }
     if (responseData != null && responseData is List) {
       List<MomentModel> list =
           responseData.map((item) => MomentModel.fromJson(item)).toList();
+      //判断是否存在下一页
+      if (responseDataa['hasNextPage']) {
+        currentPage++;
+        print('下个请求页：' + currentPage.toString());
+        isLoadingMore.value = false;
+      } else {
+        isLoadingMore.value = true;
+      }
       return list;
     }
+    isLoadingMore.value = true;
     return [];
   }
 }

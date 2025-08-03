@@ -419,7 +419,7 @@ class MomentModel {
   final String? nickname; // 用户昵称，改为可选类型
   final String? content; // 动态正文，改为可选类型
   final String? location; // 新增：位置信息，字符类型，可为空
-  final String? createTime; // 发布时间，改为可选类型
+  final DateTime? createTime; // 发布时间，改为可选类型
   final List<Media>? images; // 图片列表，改为可选类型
   final List<FriendCommentModel>? comments; // 评论内容，改为可选类型
   final List<String>? likes; // 点赞列表，改为可选类型
@@ -451,7 +451,7 @@ class MomentModel {
       portrait: _parseString(json['portrait']),
       nickname: _parseString(json['nickname']),
       content: _parseString(json['content']),
-      createTime: _parseString(json['createTime']),
+      createTime: _parseDateTime(json['createTime']),
       location: _parseString(json['location']), // 新增字段的JSON解析
       visibility: _parseInt(json['visibility']), // 新增可见性字段的JSON解析
       images: _parseMediaResourceList(json['images']),
@@ -492,7 +492,7 @@ class MomentModel {
     String? portrait,
     String? nickname,
     String? content,
-    String? createTime,
+    DateTime? createTime,
     String? location, // 新增字段在copyWith中支持更新
     int? visibility, // 新增可见性字段的复制更新支持
     List<Media>? images,
@@ -578,6 +578,29 @@ class MomentModel {
   static String? _parseString(dynamic value) {
     if (value == null) return null;
     return value.toString().trim().isNotEmpty ? value.toString() : null;
+  }
+
+  // 辅助方法：解析DateTime类型，处理空值和格式错误
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null; // 空值直接返回null
+
+    // 尝试将输入转换为字符串
+    String? dateString;
+    if (value is String) {
+      dateString = value.trim();
+    } else {
+      dateString = value.toString().trim(); // 非字符串类型转为字符串
+    }
+
+    if (dateString.isEmpty) return null; // 空字符串返回null
+
+    // 尝试解析日期，捕获格式错误
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print('日期解析失败: 输入值=$value, 错误=$e'); // 调试用日志
+      return null; // 格式错误返回null
+    }
   }
 
   // 辅助方法：解析String列表，处理null值

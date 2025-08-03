@@ -303,6 +303,33 @@ class RequestMine {
     );
     EasyLoading.showToast('密码重置成功');
   }
+
+  // 账单列表
+  static Future<List<ChatUserSignModel>> getSignList(
+    int pageNum,
+  ) async {
+    // 执行
+    AjaxData ajaxData = await ToolsRequest()
+        .page('$_prefix/getSignList', pageNum, pageSize: 20);
+    // 转换
+    return ajaxData.getList((data) => ChatUserSignModel.fromJson(data));
+  }
+
+  // 获取某用户签到信息（返回Map）
+  static Future<Map<String, dynamic>> getSignInfo() async {
+    // 执行请求
+    AjaxData ajaxData = await ToolsRequest().get('$_prefix/getSignInfo');
+    // 直接返回接口响应的Map数据（假设ajaxData.data是Map类型）
+    return ajaxData.getData((data) => data);
+  }
+
+  // 执行签到（返回Map）
+  static Future<Map<String, dynamic>> sign() async {
+    // 执行请求
+    AjaxData ajaxData = await ToolsRequest().get('$_prefix/sign');
+    // 直接返回接口响应的Map数据（假设ajaxData.data是Map类型）
+    return ajaxData.getData((data) => data);
+  }
 }
 
 class MineModel01 {
@@ -343,6 +370,52 @@ class MineModel02 {
   factory MineModel02.fromJson(Map<String, dynamic>? data) {
     return MineModel02(
       data?['code'] ?? '',
+    );
+  }
+}
+
+// 已签到信息
+class MineModel03 {
+  String signDate;
+  MineModel03(this.signDate);
+
+  factory MineModel03.fromJson(Map<String, dynamic>? data) {
+    return MineModel03(
+      data?['signDate'] ?? '',
+    );
+  }
+}
+
+class ChatUserSignModel {
+  String signid; // 主键ID
+  String userId; // 用户ID
+  String tradeId; // 用户ID
+  String signDate; // 签到日期
+  String rewardAmount; // 签到奖励
+  String createTime; // 创建时间
+  String updateTime; // 更新时间
+
+  // 构造函数
+  ChatUserSignModel({
+    this.signid = '',
+    this.userId = '',
+    this.tradeId = '',
+    this.signDate = '',
+    this.rewardAmount = '',
+    this.createTime = '',
+    this.updateTime = '',
+  });
+
+  // 从JSON映射为对象
+  factory ChatUserSignModel.fromJson(Map<String, dynamic>? data) {
+    return ChatUserSignModel(
+      signid: data?['signid']?.toString() ?? '',
+      userId: data?['userId']?.toString() ?? '',
+      tradeId: data?['tradeId']?.toString() ?? '',
+      signDate: data?['signDate'] ?? '',
+      rewardAmount: data?['rewardAmount']?.toString() ?? '0.00',
+      createTime: data?['createTime'] ?? '',
+      updateTime: data?['updateTime'] ?? '',
     );
   }
 }

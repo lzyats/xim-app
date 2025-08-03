@@ -19,18 +19,36 @@ class GroupKickedPage extends GetView<GroupKickedController> {
     Get.lazyPut(() => GroupKickedController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('移除成员'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (controller.selectList.isEmpty) {
-                throw Exception('请至少选择一个成员哦');
-              }
-              _kicked(context);
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '移除成员',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (controller.selectList.isEmpty) {
+                    throw Exception('请至少选择一个成员哦');
+                  }
+                  _kicked(context);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: GetBuilder<GroupKickedController>(
         builder: (builder) {

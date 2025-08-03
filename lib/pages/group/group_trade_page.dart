@@ -21,8 +21,26 @@ class GroupTradePage extends GetView<GroupTradeController> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text('未领红包'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '未领红包',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<GroupTradeController>(builder: (builder) {
         return SmartRefresher(

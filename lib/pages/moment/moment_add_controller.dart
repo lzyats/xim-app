@@ -61,7 +61,7 @@ class MomentAddController extends GetxController {
   }
 
   // 发表朋友圈
-  Future<void> publish() async {
+  Future<bool> publish() async {
     // 显示加载状态
     Get.showSnackbar(
       GetSnackBar(
@@ -107,7 +107,9 @@ class MomentAddController extends GetxController {
       bool post = await RequestMoment.postMoment(moments);
       if (post) {
         // 发表成功，返回上一页
-        Get.offNamed('/moment_index');
+
+        // 提交成功：关闭当前页面，并返回true给上一页（moment_index）
+        Get.back(result: true);
         Get.showSnackbar(
           GetSnackBar(
             title: '成功',
@@ -116,6 +118,7 @@ class MomentAddController extends GetxController {
             duration: Duration(seconds: 2),
           ),
         );
+        return true; // 返回成功状态
       }
     } catch (e) {
       // 发表失败
@@ -128,7 +131,9 @@ class MomentAddController extends GetxController {
         ),
       );
       print('发表失败: $e');
+      return false;
     }
+    return false; // 返回失败状态
   }
 
   // 新增的判断方法
@@ -148,6 +153,14 @@ class MomentAddController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+  }
+
+  @override
+  void dispose() {
+    // 移除当前页面的ImagePickerController（根据tag移除）
+    Get.delete<ImagePickerController>(); // tag需与初始化时一致（可通过变量保存）
+    Get.delete<MomentAddController>();
+    super.dispose();
   }
 }
 

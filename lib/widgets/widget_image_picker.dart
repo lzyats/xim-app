@@ -42,6 +42,23 @@ class ImagePickerController extends GetxController {
     selectedMedias.remove(media);
     selectedMediasInfo.remove(mediaInfo);
   }
+
+  // 重置方法
+  void reset() {
+    selectedMediasInfo.clear();
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    reset(); // 初始化时强制清空
+  }
+
+  @override
+  void dispose() {
+    reset(); // 初始化时强制清空
+    super.dispose();
+  }
 }
 
 class ImagePickerWidget extends StatelessWidget {

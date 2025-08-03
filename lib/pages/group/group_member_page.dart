@@ -18,8 +18,26 @@ class GroupMemberPage extends GetView<GroupMemberController> {
     Get.lazyPut(() => GroupMemberController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('群成员'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '群成员',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: GetBuilder<GroupMemberController>(builder: (builder) {
         return _buildTabs();

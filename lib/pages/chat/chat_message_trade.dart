@@ -40,6 +40,7 @@ class _ChatMessageTradeState extends State<ChatMessageTrade> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -150,7 +151,7 @@ class _ChatMessageTradeState extends State<ChatMessageTrade> {
             model.nickname,
           ),
           subtitle: WidgetCommon.tips(
-            'ID：${model.userNo}\n${model.createTime}',
+            '${model.createTime}',
             textAlign: TextAlign.left,
           ),
           trailing: Column(

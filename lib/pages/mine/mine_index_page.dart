@@ -1,4 +1,5 @@
 import 'package:alpaca/config/app_resource.dart';
+import 'package:alpaca/pages/mine/mine_singin_page.dart';
 import 'package:alpaca/pages/wallet/wallet_cash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import 'package:alpaca/pages/mine/mine_collect_page.dart';
 import 'package:alpaca/pages/mine/mine_index_controller.dart';
 import 'package:alpaca/pages/mine/mine_safety_page.dart';
 import 'package:alpaca/pages/mine/mine_setting_page.dart';
+import 'package:alpaca/pages/mine/mine_incode_page.dart';
 import 'package:alpaca/pages/common/common_index_page.dart';
 import 'package:alpaca/pages/wallet/wallet_index_page.dart';
 import 'package:alpaca/tools/tools_enum.dart';
@@ -41,6 +43,7 @@ class MineIndexPage extends GetView<MineIndexController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -267,6 +270,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                                     ElevatedButton(
                                       onPressed: () {
                                         // 去邀请按钮点击事件
+                                        // 打开 MineIncodePage 的导航代码
+                                        Get.toNamed(MineIncodePage.routeName);
                                       },
                                       child: Text('去邀请'),
                                       style: ElevatedButton.styleFrom(
@@ -332,6 +337,9 @@ class MineIndexPage extends GetView<MineIndexController> {
                                     ElevatedButton(
                                       onPressed: () {
                                         // 去签到按钮点击事件
+                                        Get.toNamed(
+                                          MineSigninPage.routeName,
+                                        );
                                       },
                                       child: Text('去签到'),
                                       style: ElevatedButton.styleFrom(

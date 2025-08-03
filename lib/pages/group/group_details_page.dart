@@ -35,20 +35,39 @@ class GroupDetailsPage extends GetView<GroupDetailsController> {
         ChatGroup chatGroup = controller.chatGroup;
         return Scaffold(
           resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            title: const Text('群详情'),
-            actions: [
-              WidgetAction(
-                icon: const Icon(Icons.settings),
-                enable: MemberType.normal != chatGroup.memberType,
-                onTap: () {
-                  Get.toNamed(
-                    GroupManagePage.routeName,
-                    arguments: chatGroup.groupId,
-                  );
-                },
-              )
-            ],
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0],
+                ),
+              ),
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: const Text(
+                  '群详情',
+                  style: TextStyle(color: Colors.black),
+                ),
+                actions: [
+                  WidgetAction(
+                    icon: const Icon(Icons.settings),
+                    enable:
+                        MemberType.normal != controller.chatGroup.memberType,
+                    onTap: () {
+                      Get.toNamed(
+                        GroupManagePage.routeName,
+                        arguments: controller.chatGroup.groupId,
+                      );
+                    },
+                  )
+                ],
+              ),
+            ),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -198,7 +217,7 @@ class GroupDetailsPage extends GetView<GroupDetailsController> {
                 WidgetLineCenter(
                   '举报群聊',
                   divider: false,
-                  color: Colors.red,
+                  color: Color(0xFFFF9014),
                   onTap: () {
                     Get.toNamed(
                       GroupInformPage.routeName,
@@ -210,7 +229,7 @@ class GroupDetailsPage extends GetView<GroupDetailsController> {
                 WidgetLineCenter(
                   '清空消息',
                   divider: false,
-                  color: Colors.red,
+                  color: Color(0xFFFF9014),
                   onTap: () {
                     _clearHis(context);
                   },

@@ -10,6 +10,8 @@ import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/widgets/widget_action.dart';
+import 'package:alpaca/pages/view/view_page.dart';
+import 'package:alpaca/config/app_config.dart';
 
 // 1. 将无状态组件改为有状态组件（继承StatefulWidget）
 class LoginRegisterPage extends StatefulWidget {
@@ -36,7 +38,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   int countdownSeconds = 60; // 倒计时总时长（60秒）
   late Timer _countdownTimer; // 定时器
   bool _isTimerInitialized = false; // 跟踪定时器是否已经初始化
-
+  bool _isRead = true;
   @override
   Widget build(BuildContext context) {
     // 初始化控制器（GetX逻辑保持不变）
@@ -200,6 +202,31 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 ),
               ),
               const SizedBox(height: 16),
+              // 新增：邀请码输入框（选填）
+              TextField(
+                controller: controller.inviteCodeController, // 需在控制器中添加对应变量
+                // 允许字母+数字输入（邀请码常见格式）
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
+                  LengthLimitingTextInputFormatter(6), // 限制最大长度（根据需求调整）
+                ],
+                decoration: InputDecoration(
+                  hintText: '请输入6位邀请码（选填）', // 提示用户为可选输入
+                  prefixIcon: const Icon(Icons.card_giftcard), // 邀请码相关图标
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(35),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(35),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200], // 保持与其他输入框一致的背景色
+                ),
+              ),
+              const SizedBox(height: 16), // 保持与下方验证码输入框的间距
               // 5. 验证码输入（修改获取验证码按钮）
               Row(
                 children: [
@@ -268,6 +295,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   _checkEmail(controller);
                   _checkPass(controller);
                   _checkSafe(controller);
+                  _checkincode(controller);
                   _checkCode(controller);
                   if (ToolsSubmit.call()) {
                     controller.submit();
@@ -290,12 +318,33 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 ),
               ),
               const SizedBox(height: 24),
+// 新增："已阅"勾选框
 
               // 协议勾选（保持不变）
               Row(
                 children: [
+                  Checkbox(
+                    value: _isRead, // 绑定状态变量
+                    onChanged: (value) {
+                      // 点击时更新状态
+                      setState(() {
+                        _isRead = value ?? true; // 若value为null则保持选中
+                      });
+                    },
+                    activeColor: Colors.blue, // 勾选框选中颜色
+                  ),
                   const Text('已阅读并同意'),
                   GestureDetector(
+                    onTap: () {
+                      Get.toNamed(
+                        ViewPage.routeName,
+                        arguments: ViewData(
+                          title: '服务协议',
+                          AppConfig.serviceHost,
+                          warn: false,
+                        ),
+                      );
+                    },
                     child: const Text(
                       '《用户协议》',
                       style: TextStyle(color: Colors.blue),
@@ -303,6 +352,16 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   ),
                   const Text('和'),
                   GestureDetector(
+                    onTap: () {
+                      Get.toNamed(
+                        ViewPage.routeName,
+                        arguments: ViewData(
+                          title: '隐私协议',
+                          AppConfig.privacyHost,
+                          warn: false,
+                        ),
+                      );
+                    },
                     child: const Text(
                       '《隐私政策》',
                       style: TextStyle(color: Colors.blue),
@@ -369,6 +428,15 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     var safe = controller.safePassController.text.trim();
     if (safe.length < 4) {
       throw Exception('请设置一个至少6位的系统安全码');
+    }
+  }
+
+  _checkincode(LoginRegisterController controller) {
+    var safe = controller.inviteCodeController.text.trim();
+    if (!safe.isEmpty) {
+      if (safe.length < 6) {
+        throw Exception('邀请码长度为6位');
+      }
     }
   }
 

@@ -32,6 +32,7 @@ class MineQrCodePage extends GetView<MineQrCodeController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -88,6 +89,7 @@ class MineQrCodePage extends GetView<MineQrCodeController> {
         child: GetBuilder<MineQrCodeController>(
           builder: (builder) {
             LocalUser localUser = controller.localUser;
+
             return Center(
               child: Stack(
                 alignment: Alignment.topCenter,
@@ -107,6 +109,7 @@ class MineQrCodePage extends GetView<MineQrCodeController> {
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
+                        stops: [0.0, 1.0],
                       ),
                       borderRadius: BorderRadius.circular(16),
                     ),

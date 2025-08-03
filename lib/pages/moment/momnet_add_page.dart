@@ -11,87 +11,92 @@ class MomentAddPage extends GetView<MomentAddController> {
   static const routeName = "/moment_add";
   const MomentAddPage({super.key});
 
-  // 定义顶部导航栏的渐变颜色
-  final Gradient _appBarGradient = const LinearGradient(
-    colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    stops: [0.0, 1.0],
-  );
-
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MomentAddController());
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 10),
-        child: Container(
-          decoration: BoxDecoration(gradient: _appBarGradient),
-          child: Column(
-            children: [
-              // 状态栏区域
-              Container(
-                height: MediaQuery.of(context).padding.top,
-                color: Colors.transparent,
+
+    // 监听页面返回事件
+    return WillPopScope(
+      onWillPop: () async {
+        Get.delete<ImagePickerController>();
+        return true;
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 1.0], // 颜色分布点
               ),
-              Expanded(
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: const Text('发表朋友圈'),
-                  // 在原有 AppBar 的 actions 区域中修改
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          right: 15, bottom: 5), // 新增 bottom: 10 外下边距
-                      child: Obx(() {
-                        return TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.resolveWith<Color>(
-                              (states) =>
-                                  states.contains(MaterialState.disabled)
-                                      ? Colors.grey
-                                      : Colors.green,
-                            ),
-                            foregroundColor:
-                                WidgetStateProperty.all(Colors.white),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0)),
-                            ),
-                          ),
-                          onPressed: controller.isPublishable()
-                              ? controller.publish
-                              : null,
-                          child: const Text('发表'),
-                        );
-                      }),
-                    ),
-                  ],
+            ),
+            child: AppBar(
+              centerTitle: false,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text(
+                '发表朋友圈',
+                style: TextStyle(color: Colors.black),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 15, bottom: 5),
+                  child: Obx(() {
+                    return TextButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (states) => states.contains(MaterialState.disabled)
+                              ? Colors.grey
+                              : Colors.green,
+                        ),
+                        foregroundColor: WidgetStateProperty.all(Colors.white),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0)),
+                        ),
+                      ),
+                      onPressed: controller.isPublishable()
+                          ? () => _handlePublish(context)
+                          : null,
+                      child: const Text('发表'),
+                    );
+                  }),
                 ),
-              ),
+              ],
+            ),
+          ),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextInputField(),
+              const SizedBox(height: 16.0),
+              _buildImagePickerSection(),
+              const SizedBox(height: 16.0),
+              _buildLocationPickerSection(),
+              const SizedBox(height: 16.0),
+              _buildPermissionSelectorSection(),
+              const SizedBox(height: 80.0),
             ],
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextInputField(),
-            const SizedBox(height: 16.0),
-            _buildImagePickerSection(),
-            const SizedBox(height: 16.0),
-            _buildLocationPickerSection(),
-            const SizedBox(height: 16.0),
-            _buildPermissionSelectorSection(),
-            const SizedBox(height: 80.0),
-          ],
-        ),
-      ),
     );
+  }
+
+  // 新增：处理发布逻辑的方法（关联controller并使用Navigator返回）
+  Future<void> _handlePublish(BuildContext context) async {
+    // 调用控制器的发布方法
+    bool isSuccess = await controller.publish();
+    // 如果发布成功，通过Navigator返回结果（双重保障）
+    if (isSuccess) {
+      Navigator.pop(context, true);
+    }
   }
 
   Widget _buildTextInputField() {
@@ -149,7 +154,7 @@ class MomentAddPage extends GetView<MomentAddController> {
               double longitudes = pois.latLng?.longitude ?? 0;
               controller.updateLocation(location);
               controller.updateLocationla(
-                  latitudes.toString() + '|' + longitudes.toString());
+                  longitudes.toString() + '|' + latitudes.toString());
             }
             Get.back();
           },

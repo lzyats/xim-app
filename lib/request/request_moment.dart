@@ -26,6 +26,22 @@ class RequestMoment {
     return ajaxData.result['data'];
   }
 
+  // 获取朋友圈列表
+  static Future<dynamic> getMomentListbyid(
+      String userId, int pageNum, int pageSize) async {
+    // 获取当前用户的 user_id
+    // 执行
+    AjaxData ajaxData = await ToolsRequest().get(
+      '$_prefix/getlistbyid/$userId',
+      param: {
+        'pageNum': pageNum,
+        'pageSize': pageSize,
+      },
+    );
+    // 转换
+    return ajaxData.result['data'];
+  }
+
   // 发布朋友圈
   static Future<dynamic> postMoment(MomentModel moment) async {
     // 执行
@@ -72,6 +88,9 @@ class RequestMoment {
   ) async {
     // 获取当前用户的 user_id
     String userId = ToolsStorage().local().userId;
+    // 判断是否发贴人回复
+    int source = 1;
+    if (replyTo == int.parse(userId)) source = 0;
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/comment',
@@ -80,6 +99,7 @@ class RequestMoment {
         'momentId': momentId,
         'content': content,
         'replyTo': replyTo,
+        'source': source
       },
     );
     // 可以添加提示信息

@@ -94,9 +94,25 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '发送转账',
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '发送转账',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
         ),
       ),
       body: KeyboardDismissOnTap(
@@ -165,11 +181,12 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
     );
   }
 
+  // 修改_buildReceiver方法中的TextField
   _buildReceiver() {
     return TextField(
       keyboardType: TextInputType.number,
       onTap: () async {
-        // 查询群聊人员
+        // 原有逻辑保持不变
         String groupId = ToolsStorage().chat().chatId;
         List<GroupModel02> memberList =
             await RequestGroup.getMemberList(groupId);
@@ -188,6 +205,22 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
       controller: _receiverController,
       textAlign: TextAlign.right,
       decoration: InputDecoration(
+        // 添加边框样式
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 原有属性保持不变
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 0.0),
           child: WidgetCommon.arrow(),
@@ -206,6 +239,7 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
     );
   }
 
+// 修改_buildAmount方法中的TextField
   _buildAmount() {
     return TextField(
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -214,9 +248,25 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
       ],
       textAlign: TextAlign.right,
       controller: _amountController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        // 添加边框样式
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 原有属性保持不变
         hintText: '¥ 0.00',
-        prefixIcon: Padding(
+        prefixIcon: const Padding(
           padding: EdgeInsets.all(10.0),
           child: Text(
             '转账金额',
@@ -229,16 +279,32 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
     );
   }
 
-  // 说明
+// 修改_buildRemark方法中的TextField
   _buildRemark() {
     return TextField(
       keyboardType: TextInputType.text,
       textAlign: TextAlign.right,
       maxLines: null,
       controller: _remarkController,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        // 添加边框样式
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: const BorderSide(
+            color: Colors.blue,
+            width: 1,
+          ),
+        ),
+        // 原有属性保持不变
         hintText: '请输入转账说明',
-        prefixIcon: Padding(
+        prefixIcon: const Padding(
           padding: EdgeInsets.all(10.0),
           child: Text(
             '转账说明',
@@ -337,8 +403,26 @@ class _ChatExtraGroupMember extends StatelessWidget {
       );
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('选择成员'),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
+          ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '选择成员',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ),
       ),
       body: WidgetContact(
         dataList: dataList,

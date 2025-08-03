@@ -7,20 +7,18 @@ import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 
 class MineGenderController extends BaseController {
-  String gender = ToolsStorage().local().gender;
-
+  RxString gender = ToolsStorage().local().gender.obs;
+  RxBool hasShownDialog = false.obs; // 标记弹窗是否已显示（避免重复弹出）
   void editGender(String value) {
-    gender = value;
+    gender.value = value;
     update();
   }
 
   // 提交
-  Future<void> submit() async {
+  Future<void> submit(String gender) async {
     // 执行
     await RequestMine.editGender(gender);
     // 取消
     ToolsSubmit.cancel();
-    // 返回
-    Get.back();
   }
 }

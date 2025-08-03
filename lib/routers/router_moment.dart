@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 import 'package:alpaca/pages/moment/moment_index_page.dart'; // 请根据实际情况修改路径
 import 'package:alpaca/routers/router_base.dart';
+import 'package:alpaca/pages/chat/chat_message_location.dart'; // 请根据实际情况修改路径
 
 // 朋友圈路由
 List<GetPage> getMomentPages = [

@@ -8,6 +8,9 @@ import 'package:alpaca/pages/mine/mine_collect_page.dart';
 import 'package:alpaca/pages/mine/mine_error.dart';
 import 'package:alpaca/pages/mine/mine_gender_page.dart';
 import 'package:alpaca/pages/mine/mine_intro_page.dart';
+import 'package:alpaca/pages/mine/mine_incode_page.dart';
+import 'package:alpaca/pages/mine/mine_singin_page.dart';
+import 'package:alpaca/pages/mine/mine_signlist_page.dart';
 import 'package:alpaca/pages/mine/mine_inventory_page.dart';
 import 'package:alpaca/pages/mine/mine_nickname_page.dart';
 import 'package:alpaca/pages/mine/mine_password_page.dart';
@@ -103,5 +106,20 @@ List<GetPage> getMinePages = [
   getPage(
     name: MineError.routeName,
     page: () => const MineError(),
+  ),
+  // 邀请页面
+  getPage(
+    name: MineIncodePage.routeName,
+    page: () => const MineIncodePage(),
+  ),
+  // 签到页面
+  getPage(
+    name: MineSigninPage.routeName,
+    page: () => const MineSigninPage(),
+  ),
+  // 签到页面
+  getPage(
+    name: MineSignlistPage.routeName,
+    page: () => const MineSignlistPage(),
   ),
 ];

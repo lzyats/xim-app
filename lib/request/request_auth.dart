@@ -53,13 +53,8 @@ class RequestAuth {
   }
 
   // 注册账号
-  static Future<AuthModel02> register(
-    String phone,
-    String email,
-    String? pass,
-    String code,
-    String safe,
-  ) async {
+  static Future<AuthModel02> register(String phone, String email, String? pass,
+      String code, String safe, String? incode) async {
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/register',
@@ -69,6 +64,7 @@ class RequestAuth {
         'pass': pass,
         'code': code,
         'safestr': safe,
+        'incode': incode
       },
     );
     return ajaxData.getData((data) => AuthModel02.fromJson(data));

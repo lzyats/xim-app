@@ -234,7 +234,9 @@ enum TradeType {
   scan('1008', '扫码转账', '转账记录'),
   refund('1009', '退款', '退款记录'),
   shopping('1010', '消费', '消费记录'),
-  groupTansfer('1011', '群内转账', '转账记录');
+  groupTansfer('1011', '群内转账', '转账记录'),
+  sign('1019', '每日签到', '每日签到'),
+  invo('1020', '邀请奖励', '邀请奖励');
 
   const TradeType(this.value, this.label, this.title);
   final String value;

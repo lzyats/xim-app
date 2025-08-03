@@ -21,6 +21,8 @@ class AppImage {
   //个人中心部分
   static String get hltj => '$_path/hltj.webp'; //推荐
   static String get mrqd => '$_path/mrqd.webp'; //每日签到
+  static String get sexm => '$_path/sex-m.webp'; //每日签到
+  static String get sexwm => '$_path/sex-wm.webp'; //每日签到
 }
 
 // 资源文件

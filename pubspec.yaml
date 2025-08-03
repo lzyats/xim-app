@@ -141,6 +141,9 @@ dependencies:
   # 声网
   agora_rtc_engine: ^6.1.0
 
+  #日期格式化
+  intl: ^0.19.0
+
 alipay_kit:
   scheme: alipay123
 

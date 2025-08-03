@@ -26,6 +26,7 @@ class CommonNoticesPage extends GetView<CommonNoticesController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -66,6 +67,7 @@ class CommonNoticesPage extends GetView<CommonNoticesController> {
       itemBuilder: (context, index) {
         CommonModel02 model = controller.refreshList[index];
         return WidgetLineRow(
+          leading: Icon(Icons.notifications, color: Colors.orange),
           model.title,
           subtitle: model.createTime,
           onTap: () {
@@ -94,6 +96,7 @@ class CommonNoticesItemPage extends StatelessWidget {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -106,33 +109,63 @@ class CommonNoticesItemPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              model.title,
-              style: const TextStyle(
-                fontSize: 18,
+      body: SafeArea(
+        // 避免内容被系统状态栏/导航栏遮挡
+        child: Padding(
+          // 水平+垂直内边距，让卡片不贴边
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Card(
+            elevation: 2, // 卡片阴影深度
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12), // 卡片圆角
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16), // 卡片内边距
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 公告标题
+                  Text(
+                    model.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8), // 标题与时间的间距
+                  // 公告时间
+                  Text(
+                    model.createTime,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey, // 浅灰色弱化时间视觉层级
+                    ),
+                  ),
+                  const Divider(
+                    // 分隔线（时间与内容区）
+                    height: 16,
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                  // 公告内容（长文本支持滚动）
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        model.content,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.6, // 行高（增强可读性）
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.start,
             ),
           ),
-          Align(
-            alignment: Alignment.center,
-            child: Text(
-              model.createTime,
-            ),
-          ),
-          WidgetCommon.divider(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Html(
-              data: model.content,
-            ),
-          ),
-          WidgetCommon.divider(),
-        ],
+        ),
       ),
     );
   }

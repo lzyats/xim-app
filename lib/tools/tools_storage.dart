@@ -126,6 +126,24 @@ class ToolsStorage {
     return 'Y' == value;
   }
 
+  // 新增：签到状态（按日期存储，key为"yyyy-MM-dd"格式的日期）
+  bool signInStatus({required String dateKey, bool? value}) {
+    // 存储主键（区分其他存储数据）
+    String type = 'signInStatus';
+    // 读取现有签到状态集合（默认空map）
+    Map<String, dynamic> statusMap = _storage.read(type) ?? {};
+
+    // 读取操作：如果value为null，则返回该日期的签到状态（默认未签到）
+    if (value == null) {
+      return statusMap[dateKey] ?? false;
+    }
+
+    // 写入操作：更新该日期的签到状态，并保存完整map
+    statusMap[dateKey] = value;
+    _storage.write(type, statusMap);
+    return value;
+  }
+
   // 备注
   String remark(String key, {String value = '', bool read = false}) {
     // 类型
@@ -264,6 +282,8 @@ class LocalUser {
   String privacyGroup;
   String payment;
   String pass;
+  String safestr;
+  String incode;
   AuthType auth;
 
   LocalUser(
@@ -287,6 +307,8 @@ class LocalUser {
     this.privacyGroup,
     this.payment,
     this.pass,
+    this.safestr,
+    this.incode,
     this.auth,
   );
 
@@ -312,6 +334,8 @@ class LocalUser {
       data?['privacyGroup'] ?? '',
       data?['payment'] ?? 'N',
       data?['pass'] ?? 'N',
+      data?['safestr'] ?? '',
+      data?['incode'] ?? '',
       AuthType.init(data?['auth'] ?? '0'),
     );
   }
@@ -341,6 +365,8 @@ class LocalUser {
       'privacyGroup': privacyGroup,
       'payment': payment,
       'pass': pass,
+      'safestr': safestr,
+      'incode': incode,
       'auth': auth.value,
     };
   }
@@ -357,6 +383,8 @@ class LocalConfig {
   String holdCard;
   String beian;
   int messageLimit;
+  double invo; //邀请奖励
+  double sign; //签到奖励
 
   LocalConfig(
     this.sharePath,
@@ -369,9 +397,23 @@ class LocalConfig {
     this.holdCard,
     this.beian,
     this.messageLimit,
+    this.invo,
+    this.sign,
   );
 
   static LocalConfig fromJson(Map<String, dynamic> data) {
+    // 工具方法：将 dynamic 类型安全转换为 double
+    double _toDouble(dynamic value) {
+      if (value == null) return 0.00; // 空值默认0
+      if (value is double) return value; // 已经是double，直接返回
+      if (value is String) {
+        // 是字符串，尝试解析为double（处理空字符串或非数字的情况）
+        return double.tryParse(value) ?? 0.00;
+      }
+      if (value is int) return value.toDouble(); // 整数转double
+      return 0.00; // 其他类型默认0
+    }
+
     return LocalConfig(
       data['sharePath'] ?? '',
       data['watermark'] ?? '',
@@ -383,6 +425,8 @@ class LocalConfig {
       data['holdCard'] ?? 'Y',
       data['beian'] ?? '',
       data['messageLimit'] ?? 1000,
+      _toDouble(data['invo']), // 用工具方法转换
+      _toDouble(data['sign']), // 用工具方法转换
     );
   }
 
@@ -398,6 +442,8 @@ class LocalConfig {
       'holdCard': holdCard,
       'beian': beian,
       'messageLimit': messageLimit,
+      'invo': invo,
+      'sign': sign,
     };
   }
 }

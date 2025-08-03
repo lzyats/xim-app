@@ -28,6 +28,7 @@ class WalletTradePage extends GetView<WalletTradeController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -134,6 +135,7 @@ class WalletTradeInfoPage extends GetView<WalletTradeInfoController> {
               colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
             ),
           ),
           child: AppBar(
@@ -480,6 +482,23 @@ class WalletTradeInfoPage extends GetView<WalletTradeInfoController> {
           ],
         );
       // 其他
+      case TradeType.sign:
+        return Column(
+          children: [
+            WidgetLineTable(
+              '账单类型',
+              tradeType.title,
+            ),
+            WidgetLineTable(
+              '交易金额',
+              model04.tradeAmount,
+            ),
+            WidgetLineTable(
+              '交易时间',
+              model04.createTime,
+            ),
+          ],
+        );
       default:
         return WidgetLineTable(
           '账单类型',

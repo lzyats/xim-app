@@ -18,25 +18,43 @@ class GroupInvitePage extends GetView<GroupInviteController> {
     Get.lazyPut(() => GroupInviteController());
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: const Text('邀请好友'),
-        actions: [
-          WidgetAction(
-            onTap: () {
-              if (ToolsSubmit.progress()) {
-                return;
-              }
-              // 校验
-              if (controller.selectList.isEmpty) {
-                throw Exception('请至少选择一个好友哦');
-              }
-              if (ToolsSubmit.call()) {
-                // 提交
-                controller.invite();
-              }
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 1.0],
+            ),
           ),
-        ],
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              '邀请好友',
+              style: TextStyle(color: Colors.black),
+            ),
+            actions: [
+              WidgetAction(
+                onTap: () {
+                  if (ToolsSubmit.progress()) {
+                    return;
+                  }
+                  // 校验
+                  if (controller.selectList.isEmpty) {
+                    throw Exception('请至少选择一个好友哦');
+                  }
+                  if (ToolsSubmit.call()) {
+                    // 提交
+                    controller.invite();
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: GetBuilder<GroupInviteController>(builder: (builder) {
         String memberTotal = controller.chatGroup.memberTotal;
