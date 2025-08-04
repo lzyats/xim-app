@@ -299,6 +299,7 @@ class LocalUser {
   String safestr;
   String incode;
   AuthType auth;
+  int isvip;
 
   LocalUser(
     this.userId,
@@ -324,6 +325,7 @@ class LocalUser {
     this.safestr,
     this.incode,
     this.auth,
+    this.isvip,
   );
 
   factory LocalUser.fromJson(Map<String, dynamic>? data) {
@@ -351,6 +353,7 @@ class LocalUser {
       data?['safestr'] ?? '',
       data?['incode'] ?? '',
       AuthType.init(data?['auth'] ?? '0'),
+      data?['isvip'] ?? 0,
     );
   }
 
@@ -381,6 +384,7 @@ class LocalUser {
       'pass': pass,
       'safestr': safestr,
       'incode': incode,
+      'isvip': isvip,
       'auth': auth.value,
     };
   }

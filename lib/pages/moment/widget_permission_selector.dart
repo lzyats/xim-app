@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:alpaca/tools/tools_storage.dart';
 
 class PermissionSelectionPage extends StatefulWidget {
   final String currentPermission;
@@ -18,6 +19,7 @@ class PermissionSelectionPage extends StatefulWidget {
 
 class _PermissionSelectionPageState extends State<PermissionSelectionPage> {
   late String _selectedPermission;
+  LocalUser localUser = ToolsStorage().local();
 
   @override
   void initState() {
@@ -54,7 +56,8 @@ class _PermissionSelectionPageState extends State<PermissionSelectionPage> {
         color: Colors.white,
         child: ListView(
           children: [
-            //_buildPermissionItem('完全公开', Icons.public),
+            if (localUser.isvip > 0)
+              _buildPermissionItem('广场可见(VIP功能)', Icons.public),
             _buildPermissionItem('好友可见', Icons.group),
             _buildPermissionItem('仅自己可见', Icons.lock),
           ],
