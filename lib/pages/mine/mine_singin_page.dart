@@ -36,6 +36,7 @@ class MineSigninPage extends GetView<MineSigninController> {
             colors: [Color(0xFF0099FF), Color(0xFF66CCFF)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            stops: [0.0, 1.0],
           ),
         ),
         child: Padding(

@@ -119,7 +119,7 @@ class MsgChatPage extends GetView<MsgChatController> {
                       controller: controller.scrollController,
                       index: index,
                       child: Obx(
-                        () => _buildChatItem(chatHis),
+                        () => _buildChatItem(chatHis, index),
                       ),
                     );
                   },
@@ -186,7 +186,7 @@ class MsgChatPage extends GetView<MsgChatController> {
   }
 
   // 渲染聊天
-  _buildChatItem(ChatHis chatHis) {
+  _buildChatItem(ChatHis chatHis, int index) {
     return GestureDetector(
       onTap: () {
         // 关闭小桌板
@@ -230,7 +230,7 @@ class MsgChatPage extends GetView<MsgChatController> {
                       const SizedBox(
                         height: 10,
                       ),
-                      _buildTime(chatHis),
+                      _buildTime(chatHis, index),
                     ],
                   ),
                 ),
@@ -481,8 +481,29 @@ class MsgChatPage extends GetView<MsgChatController> {
     return Container();
   }
 
-  //对话时间
-  _buildTime(ChatHis chatHis) {
+  // 对话时间
+  _buildTime(ChatHis chatHis, int index) {
+    // 默认为显示时间
+    bool shouldShowTime = true;
+
+    // 检查是否有上一条消息（不是第一条消息）
+    if (index > 0 && controller.pagingController.itemList != null) {
+      var previousItem = controller.pagingController.itemList![index - 1];
+
+      // 计算时间差（分钟）
+      final difference = chatHis.createTime
+          .difference(previousItem.createTime)
+          .inMinutes
+          .abs();
+      // 5分钟内不显示时间
+      shouldShowTime = difference > 5;
+    }
+
+    // 如果不需要显示时间，直接返回空容器
+    if (!shouldShowTime) {
+      return Container();
+    }
+
     TextAlign textAlign = TextAlign.left;
     if (chatHis.self) {
       textAlign = TextAlign.right;

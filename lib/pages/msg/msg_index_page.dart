@@ -299,8 +299,8 @@ class MsgIndexPage extends GetView<MsgIndexController> {
           ),
           if (badger > 0)
             Positioned(
-              left: 54,
-              top: 0,
+              left: 50,
+              top: 2,
               child: TDBadge(
                 TDBadgeType.message,
                 count: badger > 99 ? '99+' : badger.toString(),

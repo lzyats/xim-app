@@ -54,7 +54,7 @@ class AppConfig {
   // 请求服务协议
   static late String serviceHost;
   // 数据库
-  static const String dbName = 'alpaca—im.db';
+  static const String dbName = 'xim.db';
   // 高德地图
   static late String amapAndroid;
   static late String amapIos;

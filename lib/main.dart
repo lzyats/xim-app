@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_page.dart';
 import 'package:alpaca/config/app_config.dart';
+import 'package:alpaca/res/strings.dart';
 import 'package:alpaca/routers/router_page.dart';
 import 'package:navigation_history_observer/navigation_history_observer.dart';
 
@@ -33,9 +34,16 @@ class _MainApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
+      translations: TranslationService(),
+      fallbackLocale: TranslationService.fallbackLocale,
       supportedLocales: const [
         Locale('zh', 'CH'),
+        Locale('en', 'US'),
       ],
+      localeResolutionCallback: (locale, list) {
+        Get.locale ??= locale;
+        return locale;
+      },
       // 全局key
       navigatorKey: AppConfig.navigatorKey,
       // debug
