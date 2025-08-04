@@ -345,6 +345,21 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   Future<void> initializeCalling() async {
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
+
+    // 新增：初始化时设置音频路由
+    if (!widget.video) {
+      // 语音通话默认使用听筒
+      _speakerOn = false;
+      await _engine?.setDefaultAudioRouteToSpeakerphone(false);
+      await _engine?.setEnableSpeakerphone(false);
+    }
+
+    // 视频通话默认使用扬声器
+    if (widget.video) {
+      _speakerOn = true;
+      await _engine?.setDefaultAudioRouteToSpeakerphone(true);
+      await _engine?.setEnableSpeakerphone(true);
+    }
     // 视频
     if (widget.video) {
       var configuration = const VideoEncoderConfiguration(
@@ -387,13 +402,21 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     }
   }
 
-  // 免提开关（新增方法）
+  // 修改免提切换方法
   void _onToggleSpeaker() {
     setState(() {
       _speakerOn = !_speakerOn;
     });
-    // 通过Agora引擎切换音频路由（扬声器/听筒）
-    _engine?.setDefaultAudioRouteToSpeakerphone(_speakerOn);
+    // 确保引擎已初始化
+    if (_engine != null) {
+      // 先设置默认路由
+      _engine?.setDefaultAudioRouteToSpeakerphone(_speakerOn).then((value) {
+        // 强制切换当前路由
+        _engine?.setEnableSpeakerphone(_speakerOn);
+      }).catchError((error) {
+        debugPrint("免提切换失败: $error");
+      });
+    }
   }
 
   // 摄像头反转
@@ -660,6 +683,7 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // 在ToolsCallVideo的挂断按钮点击事件中修改
                         RawMaterialButton(
                           onPressed: () {
                             _engine?.leaveChannel();
@@ -668,8 +692,11 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
                               CallStatus.finish,
                               second: _second,
                             );
-                            Get.back();
+                            // 关键修改：使用Get.until关闭所有相关页面
+                            Get.until((route) =>
+                                !Get.currentRoute.contains('ToolsCall'));
                           },
+                          // 其他属性保持不变
                           elevation: 2.0,
                           fillColor: Colors.redAccent,
                           shape: const CircleBorder(),
