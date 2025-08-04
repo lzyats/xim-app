@@ -19,6 +19,7 @@ import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:alpaca/tools/tools_request.dart';
 
 // 总配置
 class AppConfig {
@@ -102,6 +103,7 @@ class AppConfig {
     await _loadPortrait();
     // 通知栏
     await _loadNotification();
+    //await ToolsRequest.init(); // 等待请求工具初始化完成
     // 加载配置文件
     await _loadConfig();
     // 加载配置文件

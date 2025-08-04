@@ -11,6 +11,7 @@ import 'package:navigation_history_observer/navigation_history_observer.dart';
 Future<void> main() async {
   // 初始化
   await AppConfig.init();
+
   // 运行程序
   runApp(
     // 下拉刷新

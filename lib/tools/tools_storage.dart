@@ -72,6 +72,20 @@ class ToolsStorage {
     return LocalChat.fromJson(data);
   }
 
+  // 系统配置（新增）
+  SysConfig sysConfig({SysConfig? value}) {
+    // 存储键名（与其他配置区分）
+    String type = 'sysConfig';
+    // 写入操作
+    if (value != null) {
+      _storage.write(type, value.toJson());
+      return value;
+    }
+    // 读取操作
+    Map<String, dynamic> data = _storage.read(type) ?? {};
+    return SysConfig.fromJson(data);
+  }
+
   // config
   LocalConfig config({LocalConfig? value}) {
     // 类型
@@ -445,5 +459,38 @@ class LocalConfig {
       'invo': invo,
       'sign': sign,
     };
+  }
+}
+
+//软件基本配置类
+class SysConfig {
+  String requestHost; // 接口请求主机地址（如 HTTP 接口域名）
+  String requestSocket; // Socket 连接地址（如 WebSocket 地址）
+
+  // 构造函数
+  SysConfig({
+    required this.requestHost,
+    required this.requestSocket,
+  });
+
+  // 从 JSON 数据初始化实例
+  factory SysConfig.fromJson(Map<String, dynamic> data) {
+    return SysConfig(
+      requestHost: data['requestHost'] ?? '', // 默认为空字符串
+      requestSocket: data['requestSocket'] ?? '', // 默认为空字符串
+    );
+  }
+
+  // 转换为 JSON 数据（用于存储）
+  Map<String, dynamic> toJson() {
+    return {
+      'requestHost': requestHost,
+      'requestSocket': requestSocket,
+    };
+  }
+
+  // 初始化一个默认空配置的实例
+  factory SysConfig.init() {
+    return SysConfig.fromJson({});
   }
 }

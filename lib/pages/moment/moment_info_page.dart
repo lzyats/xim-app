@@ -61,20 +61,20 @@ class MomentInfoPage extends StatelessWidget {
                       flex: 1,
                       child: Container(
                         height: 150 * posts.length.toDouble(),
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(6),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             WidgetMoment.formatDate(date),
                             if (posts.isNotEmpty)
                               WidgetMoment.buildLocationWidget(
                                   posts.first.location,
-                                  strlen: 16),
+                                  strlen: 22),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 2),
                     Expanded(
                       flex: 5,
                       child: Column(

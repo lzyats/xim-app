@@ -12,32 +12,74 @@ import 'package:alpaca/tools/tools_submit.dart';
 
 // 接口请求
 class ToolsRequest {
-  // 调用对象
-  static late final Dio _dio;
+  // 调用对象（延迟初始化，因为需要异步获取baseUrl）
+  static late Dio _dio;
   static const String _post = 'post';
+  static late String baseUrl;
+  // 新增：用于标记Dio是否已初始化的标志位
+  static bool _isInitialized = false; // 初始为未初始化
 
+  // 私有构造函数（禁止外部直接实例化）
   ToolsRequest._() {
-    // 创建对象
+    // 此处不初始化Dio，因为baseUrl需要异步获取
+  }
+
+  // 单例实例
+  static ToolsRequest? _singleton;
+
+  // 工厂方法：确保首次调用时初始化，且只初始化一次
+  factory ToolsRequest() {
+    if (_singleton == null) {
+      _singleton = ToolsRequest._();
+      // 首次创建单例时，异步获取baseUrl并初始化Dio
+      _initDio();
+    }
+    return _singleton!;
+  }
+
+  // 异步初始化Dio（核心：使用缓存的baseUrl）
+  static Future<void> _initDio() async {
+    // 1. 调用getapihost()获取缓存中的baseUrl
+    baseUrl = await getapihost();
+    // 2. 用获取到的baseUrl初始化Dio
     final BaseOptions options = BaseOptions(
-      baseUrl: AppConfig.requestHost,
+      baseUrl: baseUrl,
       connectTimeout: AppConfig.timeout,
     );
     _dio = Dio(options);
     _dio.interceptors.add(_AuthInterCeptor());
+    // 初始化完成后，将标志位设为true
+    _isInitialized = true;
   }
-  static ToolsRequest? _singleton;
-  factory ToolsRequest() => _singleton ??= ToolsRequest._();
 
-  // get请求
+  // 从缓存获取API服务器配置（你的原方法）
+  static Future<String> getapihost() async {
+    SysConfig sysConfig = ToolsStorage().sysConfig();
+    if (sysConfig.requestHost != null && sysConfig.requestHost.isNotEmpty) {
+      return sysConfig.requestHost; // 返回缓存中的值
+    }
+    return AppConfig.requestHost; // 缓存为空时使用默认值
+  }
+
+  // 确保Dio已初始化（修改：使用自定义标志位判断）
+  static Future<void> _ensureDioInitialized() async {
+    if (!_isInitialized) {
+      // 用标志位判断是否未初始化
+      await _initDio();
+    }
+  }
+
+  // get请求（增加Dio初始化检查）
   Future<AjaxData> get(
     String url, {
     bool showError = true,
     Map<String, dynamic>? param,
   }) async {
+    await _ensureDioInitialized(); // 确保Dio已初始化
     return await _request(url, showError: showError, param: param);
   }
 
-  // 分页请求
+  // 分页请求（增加Dio初始化检查）
   Future page<AjaxData>(
     String url,
     int pageNum, {
@@ -45,6 +87,7 @@ class ToolsRequest {
     int pageSize = 10,
     bool showError = true,
   }) async {
+    await _ensureDioInitialized();
     if (pageNum < 1) {
       pageNum = 1;
     }
@@ -55,26 +98,28 @@ class ToolsRequest {
     return await _request(url, param: param, showError: showError);
   }
 
-  // post请求
+  // post请求（增加Dio初始化检查）
   Future post<AjaxData>(
     String url, {
     Map<String, dynamic>? data,
     bool showError = true,
   }) async {
+    await _ensureDioInitialized();
     return await _request(url, data: data, method: _post, showError: showError);
   }
 
-  // 文件上传
+  // 文件上传（增加Dio初始化检查）
   Future<AjaxData> upload(
     String url,
     MultipartFile multipartFile, {
     bool showError = true,
   }) async {
+    await _ensureDioInitialized();
     FormData data = FormData.fromMap({'file': multipartFile});
     return await _request(url, data: data, method: _post, showError: showError);
   }
 
-  // request请求
+  // 核心请求方法
   Future<AjaxData> _request(
     String url, {
     Object? data,
@@ -85,13 +130,11 @@ class ToolsRequest {
     try {
       // 检查网络
       if (showError && !AppConfig.network) {
-        // 取消
         ToolsSubmit.cancel();
-        // 提醒
         EasyLoading.showToast('当前网络不可用', dismissOnTap: false);
         return Future.error('');
       }
-      debugPrint('请求地址：$url');
+      debugPrint('请求地址：$baseUrl$url'); // 打印完整地址（验证baseUrl是否正确）
       debugPrint('请求方式：$method');
       // 发起请求
       Response response;
@@ -100,14 +143,11 @@ class ToolsRequest {
       } else {
         response = await _dio.get(url, queryParameters: param);
       }
-      // 转换
       return AjaxData(response.data);
     } catch (ex) {
       print(ex);
       if (showError) {
-        // 取消
         ToolsSubmit.cancel();
-        // 提醒
         EasyLoading.showToast('网络开小差了，请稍后重试', dismissOnTap: false);
       }
       return Future.error('');
@@ -115,36 +155,26 @@ class ToolsRequest {
   }
 }
 
+// 以下为原有代码（拦截器、数据模型等，无需修改）
 class _AuthInterCeptor extends Interceptor {
   _AuthInterCeptor();
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // 增加headers
     Map<String, dynamic> headers = {
-      // 获取token
       'Authorization': ToolsStorage().token(),
-      // 接口版本号
       'version': AppConfig.version,
-      // 获取设备
       'device': AppConfig.device,
     };
-    // 增加headers
     options.headers.addAll(headers);
-    // 计算签名
     _sign(options);
     return handler.next(options);
   }
 
-  // 计算签名
   void _sign(RequestOptions options) {
-    // appId
     String appId = AppConfig.appId;
-    // secret
     String secret = AppConfig.appSecret;
-    // timestamp
     String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    // path
     String path = options.path;
     if ('GET' == options.method) {
       Map<String, dynamic> paramets = options.queryParameters;
@@ -161,9 +191,7 @@ class _AuthInterCeptor extends Interceptor {
         });
       }
     }
-    // 签名
     String sign = ToolsEncrypt.sign(appId, secret, timestamp, path);
-    // headers
     Map<String, dynamic> headers = {
       'appId': appId,
       'timestamp': timestamp,
@@ -175,32 +203,24 @@ class _AuthInterCeptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (response.statusCode != 200) {
-      // 取消
       ToolsSubmit.cancel();
-      // 提醒
       EasyLoading.showToast('请检查网络连接', dismissOnTap: false);
       return;
     }
     _AjaxBase ajax = _AjaxBase.fromJson(response.data);
-    // 退出登录
     if (ajax.code == LoginIndexPage.routeCode) {
       if (MiddleStatus.login == ToolsStorage().status()) {
         return;
       }
       get_.Get.offAllNamed(LoginIndexPage.routeName);
-    }
-    // 账号封禁
-    else if (ajax.code == LoginBannedPage.routeCode) {
+    } else if (ajax.code == LoginBannedPage.routeCode) {
       if (MiddleStatus.banned == ToolsStorage().status()) {
         return;
       }
       get_.Get.offAllNamed(LoginBannedPage.routeName);
     }
-    // 摊窗提示
     if (ajax.code != 200) {
-      // 取消
       ToolsSubmit.cancel();
-      // 提醒
       if ('操作成功' != ajax.msg) {
         EasyLoading.showToast(ajax.msg);
       }
@@ -210,12 +230,10 @@ class _AuthInterCeptor extends Interceptor {
   }
 }
 
-// 基础对象
 class _AjaxBase {
   int code;
   String msg;
   _AjaxBase(this.code, this.msg);
-
   factory _AjaxBase.fromJson(Map<String, dynamic> data) {
     return _AjaxBase(data['code'], data['msg']);
   }
@@ -226,18 +244,14 @@ class AjaxData<T> {
   AjaxData(this.result) {
     debugPrint('请求返回：$result');
   }
-
-  // 获取对象
   Map<String, dynamic> getJson() {
     return result['data'] ?? {};
   }
 
-  // 获取对象
   T getData(T Function(dynamic data) function) {
     return function(result['data']);
   }
 
-  // 获取列表
   List<T> getList<T>(T Function(dynamic data) function) {
     if (result.containsKey('data')) {
       return _getList(function, 'data');
@@ -247,7 +261,6 @@ class AjaxData<T> {
     return [];
   }
 
-  // 获取列表
   List<T> _getList<T>(T Function(dynamic data) function, String param) {
     List<dynamic>? dataList = List<dynamic>.from(result[param]?.map((x) => x));
     if (dataList.isEmpty) {

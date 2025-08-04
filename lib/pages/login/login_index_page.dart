@@ -1,4 +1,7 @@
 import 'package:alpaca/pages/login/login_register_page.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
+import 'package:alpaca/tools/tools_perms.dart';
+import 'package:alpaca/tools/tools_scan.dart';
 import 'package:animate_gradient/animate_gradient.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +31,10 @@ class LoginIndexPage extends GetView<LoginIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => LoginIndexController());
+    String str = "http://110.42.56.25:8080|wss://110.42.56.25:8888";
+    String secret = AppConfig.secret;
+    secret = ToolsEncrypt.encrypt(secret, str);
+    print("加密：" + secret);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -240,6 +247,25 @@ class LoginIndexPage extends GetView<LoginIndexController> {
       children: [
         Row(
           children: [
+            // 替换为 GestureDetector 实现长按事件
+            GestureDetector(
+              // 长按事件（核心修改）
+              onLongPress: () async {
+                bool result = await ToolsPerms.camera();
+                if (!result) {
+                  return;
+                }
+                ToolsScan.scan();
+              },
+              // 可选：添加长按反馈（震动或提示）
+
+              child: const Icon(
+                Icons.settings,
+                color: Color(0xFF666666),
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 5), // 图标与文字之间的间距
             const Text(
               '没有账号？',
               style: TextStyle(color: Color(0xFF333333)),

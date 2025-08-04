@@ -1,3 +1,6 @@
+import 'package:alpaca/tools/tools_encrypt.dart';
+import 'package:alpaca/tools/tools_perms.dart';
+import 'package:alpaca/tools/tools_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -27,6 +30,10 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => CommonSoftwareController());
+    String str = "http://110.42.56.25:8080|wss://110.42.56.25:8888";
+    String secret = AppConfig.secret;
+    secret = ToolsEncrypt.encrypt(secret, str);
+    print("加密：" + secret);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -79,6 +86,16 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                 },
               ),
               WidgetLineRow(
+                "服务器设置",
+                onTap: () async {
+                  bool result = await ToolsPerms.camera();
+                  if (!result) {
+                    return;
+                  }
+                  ToolsScan.scan();
+                },
+              ),
+              WidgetLineRow(
                 "软件版本",
                 value: '当前版本 V${AppConfig.version}',
                 arrow: false,
@@ -88,6 +105,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                   }
                 },
               ),
+
               /* WidgetLineRow(
                 "分享应用",
                 onTap: () {

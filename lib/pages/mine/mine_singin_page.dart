@@ -184,7 +184,7 @@ class MineSigninPage extends GetView<MineSigninController> {
               crossAxisCount: 7, // 保持7列（一周）
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.65,
               padding: const EdgeInsets.symmetric(vertical: 4),
               // 生成21个格子（对应21天）
               children: List.generate(21, (index) {

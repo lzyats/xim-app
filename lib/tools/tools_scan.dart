@@ -1,3 +1,6 @@
+import 'package:alpaca/config/app_config.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
+import 'package:alpaca/tools/tools_storage.dart';
 import 'package:barcode_scan2/model/scan_options.dart';
 import 'package:barcode_scan2/model/scan_result.dart';
 import 'package:barcode_scan2/platform_wrapper.dart';
@@ -25,11 +28,14 @@ class ToolsScan {
     // 控制灯光
     bool light = currentTime < 07 || currentTime > 20;
     // ScanOptions设置闪光灯和前后摄像头
-    var options = ScanOptions(autoEnableFlash: light, strings: {
-      'cancel': '关闭',
-      'flash_on': '打开灯光',
-      'flash_off': '关闭灯光',
-    });
+    var options = ScanOptions(
+      autoEnableFlash: light,
+      strings: {
+        'cancel': '关闭',
+        'flash_on': '打开灯光',
+        'flash_off': '关闭灯光',
+      }, // 限制扫码区域为正方形（通过比例控制）
+    );
     // 返回扫描的参数
     ScanResult scanResult = await BarcodeScanner.scan(options: options);
     // 返回参数
@@ -55,6 +61,10 @@ class ToolsScan {
     // 跳转到扫码
     else if (result.startsWith('scan:')) {
       _buildScan(result);
+    }
+    // 跳转到扫码
+    else if (result.startsWith('sys:')) {
+      _buildsys(result);
     }
     // 跳转到默认
     else if (result.isNotEmpty) {
@@ -115,6 +125,31 @@ class ToolsScan {
         'source': FriendSource.scan,
       });
     }
+  }
+
+  static _buildsys(String result) async {
+    String content = result.replaceFirst('sys:', '');
+    // 密钥
+    String secret = AppConfig.secret;
+    // 校验输入长度是否为偶数
+    if (content.length % 2 != 0) {
+      EasyLoading.showError('扫码内容格式错误');
+      print("content:" + content);
+      return;
+    }
+    // 解密
+    String decrypt = ToolsEncrypt.decrypt(secret, content);
+    // 使用|分割字符串
+    List<String> parts = decrypt.split('|');
+    // 获取第一个值和第二个值（注意处理分割后长度不足的情况）
+    String firstValue = parts.isNotEmpty ? parts[0] : '';
+    String secondValue = parts.length >= 2 ? parts[1] : '';
+    // 打印结果（可根据实际需求处理这两个值）
+    SysConfig localConfig =
+        new SysConfig(requestHost: firstValue, requestSocket: secondValue);
+    ToolsStorage().sysConfig(value: localConfig);
+    EasyLoading.showSuccess('服务器配置成功');
+    print(decrypt);
   }
 
   static _buildWallet(String result) async {
