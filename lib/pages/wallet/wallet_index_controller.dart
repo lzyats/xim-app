@@ -9,6 +9,7 @@ import 'package:alpaca/tools/tools_storage.dart';
 
 class WalletIndexController extends BaseController {
   RxString balance = '0.00'.obs;
+  LocalConfig localConfig = ToolsStorage().config();
   Rx<AuthType> authType = ToolsStorage().local().auth.obs;
 
   // 查询钱包

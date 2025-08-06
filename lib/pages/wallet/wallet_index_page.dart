@@ -92,7 +92,7 @@ class WalletIndexPage extends GetView<WalletIndexController> {
                         const SizedBox(height: 8),
                         Obx(
                           () => Text(
-                            '\$ ${controller.balance}',
+                            '${controller.localConfig.cashstr} ${controller.balance}',
                             style: const TextStyle(
                               fontSize: 30,
                               color: Colors.white,

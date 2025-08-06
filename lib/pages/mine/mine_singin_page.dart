@@ -66,7 +66,8 @@ class MineSigninPage extends GetView<MineSigninController> {
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     Text(
-                      controller.usdtBalance.toStringAsFixed(0) + " U",
+                      controller.usdtBalance.toStringAsFixed(0) +
+                          " ${controller.localConfig.cashname}",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -107,7 +108,7 @@ class MineSigninPage extends GetView<MineSigninController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '每日签到获取$sign USDT',
+                  '每日签到获取$sign ${controller.localConfig.cashname}',
                   style: TextStyle(
                     color: Colors.blue,
                     fontSize: 18,
@@ -303,9 +304,10 @@ class MineSigninPage extends GetView<MineSigninController> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildRuleItem('每日签到可获得对应 USDT 奖励'),
+              _buildRuleItem('每日签到可获得对应金额奖励'),
               _buildRuleItem('签到获取的奖励符合系统提现要求即可提现'),
-              _buildRuleItem('连续签到30天额外奖励 10 USDT'),
+              _buildRuleItem(
+                  '连续签到30天额外奖励 10 ${controller.localConfig.cashname}'),
               _buildRuleItem('漏签不可以进行补签，签到中断后签到从0开始计算'),
             ],
           ),

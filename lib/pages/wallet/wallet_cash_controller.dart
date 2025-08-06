@@ -11,17 +11,20 @@ class WalletCashController extends BaseController {
   TextEditingController amountController = TextEditingController();
   // 认证
   AuthType auth = ToolsStorage().local().auth;
+  LocalConfig localConfig = ToolsStorage().config();
   // 余额
   String balance = '0.00';
   double amount = 50.0;
   double charge = 0.00;
-  double rates = 0.00;
+  double min = 0.00;
+  RxDouble rates = 0.00.obs;
   WalletModel01 select = WalletModel01.init();
   // 获取配置
   getConfig() async {
     refreshData = WalletModel02.init();
     refreshData = await RequestWallet.getCashConfig();
-    rates = refreshData.rates;
+    min = refreshData.min;
+    rates.value = refreshData.rates;
     update();
   }
 

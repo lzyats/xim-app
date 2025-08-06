@@ -21,6 +21,7 @@ class LoginRegisterController extends BaseController {
   TextEditingController confirmPassController = TextEditingController();
   TextEditingController safePassController = TextEditingController();
   TextEditingController inviteCodeController = TextEditingController();
+  TextEditingController nicknameController = TextEditingController();
 
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
@@ -48,9 +49,10 @@ class LoginRegisterController extends BaseController {
     String pass = passController.text.trim();
     String safe = safePassController.text.trim();
     String incode = inviteCodeController.text.trim();
+    String nickname = nicknameController.text.trim();
     // 执行
-    AuthModel02 model =
-        await RequestAuth.register(phone, email, pass, code, safe, incode);
+    AuthModel02 model = await RequestAuth.register(
+        phone, nickname, email, pass, code, safe, incode);
     // 取消
     ToolsSubmit.cancel();
     // 取消

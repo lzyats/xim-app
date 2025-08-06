@@ -403,6 +403,8 @@ class LocalConfig {
   int messageLimit;
   double invo; //邀请奖励
   double sign; //签到奖励
+  String cashname;
+  String cashstr;
 
   LocalConfig(
     this.sharePath,
@@ -417,6 +419,8 @@ class LocalConfig {
     this.messageLimit,
     this.invo,
     this.sign,
+    this.cashname,
+    this.cashstr,
   );
 
   static LocalConfig fromJson(Map<String, dynamic> data) {
@@ -445,6 +449,8 @@ class LocalConfig {
       data['messageLimit'] ?? 1000,
       _toDouble(data['invo']), // 用工具方法转换
       _toDouble(data['sign']), // 用工具方法转换
+      data['cashname'] ?? '元',
+      data['cashstr'] ?? '￥',
     );
   }
 
@@ -462,6 +468,8 @@ class LocalConfig {
       'messageLimit': messageLimit,
       'invo': invo,
       'sign': sign,
+      'cashname': cashname,
+      'cashstr': cashstr,
     };
   }
 }

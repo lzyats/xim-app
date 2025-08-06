@@ -15,6 +15,7 @@ class ChatExtraCall extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LocalUser localUser = ToolsStorage().local();
     return ExtraItem(
       label: '通话',
       icon: Image.asset(
@@ -35,28 +36,43 @@ class ChatExtraCall extends StatelessWidget {
         if (!result) {
           return;
         }
-        WidgetBottom([
-          BottomModel(
-            '视频通话',
-            icon: Icon(Icons.videocam), // 添加视频通话图标
-            onTap: () async {
-              // 关闭
-              Get.back();
-              // 事件
-              _even('video');
-            },
-          ),
-          BottomModel(
-            '语音通话',
-            icon: Icon(Icons.phone), // 添加语音通话图标
-            onTap: () async {
-              // 关闭
-              Get.back();
-              // 事件
-              _even('voice');
-            },
-          ),
-        ]);
+        if (localUser.isvip > 0) {
+          WidgetBottom([
+            BottomModel(
+              '视频通话',
+              icon: Icon(Icons.videocam), // 添加视频通话图标
+              onTap: () async {
+                // 关闭
+                Get.back();
+                // 事件
+                _even('video');
+              },
+            ),
+            BottomModel(
+              '语音通话',
+              icon: Icon(Icons.phone), // 添加语音通话图标
+              onTap: () async {
+                // 关闭
+                Get.back();
+                // 事件
+                _even('voice');
+              },
+            ),
+          ]);
+        } else {
+          WidgetBottom([
+            BottomModel(
+              '语音通话',
+              icon: Icon(Icons.phone), // 添加语音通话图标
+              onTap: () async {
+                // 关闭
+                Get.back();
+                // 事件
+                _even('voice');
+              },
+            ),
+          ]);
+        }
       },
     ).buildItem();
   }

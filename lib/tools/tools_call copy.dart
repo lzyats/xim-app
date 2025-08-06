@@ -82,20 +82,17 @@ class _ToolsCallState extends State<ToolsCall> {
       }
       switch (status) {
         case CallStatus.cancel:
-          break;
         case CallStatus.reject:
-          break;
-        case CallStatus.connect:
+        case CallStatus.finish:
+          // 处理通话终止状态
+          if (!_back) {
+            Get.back();
+          }
+          EasyLoading.showToast(status.label);
           break;
         default:
           return;
       }
-      // 返回
-      if (!_back) {
-        Get.back();
-      }
-      // 提醒
-      EasyLoading.showToast(status.label);
     });
   }
 
@@ -114,11 +111,9 @@ class _ToolsCallState extends State<ToolsCall> {
 
   @override
   void dispose() {
-    if (mounted) {
-      audioPlayer.stop();
-      _subscription.cancel();
-      _timer?.cancel();
-    }
+    audioPlayer.stop();
+    _subscription.cancel();
+    _timer?.cancel();
     AppConfig.callKit = '';
     super.dispose();
   }
@@ -127,12 +122,11 @@ class _ToolsCallState extends State<ToolsCall> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(
+        // 多重渐变背景
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            stops: [0.1, 0.6],
             colors: [
               Color(0xFF808080), // 浅灰色
               Color(0xFF404040), // 深灰色
@@ -168,10 +162,7 @@ class _ToolsCallState extends State<ToolsCall> {
   _buildPortrait() {
     return Column(
       children: [
-        WidgetCommon.showAvatar(
-          widget.portrait,
-          size: 100,
-        ),
+        WidgetCommon.showAvatar(widget.portrait, size: 100, yj: 55),
         const SizedBox(
           height: 20,
         ),
@@ -191,25 +182,46 @@ class _ToolsCallState extends State<ToolsCall> {
     if (isCall && widget.request) {
       return Container();
     }
-    return RawMaterialButton(
-      onPressed: () {
-        if (isCall) {
-          _startCall(isCall);
-          // 计数器
-          ToolsBadger().subtraction(widget.chatId);
-        } else {
-          _endCall(auto: false);
-        }
-      },
-      shape: const CircleBorder(),
-      elevation: 2.0,
-      fillColor: isCall ? Colors.green : Colors.redAccent,
-      padding: const EdgeInsets.all(15.0),
-      child: Icon(
-        isCall ? Icons.call : Icons.call_end,
-        color: Colors.white,
-        size: 35.0,
-      ),
+    return Column(
+      children: [
+        RawMaterialButton(
+          onPressed: () {
+            if (isCall) {
+              _startCall(isCall);
+              // 计数器
+              ToolsBadger().subtraction(widget.chatId);
+            } else {
+              _endCall(auto: false);
+            }
+          },
+          shape: const CircleBorder(),
+          elevation: 2.0,
+          fillColor: isCall ? Colors.green : Colors.redAccent,
+          padding: const EdgeInsets.all(15.0),
+          child: Icon(
+            isCall ? Icons.call : Icons.call_end,
+            color: Colors.white,
+            size: 35.0,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (!isCall)
+          Text(
+            '挂断',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14.0,
+            ),
+          ),
+        if (isCall)
+          Text(
+            '接听',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14.0,
+            ),
+          ),
+      ],
     );
   }
 
@@ -309,42 +321,97 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   bool _mutedAudio = false;
   bool _mutedVideo = false;
   int _second = 0;
-
-  //UI优化
   bool _speakerOn = false;
+  late StreamSubscription _callEventSubscription;
 
   @override
   void initState() {
     super.initState();
     AppConfig.callKit = widget.chatId;
     initializeCalling();
+    _setupCallEventListening();
   }
 
   @override
   void dispose() {
     _engine?.leaveChannel();
+    _callEventSubscription.cancel();
     AppConfig.callKit = '';
     super.dispose();
   }
 
+  void _setupCallEventListening() {
+    _callEventSubscription = EventSetting().event.stream.listen((model) {
+      if (SettingType.sys != model.setting || 'call' != model.label) {
+        return;
+      }
+      if (widget.channel != model.primary) {
+        return;
+      }
+
+      try {
+        Map<String, dynamic> content = jsonDecode(model.value);
+        CallStatus status = CallStatus.init(content['callStatus']);
+
+        if (status == CallStatus.cancel ||
+            status == CallStatus.reject ||
+            status == CallStatus.finish) {
+          if (mounted) {
+            Get.until((route) => !Get.currentRoute.contains('ToolsCall'));
+          }
+        }
+      } catch (e) {
+        debugPrint('解析通话事件失败: $e');
+      }
+    });
+  }
+
+  // 在 _initAgoraRtcEngine 方法中初始化音频路由，确保在引擎初始化后立即设置
+  Future<void> _initAgoraRtcEngine() async {
+    _engine = createAgoraRtcEngine();
+    // 1. 先初始化引擎
+    await _engine?.initialize(
+      RtcEngineContext(
+        appId: ToolsStorage().config().callKit,
+        channelProfile: ChannelProfileType.channelProfileCommunication,
+      ),
+    );
+
+    // 2. 初始化后立即设置音频路由（关键优化）
+    if (!widget.video) {
+      // 语音通话：默认使用听筒
+      _speakerOn = false;
+      await _engine?.setEnableSpeakerphone(false); // 先禁用扬声器
+      await _engine?.setDefaultAudioRouteToSpeakerphone(false); // 路由到听筒
+    } else {
+      // 视频通话：默认使用扬声器
+      _speakerOn = true;
+      await _engine?.setEnableSpeakerphone(true); // 先启用扬声器
+      await _engine?.setDefaultAudioRouteToSpeakerphone(true); // 路由到扬声器
+    }
+
+    // 3. 最后启用音视频（确保路由设置在音视频启用前完成）
+    if (widget.video) {
+      await _engine?.enableVideo();
+    } else {
+      await _engine?.enableAudio();
+    }
+  }
+
+  // 修改 initializeCalling 方法，移除重复的音频设置
   Future<void> initializeCalling() async {
-    await _initAgoraRtcEngine();
+    await _initAgoraRtcEngine(); // 已在引擎初始化时设置音频路由
     _addAgoraEventHandlers();
-    // 视频
+
     if (widget.video) {
       var configuration = const VideoEncoderConfiguration(
-        dimensions: VideoDimensions(
-          width: 1920,
-          height: 1080,
-        ),
+        dimensions: VideoDimensions(width: 1920, height: 1080),
         orientationMode: OrientationMode.orientationModeAdaptive,
       );
       await _engine?.setVideoEncoderConfiguration(configuration);
     }
-    // 语音
-    else {
-      await _engine?.setDefaultAudioRouteToSpeakerphone(true);
-    }
+
+    // 加入频道（此时音频路由已正确设置）
     await _engine?.joinChannel(
       token: widget.token,
       channelId: widget.channel,
@@ -353,26 +420,22 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 初始化
-  Future<void> _initAgoraRtcEngine() async {
-    _engine = createAgoraRtcEngine();
-    await _engine?.initialize(
-      RtcEngineContext(
-        appId: ToolsStorage().config().callKit,
-        channelProfile: ChannelProfileType.channelProfileCommunication,
-      ),
-    );
-    // 视频
-    if (widget.video) {
-      await _engine?.enableVideo();
-    }
-    // 语音
-    else {
-      await _engine?.enableAudio();
+// 优化免提切换方法，增加异常捕获和状态同步
+  void _onToggleSpeaker() {
+    setState(() => _speakerOn = !_speakerOn);
+    if (_engine != null) {
+      // 确保两个方法的参数一致
+      _engine?.setEnableSpeakerphone(_speakerOn).then((_) {
+        return _engine?.setDefaultAudioRouteToSpeakerphone(_speakerOn);
+      }).catchError((error) {
+        // 捕获异常并回滚状态
+        setState(() => _speakerOn = !_speakerOn);
+        debugPrint("免提切换失败: $error");
+        EasyLoading.showToast("免提切换失败，请重试");
+      });
     }
   }
 
-  // 摄像头反转
   _onToggleCamera() {
     _engine?.switchCamera().then((value) {
       setState(() {
@@ -381,7 +444,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     });
   }
 
-  // 语音开关
   void _onToggleMuteAudio() {
     setState(() {
       _mutedAudio = !_mutedAudio;
@@ -389,7 +451,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     _engine?.muteLocalAudioStream(_mutedAudio);
   }
 
-  // 视频开关
   void _onToggleMuteVideo() {
     setState(() {
       _mutedVideo = !_mutedVideo;
@@ -397,10 +458,8 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     _engine?.muteLocalVideoStream(_mutedVideo);
   }
 
-  // 监听通道
   void _addAgoraEventHandlers() {
     _engine?.registerEventHandler(RtcEngineEventHandler(
-      // 好友加入
       onUserJoined: (connection, remote, elapsed) {
         if (mounted) {
           setState(() {
@@ -408,7 +467,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
           });
         }
       },
-      // 好友离开
       onUserOffline: (connection, int remote, UserOfflineReasonType reason) {
         if (mounted) {
           setState(() {
@@ -420,8 +478,12 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
           CallStatus.finish,
           second: _second,
         );
-        // 返回
-        if ('/ToolsCallVideo' == Get.currentRoute) {
+        if (mounted && Get.currentRoute.contains('ToolsCallVideo')) {
+          Get.until((route) => !Get.currentRoute.contains('ToolsCall'));
+        }
+      },
+      onLeaveChannel: (connection, stats) {
+        if (mounted) {
           Get.until((route) => !Get.currentRoute.contains('ToolsCall'));
         }
       },
@@ -455,7 +517,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 自己的窗口
   _localVideo() {
     return AgoraVideoView(
       controller: VideoViewController(
@@ -465,7 +526,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 朋友的窗口
   _remoteVideo() {
     if (_remote != null) {
       return Stack(
@@ -483,7 +543,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     return Container();
   }
 
-  // 计时器
   _timerView() {
     return Positioned(
       top: 45,
@@ -499,7 +558,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 本地摄像头
   _cameraView() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 75.0, horizontal: 20.0),
@@ -525,7 +583,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 底部按钮
   _bottomView() {
     return Container(
       margin: const EdgeInsets.all(20.0),
@@ -779,7 +836,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 关闭按钮
   _cancelView() {
     return Align(
       alignment: Alignment.topRight,
@@ -805,7 +861,6 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
     );
   }
 
-  // 头像
   _buildPortrait() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -826,25 +881,8 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
       ],
     );
   }
-
-  // 优化免提切换方法，增加异常捕获和状态同步
-  void _onToggleSpeaker() {
-    setState(() => _speakerOn = !_speakerOn);
-    if (_engine != null) {
-      // 确保两个方法的参数一致
-      _engine?.setEnableSpeakerphone(_speakerOn).then((_) {
-        return _engine?.setDefaultAudioRouteToSpeakerphone(_speakerOn);
-      }).catchError((error) {
-        // 捕获异常并回滚状态
-        setState(() => _speakerOn = !_speakerOn);
-        debugPrint("免提切换失败: $error");
-        EasyLoading.showToast("免提切换失败，请重试");
-      });
-    }
-  }
 }
 
-// 时间计时器
 class ToolsTimerView extends StatefulWidget {
   final Function(int second) onChange;
   const ToolsTimerView({
@@ -879,9 +917,7 @@ class ToolsTimerViewState extends State<ToolsTimerView> {
   @override
   void dispose() {
     super.dispose();
-    if (_timer != null) {
-      _timer?.cancel();
-    }
+    _timer?.cancel();
   }
 
   @override

@@ -40,6 +40,8 @@ class WalletCashPage extends GetView<WalletCashController> {
         WalletModel02 model02 = controller.refreshData;
         double accountBalance = double.parse(controller.balance);
         double selectedAmount = controller.amount;
+        String cashstr = controller.localConfig.cashstr;
+        String cashname = controller.localConfig.cashname;
 
         // 只有当不是用户手动输入时，才更新控制器的文本
         if (!_isUserInput) {
@@ -52,13 +54,14 @@ class WalletCashPage extends GetView<WalletCashController> {
           double amount,
           double width,
           double currentSelected,
+          String cashstr,
           VoidCallback onTap,
         ) {
           return InkWell(
             onTap: onTap,
             child: Container(
               width: width,
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              padding: const EdgeInsets.symmetric(vertical: 15.0),
               decoration: BoxDecoration(
                 color: currentSelected == amount
                     ? Colors.blue
@@ -68,7 +71,7 @@ class WalletCashPage extends GetView<WalletCashController> {
               child: Column(
                 children: [
                   Text(
-                    '${amount.toStringAsFixed(2)}',
+                    '${amount.toStringAsFixed(2)} ${cashstr}',
                     style: TextStyle(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -77,16 +80,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           : Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 2.0),
-                  Text(
-                    'USDT',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: currentSelected == amount
-                          ? Colors.white
-                          : Colors.grey,
-                    ),
-                  ),
+                  SizedBox(height: 2.0),
                 ],
               ),
             ),
@@ -155,7 +149,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                             ),
                             const SizedBox(height: 8.0),
                             Text(
-                              '${accountBalance}',
+                              '${cashstr} ${accountBalance}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24.0,
@@ -182,7 +176,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                         ),
                         child: const Center(
                           child: Icon(
-                            AppFonts.e7f8,
+                            Icons.money, // 替换为系统图标
                             color: Colors.orange,
                             size: 30.0,
                           ),
@@ -194,7 +188,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                 const SizedBox(height: 12.0),
                 // 提现U币数标题
                 const Text(
-                  '提现U币数',
+                  '提现金额',
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
@@ -211,6 +205,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           50.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(50.0);
@@ -221,6 +216,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           80.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(80.0);
@@ -231,6 +227,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           100.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(100.0);
@@ -247,6 +244,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           200.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(200.0);
@@ -257,6 +255,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           300.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(300.0);
@@ -267,6 +266,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           500.0,
                           buttonWidth,
                           selectedAmount,
+                          cashname,
                           () {
                             _isUserInput = false;
                             controller.changeAmount(500.0);
@@ -326,7 +326,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                             double max = accountBalance;
 
                             if (inputAmount < min) {
-                              inputAmount = min;
+                              /* inputAmount = min;
                               _customAmountController.text =
                                   min.toStringAsFixed(2);
                               _customAmountController.selection =
@@ -334,7 +334,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                                 TextPosition(
                                     offset:
                                         _customAmountController.text.length),
-                              );
+                              ); */
                             } else if (inputAmount > max) {
                               inputAmount = max;
                               _customAmountController.text =
@@ -365,6 +365,78 @@ class WalletCashPage extends GetView<WalletCashController> {
                 ),
                 const SizedBox(height: 12.0),
 
+                // 汇率转换显示区域
+                Container(
+                  width: double.infinity, // 关键：强制宽度充满父容器
+                  padding: const EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Obx(() {
+                    // 获取当前输入金额
+                    double currentAmount = controller.amount;
+                    // 假设汇率为1:6.9（实际项目中建议从API获取实时汇率）
+                    double exchangeRate = controller.rates.value;
+                    // 计算转换后金额
+                    double convertedAmount = currentAmount / exchangeRate;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(color: Colors.black87),
+                            children: [
+                              TextSpan(
+                                text: '实时汇率转换 ',
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '${cashstr} ${currentAmount.toStringAsFixed(2)} ',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' = ',
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '\$ ${convertedAmount.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    '  (汇率: 1 USDT  = ${exchangeRate.toStringAsFixed(2)} ${cashname})',
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+                const SizedBox(height: 12.0),
                 _buildWallet(),
                 const SizedBox(height: 12.0),
                 // 提现按钮和钱包管理按钮
@@ -384,12 +456,14 @@ class WalletCashPage extends GetView<WalletCashController> {
                             return;
                           }
                           double charge = controller.charge + model02.cost;
+
                           double min = charge;
                           if (min < model02.min) {
                             min = model02.min;
                           }
-                          if (selectedAmount < charge) {
-                            EasyLoading.showInfo('提现金额不能小于 $min 元');
+
+                          if (selectedAmount < min) {
+                            EasyLoading.showInfo('系统最小提现金额为 $min 元');
                             return;
                           }
                           if (controller.select.name.isEmpty) {
