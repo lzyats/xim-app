@@ -18,8 +18,6 @@ class AppSetting {
     // socket地址
     //AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
     AppConfig.requestSocket = 'wss://110.42.56.25:8888';
-    // 添加朋友圈API请求地址
-    AppConfig.commentHost = 'http://110.42.56.25:8088';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://work.weixin.qq.com/nl/eula';
     // 请求服务协议

@@ -11,7 +11,7 @@
  Target Server Version : 50744 (5.7.44-log)
  File Encoding         : 65001
 
- Date: 07/08/2025 11:58:31
+ Date: 07/08/2025 17:51:10
 */
 
 SET NAMES utf8mb4;
@@ -426,26 +426,34 @@ CREATE TABLE `chat_portrait`  (
 -- ----------------------------
 -- Records of chat_portrait
 -- ----------------------------
-INSERT INTO `chat_portrait` VALUES (1793574396027731910, 'https://img.alicdn.com/imgextra/i1/87413133/O1CN01PoqsS81Z0xr5CjDQF_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731911, 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01B9UyI51Z0xr0ghHfJ_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731912, 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01uJoEkC1Z0xr2HRPze_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731913, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN01Y8sHn41Z0xr2HVF3c_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731914, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01MzRXKx1Z0xqztYS0U_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731915, 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01uJSXr81Z0xqvP8j6B_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731916, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01rLvHhr1Z0xr509mb0_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731917, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01JbXfqp1Z0xr32dbmq_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731918, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN01CqSpkj1Z0xr2pRh6i_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731919, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN019n6Eua1Z0xr32eY2C_!!87413133.png', '1', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731970, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN01Z2HXBK1Z0xr5n01Fa_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731971, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN01zsju3k1Z0xr2HSDrj_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731972, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01yiRrTQ1Z0xr47i7cL_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731973, 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01nYqOd21Z0xqvPB8vi_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731974, 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01yj29Ke1Z0xr30zhUm_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731975, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN01r47v1w1Z0xr50Bznn_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731976, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01eQA5Op1Z0xr3knxRm_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731977, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN017YUobu1Z0xr3ko9uj_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731978, 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01mag3bv1Z0xr2pSQtG_!!87413133.png', '2', 'Y');
-INSERT INTO `chat_portrait` VALUES (1793574396027731979, 'https://img.alicdn.com/imgextra/i3/87413133/O1CN012rid7r1Z0xr5mzHYW_!!87413133.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731910, 'http://192.168.0.1:19000/xim/att/1.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731911, 'http://192.168.0.1:19000/xim/att/2.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731912, 'http://192.168.0.1:19000/xim/att/3.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731913, 'http://192.168.0.1:19000/xim/att/4.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731914, 'http://192.168.0.1:19000/xim/att/5.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731915, 'http://192.168.0.1:19000/xim/att/6.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731916, 'http://192.168.0.1:19000/xim/att/7.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731917, 'http://192.168.0.1:19000/xim/att/8.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731918, 'http://192.168.0.1:19000/xim/att/9.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731919, 'http://192.168.0.1:19000/xim/att/10.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731920, 'http://192.168.0.1:19000/xim/att/11.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731921, 'http://192.168.0.1:19000/xim/att/12.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731922, 'http://192.168.0.1:19000/xim/att/13.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731923, 'http://192.168.0.1:19000/xim/att/14.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731924, 'http://192.168.0.1:19000/xim/att/15.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731925, 'http://192.168.0.1:19000/xim/att/16.png', '1', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731970, 'http://192.168.0.1:19000/xim/btt/1.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731971, 'http://192.168.0.1:19000/xim/btt/2.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731972, 'http://192.168.0.1:19000/xim/btt/3.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731973, 'http://192.168.0.1:19000/xim/btt/4.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731974, 'http://192.168.0.1:19000/xim/btt/5.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731975, 'http://192.168.0.1:19000/xim/btt/6.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731976, 'http://192.168.0.1:19000/xim/btt/7.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731977, 'http://192.168.0.1:19000/xim/btt/8.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731978, 'http://192.168.0.1:19000/xim/btt/9.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731979, 'http://192.168.0.1:19000/xim/btt/10.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731980, 'http://192.168.0.1:19000/xim/btt/11.png', '2', 'Y');
+INSERT INTO `chat_portrait` VALUES (1793574396027731981, 'http://192.168.0.1:19000/xim/btt/12.png', '2', 'Y');
 
 -- ----------------------------
 -- Table structure for chat_resource
@@ -479,9 +487,9 @@ CREATE TABLE `chat_robot`  (
 -- ----------------------------
 -- Records of chat_robot
 -- ----------------------------
-INSERT INTO `chat_robot` VALUES (10001, '8ykc55fcq1fc21agt11qtni60hujhrxf', '在线客服', 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01NxWkgo1Z0xqvPDYbs_!!87413133.png', '[]');
-INSERT INTO `chat_robot` VALUES (10002, 'qry41hxsjg8l4kg242z5s1u91oxll8b', '支付助手', 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01sVp8VY1Z0xsCzOdWE_!!87413133.png', '[]');
-INSERT INTO `chat_robot` VALUES (10003, 'zgs5ibsx565wn4ccbb3hqlnozwyiktm9', '系统AI', 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01V9Um9U1Z0xs1UA7iE_!!87413133.png', '[]');
+INSERT INTO `chat_robot` VALUES (10001, '8ykc55fcq1fc21agt11qtni60hujhrxf', '在线客服', 'http://192.168.0.1:19000/xim/root/1.png', '[]');
+INSERT INTO `chat_robot` VALUES (10002, 'qry41hxsjg8l4kg242z5s1u91oxll8b', '支付助手', 'http://192.168.0.1:19000/xim/root/2.png', '[]');
+INSERT INTO `chat_robot` VALUES (10003, 'zgs5ibsx565wn4ccbb3hqlnozwyiktm9', 'AI助理', 'http://192.168.0.1:19000/xim/root/3.png', '[]');
 
 -- ----------------------------
 -- Table structure for chat_robot_reply
@@ -1133,8 +1141,8 @@ CREATE TABLE `qrtz_scheduler_state`  (
 -- ----------------------------
 -- Records of qrtz_scheduler_state
 -- ----------------------------
-INSERT INTO `qrtz_scheduler_state` VALUES ('AppScheduler', '10-30-18-41754531699703', 1754539133113, 15000);
-INSERT INTO `qrtz_scheduler_state` VALUES ('AppScheduler', 'DESKTOP-PSRFMEG1754537465701', 1754539129786, 15000);
+INSERT INTO `qrtz_scheduler_state` VALUES ('AppScheduler', '10-30-18-41754531699703', 1754560287082, 15000);
+INSERT INTO `qrtz_scheduler_state` VALUES ('AppScheduler', 'DESKTOP-PSRFMEG1754537465701', 1754560283023, 15000);
 
 -- ----------------------------
 -- Table structure for qrtz_simple_triggers
@@ -1211,11 +1219,11 @@ CREATE TABLE `qrtz_triggers`  (
 -- ----------------------------
 -- Records of qrtz_triggers
 -- ----------------------------
-INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799001', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799001', 'DEFAULT', NULL, 1754539200000, 1754538900000, 5, 'WAITING', 'CRON', 1754537469000, 0, NULL, 2, '');
+INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799001', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799001', 'DEFAULT', NULL, 1754560500000, 1754560200000, 5, 'WAITING', 'CRON', 1754537469000, 0, NULL, 2, '');
 INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799002', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799002', 'DEFAULT', NULL, 1754593200000, -1, 5, 'WAITING', 'CRON', 1754537469000, 0, NULL, 2, '');
-INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799003', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799003', 'DEFAULT', NULL, 1754539200000, 1754538600000, 5, 'WAITING', 'CRON', 1754537470000, 0, NULL, 2, '');
+INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799003', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799003', 'DEFAULT', NULL, 1754560800000, 1754560200000, 5, 'WAITING', 'CRON', 1754537470000, 0, NULL, 2, '');
 INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799004', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799004', 'DEFAULT', NULL, 1754600400000, -1, 5, 'WAITING', 'CRON', 1754537470000, 0, NULL, 2, '');
-INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799005', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799005', 'DEFAULT', NULL, 1754539200000, 1754538900000, 5, 'WAITING', 'CRON', 1754537471000, 0, NULL, 2, '');
+INSERT INTO `qrtz_triggers` VALUES ('AppScheduler', 'TASK_CLASS_NAME1793574396027799005', 'DEFAULT', 'TASK_CLASS_NAME1793574396027799005', 'DEFAULT', NULL, 1754560500000, 1754560200000, 5, 'WAITING', 'CRON', 1754537471000, 0, NULL, 2, '');
 
 -- ----------------------------
 -- Table structure for quartz_job
@@ -1258,6 +1266,184 @@ CREATE TABLE `quartz_log`  (
 -- ----------------------------
 INSERT INTO `quartz_log` VALUES (1953303837045518337, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 11:55:00');
 INSERT INTO `quartz_log` VALUES (1953303839625019394, '钱包补偿', 'walletReceiveService.task()', '总共耗时：91毫秒', 'Y', '2025-08-07 11:55:01');
+INSERT INTO `quartz_log` VALUES (1953305095353495554, '钱包任务', 'walletTaskService.task()', '总共耗时：8毫秒', 'Y', '2025-08-07 12:00:00');
+INSERT INTO `quartz_log` VALUES (1953305095588376578, '钱包补偿', 'walletReceiveService.task()', '总共耗时：8毫秒', 'Y', '2025-08-07 12:00:00');
+INSERT INTO `quartz_log` VALUES (1953305097668755458, '用户解封', 'chatTaskService.banned()', '总共耗时：62毫秒', 'Y', '2025-08-07 12:00:01');
+INSERT INTO `quartz_log` VALUES (1953306353648889858, '钱包任务', 'walletTaskService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 12:05:00');
+INSERT INTO `quartz_log` VALUES (1953306356207419393, '钱包补偿', 'walletReceiveService.task()', '总共耗时：71毫秒', 'Y', '2025-08-07 12:05:01');
+INSERT INTO `quartz_log` VALUES (1953307611935895554, '用户解封', 'chatTaskService.banned()', '总共耗时：12毫秒', 'Y', '2025-08-07 12:10:00');
+INSERT INTO `quartz_log` VALUES (1953307612116250626, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 12:10:00');
+INSERT INTO `quartz_log` VALUES (1953307614410539010, '钱包任务', 'walletTaskService.task()', '总共耗时：67毫秒', 'Y', '2025-08-07 12:10:01');
+INSERT INTO `quartz_log` VALUES (1953308870235484162, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 12:15:00');
+INSERT INTO `quartz_log` VALUES (1953308872601075714, '钱包任务', 'walletTaskService.task()', '总共耗时：66毫秒', 'Y', '2025-08-07 12:15:01');
+INSERT INTO `quartz_log` VALUES (1953310128539267074, '钱包任务', 'walletTaskService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 12:20:00');
+INSERT INTO `quartz_log` VALUES (1953310128816091138, '钱包补偿', 'walletReceiveService.task()', '总共耗时：8毫秒', 'Y', '2025-08-07 12:20:00');
+INSERT INTO `quartz_log` VALUES (1953310131110379522, '用户解封', 'chatTaskService.banned()', '总共耗时：81毫秒', 'Y', '2025-08-07 12:20:01');
+INSERT INTO `quartz_log` VALUES (1953311386780135426, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 12:25:00');
+INSERT INTO `quartz_log` VALUES (1953311389128949761, '钱包补偿', 'walletReceiveService.task()', '总共耗时：62毫秒', 'Y', '2025-08-07 12:25:01');
+INSERT INTO `quartz_log` VALUES (1953312645100695553, '用户解封', 'chatTaskService.banned()', '总共耗时：10毫秒', 'Y', '2025-08-07 12:30:00');
+INSERT INTO `quartz_log` VALUES (1953312645331382274, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 12:30:00');
+INSERT INTO `quartz_log` VALUES (1953312647889911810, '钱包任务', 'walletTaskService.task()', '总共耗时：103毫秒', 'Y', '2025-08-07 12:30:01');
+INSERT INTO `quartz_log` VALUES (1953313903396089857, '钱包任务', 'walletTaskService.task()', '总共耗时：14毫秒', 'Y', '2025-08-07 12:35:00');
+INSERT INTO `quartz_log` VALUES (1953313905547771906, '钱包补偿', 'walletReceiveService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 12:35:00');
+INSERT INTO `quartz_log` VALUES (1953315161758593025, '钱包任务', 'walletTaskService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 12:40:00');
+INSERT INTO `quartz_log` VALUES (1953315162089943041, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 12:40:00');
+INSERT INTO `quartz_log` VALUES (1953315163906080770, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 12:40:01');
+INSERT INTO `quartz_log` VALUES (1953316419978489857, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 12:45:00');
+INSERT INTO `quartz_log` VALUES (1953316422142754818, '钱包任务', 'walletTaskService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 12:45:00');
+INSERT INTO `quartz_log` VALUES (1953317678240329730, '用户解封', 'chatTaskService.banned()', '总共耗时：11毫秒', 'Y', '2025-08-07 12:50:00');
+INSERT INTO `quartz_log` VALUES (1953317678433267714, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 12:50:00');
+INSERT INTO `quartz_log` VALUES (1953317680375234562, '钱包任务', 'walletTaskService.task()', '总共耗时：63毫秒', 'Y', '2025-08-07 12:50:00');
+INSERT INTO `quartz_log` VALUES (1953318936556695554, '钱包任务', 'walletTaskService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 12:55:00');
+INSERT INTO `quartz_log` VALUES (1953318938620297218, '钱包补偿', 'walletReceiveService.task()', '总共耗时：70毫秒', 'Y', '2025-08-07 12:55:00');
+INSERT INTO `quartz_log` VALUES (1953320194826924034, '钱包任务', 'walletTaskService.task()', '总共耗时：9毫秒', 'Y', '2025-08-07 13:00:00');
+INSERT INTO `quartz_log` VALUES (1953320195053416449, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 13:00:00');
+INSERT INTO `quartz_log` VALUES (1953320197406425090, '用户解封', 'chatTaskService.banned()', '总共耗时：74毫秒', 'Y', '2025-08-07 13:00:01');
+INSERT INTO `quartz_log` VALUES (1953321453139095553, '钱包补偿', 'walletReceiveService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 13:05:00');
+INSERT INTO `quartz_log` VALUES (1953321455592767490, '钱包任务', 'walletTaskService.task()', '总共耗时：67毫秒', 'Y', '2025-08-07 13:05:01');
+INSERT INTO `quartz_log` VALUES (1953322711400935425, '用户解封', 'chatTaskService.banned()', '总共耗时：8毫秒', 'Y', '2025-08-07 13:10:00');
+INSERT INTO `quartz_log` VALUES (1953322711572901890, '钱包补偿', 'walletReceiveService.task()', '总共耗时：2毫秒', 'Y', '2025-08-07 13:10:00');
+INSERT INTO `quartz_log` VALUES (1953322713661669377, '钱包任务', 'walletTaskService.task()', '总共耗时：60毫秒', 'Y', '2025-08-07 13:10:01');
+INSERT INTO `quartz_log` VALUES (1953323969671163906, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 13:15:00');
+INSERT INTO `quartz_log` VALUES (1953323973081137154, '钱包任务', 'walletTaskService.task()', '总共耗时：71毫秒', 'Y', '2025-08-07 13:15:01');
+INSERT INTO `quartz_log` VALUES (1953325228000112641, '用户解封', 'chatTaskService.banned()', '总共耗时：5毫秒', 'Y', '2025-08-07 13:20:00');
+INSERT INTO `quartz_log` VALUES (1953325229933686785, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 13:20:00');
+INSERT INTO `quartz_log` VALUES (1953325230181154818, '钱包任务', 'walletTaskService.task()', '总共耗时：63毫秒', 'Y', '2025-08-07 13:20:00');
+INSERT INTO `quartz_log` VALUES (1953326486303895554, '钱包任务', 'walletTaskService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 13:25:00');
+INSERT INTO `quartz_log` VALUES (1953326488564629506, '钱包补偿', 'walletReceiveService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 13:25:01');
+INSERT INTO `quartz_log` VALUES (1953327744607678465, '钱包任务', 'walletTaskService.task()', '总共耗时：9毫秒', 'Y', '2025-08-07 13:30:00');
+INSERT INTO `quartz_log` VALUES (1953327746272817153, '钱包补偿', 'walletReceiveService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 13:30:00');
+INSERT INTO `quartz_log` VALUES (1953327746641920002, '用户解封', 'chatTaskService.banned()', '总共耗时：68毫秒', 'Y', '2025-08-07 13:30:00');
+INSERT INTO `quartz_log` VALUES (1953329002848546818, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 13:35:00');
+INSERT INTO `quartz_log` VALUES (1953329005012811778, '钱包任务', 'walletTaskService.task()', '总共耗时：65毫秒', 'Y', '2025-08-07 13:35:00');
+INSERT INTO `quartz_log` VALUES (1953330261135552513, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 13:40:00');
+INSERT INTO `quartz_log` VALUES (1953330263102681090, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 13:40:00');
+INSERT INTO `quartz_log` VALUES (1953330263387897858, '用户解封', 'chatTaskService.banned()', '总共耗时：58毫秒', 'Y', '2025-08-07 13:40:01');
+INSERT INTO `quartz_log` VALUES (1953331519460306946, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 13:45:00');
+INSERT INTO `quartz_log` VALUES (1953331526028591106, '钱包任务', 'walletTaskService.task()', '总共耗时：65毫秒', 'Y', '2025-08-07 13:45:02');
+INSERT INTO `quartz_log` VALUES (1953332777709563905, '钱包任务', 'walletTaskService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 13:50:00');
+INSERT INTO `quartz_log` VALUES (1953332779597000705, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 13:50:00');
+INSERT INTO `quartz_log` VALUES (1953332779894800385, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 13:50:00');
+INSERT INTO `quartz_log` VALUES (1953334036034318338, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 13:55:00');
+INSERT INTO `quartz_log` VALUES (1953334038110502914, '钱包任务', 'walletTaskService.task()', '总共耗时：72毫秒', 'Y', '2025-08-07 13:55:00');
+INSERT INTO `quartz_log` VALUES (1953335294308741121, '用户解封', 'chatTaskService.banned()', '总共耗时：6毫秒', 'Y', '2025-08-07 14:00:00');
+INSERT INTO `quartz_log` VALUES (1953335294560399362, '钱包补偿', 'walletReceiveService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 14:00:00');
+INSERT INTO `quartz_log` VALUES (1953335297194426369, '钱包任务', 'walletTaskService.task()', '总共耗时：98毫秒', 'Y', '2025-08-07 14:00:01');
+INSERT INTO `quartz_log` VALUES (1953336552578969602, '钱包任务', 'walletTaskService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 14:05:00');
+INSERT INTO `quartz_log` VALUES (1953336556462899202, '钱包补偿', 'walletReceiveService.task()', '总共耗时：99毫秒', 'Y', '2025-08-07 14:05:01');
+INSERT INTO `quartz_log` VALUES (1953337810882752513, '用户解封', 'chatTaskService.banned()', '总共耗时：7毫秒', 'Y', '2025-08-07 14:10:00');
+INSERT INTO `quartz_log` VALUES (1953337811092467713, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 14:10:00');
+INSERT INTO `quartz_log` VALUES (1953337813483225089, '钱包任务', 'walletTaskService.task()', '总共耗时：70毫秒', 'Y', '2025-08-07 14:10:01');
+INSERT INTO `quartz_log` VALUES (1953339069190729730, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 14:15:00');
+INSERT INTO `quartz_log` VALUES (1953339072055443458, '钱包任务', 'walletTaskService.task()', '总共耗时：65毫秒', 'Y', '2025-08-07 14:15:01');
+INSERT INTO `quartz_log` VALUES (1953340327473541122, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 14:20:00');
+INSERT INTO `quartz_log` VALUES (1953340329390338050, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 14:20:00');
+INSERT INTO `quartz_log` VALUES (1953340329872687106, '用户解封', 'chatTaskService.banned()', '总共耗时：72毫秒', 'Y', '2025-08-07 14:20:01');
+INSERT INTO `quartz_log` VALUES (1953341585773129730, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 14:25:00');
+INSERT INTO `quartz_log` VALUES (1953341588528791554, '钱包任务', 'walletTaskService.task()', '总共耗时：57毫秒', 'Y', '2025-08-07 14:25:01');
+INSERT INTO `quartz_log` VALUES (1953342844068524034, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 14:30:00');
+INSERT INTO `quartz_log` VALUES (1953342844324376578, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 14:30:00');
+INSERT INTO `quartz_log` VALUES (1953342847067455489, '用户解封', 'chatTaskService.banned()', '总共耗时：171毫秒', 'Y', '2025-08-07 14:30:01');
+INSERT INTO `quartz_log` VALUES (1953344102351335426, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 14:35:00');
+INSERT INTO `quartz_log` VALUES (1953344104561737730, '钱包补偿', 'walletReceiveService.task()', '总共耗时：67毫秒', 'Y', '2025-08-07 14:35:00');
+INSERT INTO `quartz_log` VALUES (1953345360650924033, '用户解封', 'chatTaskService.banned()', '总共耗时：10毫秒', 'Y', '2025-08-07 14:40:00');
+INSERT INTO `quartz_log` VALUES (1953345360869027841, '钱包补偿', 'walletReceiveService.task()', '总共耗时：10毫秒', 'Y', '2025-08-07 14:40:00');
+INSERT INTO `quartz_log` VALUES (1953345364589379586, '钱包任务', 'walletTaskService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 14:40:01');
+INSERT INTO `quartz_log` VALUES (1953346618908569601, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 14:45:00');
+INSERT INTO `quartz_log` VALUES (1953346621504847873, '钱包任务', 'walletTaskService.task()', '总共耗时：73毫秒', 'Y', '2025-08-07 14:45:01');
+INSERT INTO `quartz_log` VALUES (1953347877279461378, '用户解封', 'chatTaskService.banned()', '总共耗时：18毫秒', 'Y', '2025-08-07 14:50:00');
+INSERT INTO `quartz_log` VALUES (1953347877455622145, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 14:50:00');
+INSERT INTO `quartz_log` VALUES (1953347879842185217, '钱包任务', 'walletTaskService.task()', '总共耗时：55毫秒', 'Y', '2025-08-07 14:50:01');
+INSERT INTO `quartz_log` VALUES (1953349135528718338, '钱包补偿', 'walletReceiveService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 14:55:00');
+INSERT INTO `quartz_log` VALUES (1953349137743314945, '钱包任务', 'walletTaskService.task()', '总共耗时：68毫秒', 'Y', '2025-08-07 14:55:00');
+INSERT INTO `quartz_log` VALUES (1953350393811529729, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 15:00:00');
+INSERT INTO `quartz_log` VALUES (1953350394155462657, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 15:00:00');
+INSERT INTO `quartz_log` VALUES (1953350396370059265, '用户解封', 'chatTaskService.banned()', '总共耗时：75毫秒', 'Y', '2025-08-07 15:00:01');
+INSERT INTO `quartz_log` VALUES (1953351652106924033, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 15:05:00');
+INSERT INTO `quartz_log` VALUES (1953351659757338626, '钱包任务', 'walletTaskService.task()', '总共耗时：586毫秒', 'Y', '2025-08-07 15:05:01');
+INSERT INTO `quartz_log` VALUES (1953352910377152513, '用户解封', 'chatTaskService.banned()', '总共耗时：6毫秒', 'Y', '2025-08-07 15:10:00');
+INSERT INTO `quartz_log` VALUES (1953352910591062017, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 15:10:00');
+INSERT INTO `quartz_log` VALUES (1953352913401249793, '钱包任务', 'walletTaskService.task()', '总共耗时：123毫秒', 'Y', '2025-08-07 15:10:01');
+INSERT INTO `quartz_log` VALUES (1953354168680935425, '钱包任务', 'walletTaskService.task()', '总共耗时：8毫秒', 'Y', '2025-08-07 15:15:00');
+INSERT INTO `quartz_log` VALUES (1953354171092664322, '钱包补偿', 'walletReceiveService.task()', '总共耗时：63毫秒', 'Y', '2025-08-07 15:15:01');
+INSERT INTO `quartz_log` VALUES (1953355426993106945, '钱包任务', 'walletTaskService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 15:20:00');
+INSERT INTO `quartz_log` VALUES (1953355427207016450, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 15:20:00');
+INSERT INTO `quartz_log` VALUES (1953355430717652993, '用户解封', 'chatTaskService.banned()', '总共耗时：69毫秒', 'Y', '2025-08-07 15:20:01');
+INSERT INTO `quartz_log` VALUES (1953356685263335425, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 15:25:00');
+INSERT INTO `quartz_log` VALUES (1953356687926722562, '钱包任务', 'walletTaskService.task()', '总共耗时：129毫秒', 'Y', '2025-08-07 15:25:01');
+INSERT INTO `quartz_log` VALUES (1953357943554535426, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:30:00');
+INSERT INTO `quartz_log` VALUES (1953357943839748097, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:30:00');
+INSERT INTO `quartz_log` VALUES (1953357946117259266, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 15:30:01');
+INSERT INTO `quartz_log` VALUES (1953359201849929730, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 15:35:00');
+INSERT INTO `quartz_log` VALUES (1953359204249075714, '钱包任务', 'walletTaskService.task()', '总共耗时：70毫秒', 'Y', '2025-08-07 15:35:01');
+INSERT INTO `quartz_log` VALUES (1953360460166295553, '用户解封', 'chatTaskService.banned()', '总共耗时：7毫秒', 'Y', '2025-08-07 15:40:00');
+INSERT INTO `quartz_log` VALUES (1953360462234087426, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 15:40:01');
+INSERT INTO `quartz_log` VALUES (1953360462544470018, '钱包任务', 'walletTaskService.task()', '总共耗时：75毫秒', 'Y', '2025-08-07 15:40:01');
+INSERT INTO `quartz_log` VALUES (1953361718415552513, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:45:00');
+INSERT INTO `quartz_log` VALUES (1953361720844058625, '钱包任务', 'walletTaskService.task()', '总共耗时：69毫秒', 'Y', '2025-08-07 15:45:01');
+INSERT INTO `quartz_log` VALUES (1953362976698363906, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:50:00');
+INSERT INTO `quartz_log` VALUES (1953362977008742402, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:50:00');
+INSERT INTO `quartz_log` VALUES (1953362979458220033, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 15:50:01');
+INSERT INTO `quartz_log` VALUES (1953364234989563905, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 15:55:00');
+INSERT INTO `quartz_log` VALUES (1953364237661339650, '钱包补偿', 'walletReceiveService.task()', '总共耗时：70毫秒', 'Y', '2025-08-07 15:55:01');
+INSERT INTO `quartz_log` VALUES (1953365493305929729, '用户解封', 'chatTaskService.banned()', '总共耗时：7毫秒', 'Y', '2025-08-07 16:00:00');
+INSERT INTO `quartz_log` VALUES (1953365493519839233, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:00:00');
+INSERT INTO `quartz_log` VALUES (1953365495759601665, '钱包任务', 'walletTaskService.task()', '总共耗时：69毫秒', 'Y', '2025-08-07 16:00:01');
+INSERT INTO `quartz_log` VALUES (1953366751530020866, '钱包任务', 'walletTaskService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 16:05:00');
+INSERT INTO `quartz_log` VALUES (1953366753941749762, '钱包补偿', 'walletReceiveService.task()', '总共耗时：84毫秒', 'Y', '2025-08-07 16:05:01');
+INSERT INTO `quartz_log` VALUES (1953368009854775297, '用户解封', 'chatTaskService.banned()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:10:00');
+INSERT INTO `quartz_log` VALUES (1953368010022547457, '钱包补偿', 'walletReceiveService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:10:00');
+INSERT INTO `quartz_log` VALUES (1953368012631408641, '钱包任务', 'walletTaskService.task()', '总共耗时：82毫秒', 'Y', '2025-08-07 16:10:01');
+INSERT INTO `quartz_log` VALUES (1953369268275998721, '钱包任务', 'walletTaskService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 16:15:00');
+INSERT INTO `quartz_log` VALUES (1953369270738059265, '钱包补偿', 'walletReceiveService.task()', '总共耗时：67毫秒', 'Y', '2025-08-07 16:15:01');
+INSERT INTO `quartz_log` VALUES (1953370526479118338, '用户解封', 'chatTaskService.banned()', '总共耗时：10毫秒', 'Y', '2025-08-07 16:20:00');
+INSERT INTO `quartz_log` VALUES (1953370526705610753, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 16:20:00');
+INSERT INTO `quartz_log` VALUES (1953370529108951041, '钱包任务', 'walletTaskService.task()', '总共耗时：66毫秒', 'Y', '2025-08-07 16:20:01');
+INSERT INTO `quartz_log` VALUES (1953371784761929730, '钱包任务', 'walletTaskService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 16:25:00');
+INSERT INTO `quartz_log` VALUES (1953371787265933314, '钱包补偿', 'walletReceiveService.task()', '总共耗时：67毫秒', 'Y', '2025-08-07 16:25:01');
+INSERT INTO `quartz_log` VALUES (1953373043044741122, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:30:00');
+INSERT INTO `quartz_log` VALUES (1953373043355119618, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 16:30:00');
+INSERT INTO `quartz_log` VALUES (1953373045661990913, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 16:30:01');
+INSERT INTO `quartz_log` VALUES (1953374301335941121, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 16:35:00');
+INSERT INTO `quartz_log` VALUES (1953374303798001666, '钱包任务', 'walletTaskService.task()', '总共耗时：59毫秒', 'Y', '2025-08-07 16:35:01');
+INSERT INTO `quartz_log` VALUES (1953375559622946817, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:40:00');
+INSERT INTO `quartz_log` VALUES (1953375559836856322, '钱包补偿', 'walletReceiveService.task()', '总共耗时：8毫秒', 'Y', '2025-08-07 16:40:00');
+INSERT INTO `quartz_log` VALUES (1953375562105978882, '用户解封', 'chatTaskService.banned()', '总共耗时：74毫秒', 'Y', '2025-08-07 16:40:01');
+INSERT INTO `quartz_log` VALUES (1953376817893175297, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 16:45:00');
+INSERT INTO `quartz_log` VALUES (1953376820342652929, '钱包任务', 'walletTaskService.task()', '总共耗时：73毫秒', 'Y', '2025-08-07 16:45:01');
+INSERT INTO `quartz_log` VALUES (1953378076217929730, '用户解封', 'chatTaskService.banned()', '总共耗时：8毫秒', 'Y', '2025-08-07 16:50:00');
+INSERT INTO `quartz_log` VALUES (1953378076402479106, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 16:50:00');
+INSERT INTO `quartz_log` VALUES (1953378078998757377, '钱包任务', 'walletTaskService.task()', '总共耗时：63毫秒', 'Y', '2025-08-07 16:50:01');
+INSERT INTO `quartz_log` VALUES (1953379334500741121, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 16:55:00');
+INSERT INTO `quartz_log` VALUES (1953379336933441537, '钱包补偿', 'walletReceiveService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 16:55:01');
+INSERT INTO `quartz_log` VALUES (1953380592804524034, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 17:00:00');
+INSERT INTO `quartz_log` VALUES (1953380595761508353, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 17:00:01');
+INSERT INTO `quartz_log` VALUES (1953380596138999809, '用户解封', 'chatTaskService.banned()', '总共耗时：82毫秒', 'Y', '2025-08-07 17:00:01');
+INSERT INTO `quartz_log` VALUES (1953381851104112641, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 17:05:00');
+INSERT INTO `quartz_log` VALUES (1953381853402595330, '钱包任务', 'walletTaskService.task()', '总共耗时：57毫秒', 'Y', '2025-08-07 17:05:01');
+INSERT INTO `quartz_log` VALUES (1953383109382729730, '用户解封', 'chatTaskService.banned()', '总共耗时：7毫秒', 'Y', '2025-08-07 17:10:00');
+INSERT INTO `quartz_log` VALUES (1953383109596639233, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 17:10:00');
+INSERT INTO `quartz_log` VALUES (1953383111903510530, '钱包任务', 'walletTaskService.task()', '总共耗时：77毫秒', 'Y', '2025-08-07 17:10:01');
+INSERT INTO `quartz_log` VALUES (1953384367636180993, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 17:15:00');
+INSERT INTO `quartz_log` VALUES (1953384370626723842, '钱包补偿', 'walletReceiveService.task()', '总共耗时：73毫秒', 'Y', '2025-08-07 17:15:01');
+INSERT INTO `quartz_log` VALUES (1953385625956741121, '钱包任务', 'walletTaskService.task()', '总共耗时：7毫秒', 'Y', '2025-08-07 17:20:00');
+INSERT INTO `quartz_log` VALUES (1953385627848372225, '钱包补偿', 'walletReceiveService.task()', '总共耗时：3毫秒', 'Y', '2025-08-07 17:20:00');
+INSERT INTO `quartz_log` VALUES (1953385628167143425, '用户解封', 'chatTaskService.banned()', '总共耗时：66毫秒', 'Y', '2025-08-07 17:20:00');
+INSERT INTO `quartz_log` VALUES (1953386884260524034, '钱包补偿', 'walletReceiveService.task()', '总共耗时：6毫秒', 'Y', '2025-08-07 17:25:00');
+INSERT INTO `quartz_log` VALUES (1953386886491897858, '钱包任务', 'walletTaskService.task()', '总共耗时：64毫秒', 'Y', '2025-08-07 17:25:01');
+INSERT INTO `quartz_log` VALUES (1953388142530752514, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 17:30:00');
+INSERT INTO `quartz_log` VALUES (1953388144447549441, '钱包补偿', 'walletReceiveService.task()', '总共耗时：9毫秒', 'Y', '2025-08-07 17:30:00');
+INSERT INTO `quartz_log` VALUES (1953388144854401025, '用户解封', 'chatTaskService.banned()', '总共耗时：60毫秒', 'Y', '2025-08-07 17:30:01');
+INSERT INTO `quartz_log` VALUES (1953389400821952514, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 17:35:00');
+INSERT INTO `quartz_log` VALUES (1953389403070103554, '钱包任务', 'walletTaskService.task()', '总共耗时：65毫秒', 'Y', '2025-08-07 17:35:01');
+INSERT INTO `quartz_log` VALUES (1953390659129929729, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 17:40:00');
+INSERT INTO `quartz_log` VALUES (1953390661050920962, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 17:40:00');
+INSERT INTO `quartz_log` VALUES (1953390661390663681, '用户解封', 'chatTaskService.banned()', '总共耗时：62毫秒', 'Y', '2025-08-07 17:40:01');
+INSERT INTO `quartz_log` VALUES (1953391917374992386, '钱包任务', 'walletTaskService.task()', '总共耗时：2毫秒', 'Y', '2025-08-07 17:45:00');
+INSERT INTO `quartz_log` VALUES (1953391919912550401, '钱包补偿', 'walletReceiveService.task()', '总共耗时：60毫秒', 'Y', '2025-08-07 17:45:01');
+INSERT INTO `quartz_log` VALUES (1953393175708135426, '钱包任务', 'walletTaskService.task()', '总共耗时：5毫秒', 'Y', '2025-08-07 17:50:00');
+INSERT INTO `quartz_log` VALUES (1953393177616543745, '钱包补偿', 'walletReceiveService.task()', '总共耗时：4毫秒', 'Y', '2025-08-07 17:50:00');
+INSERT INTO `quartz_log` VALUES (1953393178119864322, '用户解封', 'chatTaskService.banned()', '总共耗时：88毫秒', 'Y', '2025-08-07 17:50:01');
 
 -- ----------------------------
 -- Table structure for sys_column
@@ -1642,9 +1828,9 @@ CREATE TABLE `uni_item`  (
 -- ----------------------------
 -- Records of uni_item
 -- ----------------------------
-INSERT INTO `uni_item` VALUES (10001, NULL, '百度一下', 'https://img.alicdn.com/imgextra/i2/87413133/O1CN01sm9ayS1Z0xsyy6UG8_!!87413133.jpg', 100, 'https://www.baidu.com/', 'url', 'Y');
-INSERT INTO `uni_item` VALUES (10002, '__UNI__E28E426', '天气预报', 'https://img.alicdn.com/imgextra/i3/87413133/O1CN011GqQfO1Z0xszOTtqa_!!87413133.jpg', 100, 'https://baidu.com/alpaca/wgt/__UNI__E28E426.wgt', 'mini', 'Y');
-INSERT INTO `uni_item` VALUES (10003, '__UNI__50FBB74', '授权示例', 'https://img.alicdn.com/imgextra/i4/87413133/O1CN01JHvuTb1Z0xswBOXWk_!!87413133.jpg', 100, 'https://baidu.com/alpaca/wgt/__UNI__50FBB74.wgt', 'mini', 'Y');
+INSERT INTO `uni_item` VALUES (10001, NULL, '百度一下', 'http://192.168.0.1:19000/xim/root/4.png', 100, 'https://www.baidu.com/', 'url', 'Y');
+INSERT INTO `uni_item` VALUES (10002, '__UNI__E28E426', '天气预报', 'http://192.168.0.1:19000/xim/root/5.png', 100, 'https://baidu.com/alpaca/wgt/__UNI__E28E426.wgt', 'mini', 'Y');
+INSERT INTO `uni_item` VALUES (10003, '__UNI__50FBB74', '授权示例', 'http://192.168.0.1:19000/xim/root/6.png', 100, 'https://baidu.com/alpaca/wgt/__UNI__50FBB74.wgt', 'mini', 'Y');
 
 -- ----------------------------
 -- Table structure for wallet_bank
