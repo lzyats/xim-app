@@ -19,9 +19,7 @@ local.properties
 .packages
 .flutter-plugins
 
-
 .packages
-
 
 # IntelliJ related
 *.iml
@@ -29,12 +27,10 @@ local.properties
 *.iws
 .idea/
 
-
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 #.vscode/
-
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -44,7 +40,6 @@ local.properties
 .pub-cache/
 .pub/
 build/
-
 
 # Android related
 # Android related
@@ -58,7 +53,6 @@ build/
 **/android/key.properties
 *.jks
 
-
 # 针对flutter当做module集成进现有项目时，.android目录下的文件
 **/.android/**/gradle-wrapper.jar
 **/.android/.gradle
@@ -68,9 +62,6 @@ build/
 **/.android/local.properties
 **/.android/**/GeneratedPluginRegistrant.java
 **/.android/key.properties
-
-
-
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -98,7 +89,6 @@ build/
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-
 # 针对flutter当做module集成进现有项目时，.ios目录下的文件
 **/.ios/**/*.mode1v3
 **/.ios/**/*.mode2v3
@@ -125,23 +115,17 @@ build/
 **/.ios/ServiceDefinitions.json
 **/.ios/Runner/GeneratedPluginRegistrant.*
 
-
-
-
 # macOS
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/Flutter-Debug.xcconfig
 **/macos/Flutter/Flutter-Release.xcconfig
 **/macos/Flutter/Flutter-Profile.xcconfig
 
-
 # Coverage
 coverage/
 
-
 # Symbols
 app.*.symbols
-
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
@@ -151,3 +135,6 @@ app.*.symbols
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
 .packages~92442170bbeb67da2b4cc92142720c48c0d7f490
+
+# FVM Version Cache
+.fvm/
