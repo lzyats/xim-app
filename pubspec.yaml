@@ -116,7 +116,7 @@ dependencies:
   # 导航历史
   navigation_history_observer: ^1.1.1
   # 个推推送
-  getuiflut: ^0.2.32
+  getuiflut: ^0.2.37
   # 高德地图
   amap_map_fluttify: ^2.0.2
   # 消息声音

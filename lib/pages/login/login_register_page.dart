@@ -293,6 +293,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   ),
                   Expanded(
                     child: TextField(
+                      // 添加数字键盘配置
+                      keyboardType: TextInputType.number, // 关键配置：强制显示数字键盘
                       controller: controller.safePassController,
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,

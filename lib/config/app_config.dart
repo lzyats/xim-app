@@ -19,7 +19,7 @@ import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:alpaca/tools/tools_request.dart';
+import 'package:alpaca/tools/tools_call.dart';
 
 // 总配置
 class AppConfig {

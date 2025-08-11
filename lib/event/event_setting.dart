@@ -340,6 +340,7 @@ class EventSetting {
       switch (model.label) {
         case 'friend':
         case 'group':
+        case 'moment':
         case 'message':
           break;
         default:

@@ -3,7 +3,7 @@ import 'package:alpaca/tools/tools_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_comment.dart';
-import 'package:alpaca/pages/moment/moment_index_controller.dart';
+import 'package:alpaca/pages/moment/moment_index_controller copy.dart';
 import 'package:alpaca/pages/moment/momnet_add_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -36,6 +36,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
   void initState() {
     super.initState();
     controller = Get.put(MomentIndexController());
+    _scrollController.addListener(_handleScroll);
   }
 
   @override
@@ -44,6 +45,18 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     _commentController.dispose();
     Get.delete<MomentIndexController>();
     super.dispose();
+  }
+
+  void _handleScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      controller.onLoadMore();
+    }
+  }
+
+  // 下拉刷新方法
+  Future<void> _onRefresh() async {
+    await controller.reloadData();
   }
 
   @override
@@ -79,27 +92,39 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
       body: Stack(
         children: [
           RefreshIndicator(
-            onRefresh: controller.onRefresh1,
+            onRefresh: _onRefresh,
             child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
               // 核心修改：无论数据是否为空，都使用ListView确保可下拉
               return ListView.separated(
                 controller: _scrollController,
                 // 数据为空时，设置itemCount为1（显示空状态）；否则为实际数据量+加载更多项
                 itemCount: controller.momentList.isEmpty
-                    ? 1
-                    : controller.momentList.length,
+                    ? 1 // 空列表时显示1个占位项
+                    : controller.momentList.length +
+                        (controller.isLoadingMore.value ? 1 : 0),
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
                   color: Colors.grey.withOpacity(0.2),
                 ),
                 itemBuilder: (context, index) {
+                  // 数据为空时，显示空状态提示
                   if (controller.momentList.isEmpty) {
                     return _buildEmptyState();
                   }
-                  // 如果是最后一项且有更多数据，显示加载中
-                  if (index == controller.momentList.length) {
-                    return const Center(child: CircularProgressIndicator());
+
+                  // 加载更多时的占位项
+                  if (index == controller.momentList.length &&
+                      controller.isLoadingMore.value) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
                   }
+
                   // 正常数据项
                   final moment = controller.momentList[index];
                   return _buildMomentItem(moment);
@@ -308,15 +333,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
-  // 正确的页面跳转方式（修改后）
-  void _openMomentAddPage() {
-    // 方式1：直接创建页面实例，监听返回结果
-    Get.to(() => const MomentAddPage())?.then((result) {
-      // 若返回结果为true（表示提交成功），则刷新当前页面
-      if (result == true) {}
-    });
-  }
-
   // 新增：空状态显示组件
   Widget _buildEmptyState() {
     return Container(
@@ -354,6 +370,17 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
         ],
       ),
     );
+  }
+
+// 正确的页面跳转方式（修改后）
+  void _openMomentAddPage() {
+    // 方式1：直接创建页面实例，监听返回结果
+    Get.to(() => const MomentAddPage())?.then((result) {
+      // 若返回结果为true（表示提交成功），则刷新当前页面
+      if (result == true) {
+        _onRefresh(); // 调用下拉刷新的方法，重新加载数据
+      }
+    });
   }
 
   //朋友圈列表项
@@ -492,15 +519,10 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
       builder: (context, constraints) {
         final double width = (constraints.maxWidth - 20) / 3;
 
-        // 将 map 生成的 List<Widget> 放入 Wrap 中
         return Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: picList.asMap().entries.map((entry) {
-            // 这里返回 List<Widget> 作为 Wrap 的 children
-            final int index = entry.key;
-            final Media media = entry.value;
-
+          children: picList.map((media) {
             if (media == null) return const SizedBox.shrink();
             if (media.type == null) {
               print("警告：媒体资源 type 为 null，跳过处理");
@@ -508,10 +530,12 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
             }
 
             if (media.type == 0) {
-              // 图片逻辑
+              // 图片逻辑（不变）
               return GestureDetector(
                 onTap: () {
-                  WidgetMoment.showImageViewer(context, picList, index);
+                  // 点击图片打开大图预览
+                  WidgetMoment.showImageViewer(
+                      context, picList, picList.indexOf(media));
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6),
@@ -520,6 +544,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                     width: width,
                     height: width,
                     fit: BoxFit.cover,
+                    // 图片加载中显示的占位符
                     placeholder: (context, url) => Container(
                       width: width,
                       height: width,
@@ -533,6 +558,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                         ),
                       ),
                     ),
+                    // 图片加载失败显示的错误占位符
                     errorWidget: (context, url, error) => Container(
                       width: width,
                       height: width,
@@ -547,21 +573,22 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                 ),
               );
             } else if (media.type == 1) {
-              // 视频逻辑
+              // 视频逻辑（修改此处）
               return GestureDetector(
                 onTap: () {
+                  // 点击触发全屏播放
                   WidgetMoment.playVideoFullscreen(context, media.url);
                 },
                 child: _buildVideoPlayerPlaceholder(
-                  media.url,
-                  media.thumbnail ?? '',
+                  media.url, // 视频地址
+                  media.thumbnail ?? '', // 封面图地址（核心修改）
                   width,
                   width,
                 ),
               );
             }
             return const SizedBox.shrink();
-          }).toList(), // 将 Iterable 转换为 List<Widget>
+          }).toList(),
         );
       },
     );
@@ -718,7 +745,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
 
   // 渲染点赞列表（新增方法）
   Widget _renderLikes(List<String> likes) {
-    if (likes == null || likes.isEmpty) {
+    if (likes.isEmpty) {
       return const SizedBox.shrink(); // 点赞列表为空时不显示
     }
 
@@ -794,7 +821,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                         TextSpan(text: '：${comment.content}'),
                       ]..insertAll(
                           1,
-                          comment.source ?? false
+                          comment.source ?? true
                               ? [const TextSpan()]
                               : [
                                   const TextSpan(text: ' 回复 '),

@@ -21,6 +21,52 @@ import UIKit
     let channel = FlutterMethodChannel(name: "flutter_uni_channel", binaryMessenger: controller.binaryMessenger)
     let event = FlutterEventChannel(name: "flutter_uni_stream", binaryMessenger: controller.binaryMessenger)
     event.setStreamHandler(self)
+
+    // 注册浮窗通道
+        let overlayChannel = FlutterMethodChannel(name: "vip.myim/overlay", binaryMessenger: controller.binaryMessenger)
+        overlayChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
+            switch call.method {
+            case "requestOverlayPermission":
+                // iOS需要请求相应权限
+                result(true)
+            case "showCallOverlay":
+                if let args = call.arguments as? [String: Any],
+                   let eventData = args["eventData"] as? String {
+                    self?.showCallOverlay(eventData: eventData)
+                    result(true)
+                } else {
+                    result(false)
+                }
+            default:
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        
+        // 注册唤醒通道
+        let wakeupChannel = FlutterMethodChannel(name: "vip.myim/wakeup", binaryMessenger: controller.binaryMessenger)
+        wakeupChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
+            if call.method == "wakeUp" {
+                self?.wakeUpApp()
+                result(true)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        }
+        
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    // 唤醒应用
+    private func wakeUpApp() {
+        UIApplication.shared.applicationIconBadgeNumber = 0
+        let rootViewController = UIApplication.shared.keyWindow?.rootViewController
+        rootViewController?.setNeedsDisplay()
+    }
+    
+    // 显示通话浮窗
+    private func showCallOverlay(eventData: String) {
+        // 实现iOS浮窗逻辑
+    }
     
     channel.setMethodCallHandler({ [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
       switch(call.method) {
@@ -231,4 +277,7 @@ import UIKit
   //   backdata["event"] = "close"
   //   eventSink?(backdata)
   // }
+
+  // 添加语音唤醒功能
+
 }

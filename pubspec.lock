@@ -753,10 +753,10 @@ packages:
     dependency: "direct main"
     description:
       name: getuiflut
-      sha256: "98d0cc0c0ceace77e6f5bfca606bce0f60cb8a5f0760f90ce3c96d7a68c6938c"
+      sha256: "29c2b5179063458d100eac6fcaeec2e4c9d43c142ab7ad831e1ee6fe28ba75b0"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.2.32"
+    version: "0.2.37"
   grouped_list:
     dependency: "direct main"
     description:

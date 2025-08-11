@@ -1,9 +1,11 @@
+import 'package:alpaca/tools/tools_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_controller.dart';
 import 'package:alpaca/config/app_theme.dart';
+import 'package:alpaca/pages/moment/moment_index_controller.dart';
 
 // 主页面
 class MainPage extends GetView<MainController> {
@@ -14,6 +16,7 @@ class MainPage extends GetView<MainController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MainController());
+
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -65,6 +68,14 @@ class MainPage extends GetView<MainController> {
                 onTap: (int index) {
                   builder.currentIndex = index;
                   builder.update();
+                  if (index == 1) {
+                    final momentController = Get.find<MomentIndexController>();
+                    // 调用公共的刷新方法
+                    //momentController.onRefresh();
+                    builder.items[1] = builder.initItem(1, badger: 0);
+                    int momentbadger = ToolsStorage().momentbadger(update: 0);
+                    builder.update();
+                  }
                 },
               ),
             ),

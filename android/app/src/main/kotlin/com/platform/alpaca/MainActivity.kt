@@ -15,12 +15,55 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
+import android.os.Build
+import android.provider.Settings
+import android.content.Intent
+import android.net.Uri
+import android.view.WindowManager
 
 class MainActivity: FlutterFragmentActivity() {
+    // 注册通道
+    private val OVERLAY_CHANNEL = "vip.myim/overlay"
+    private val WAKEUP_CHANNEL = "vip.myim/wakeup"
     /* ======================================================= */
     /* Override/Implements Methods                             */
     /* ======================================================= */
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+        // 浮窗相关通道
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OVERLAY_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "requestOverlayPermission" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:$packageName"))
+                        startActivityForResult(intent, 1001)
+                        result.success(true)
+                    } else {
+                        result.success(true)
+                    }
+                }
+                "showCallOverlay" -> {
+                    val eventData = call.argument<String>("eventData")
+                    // 显示通话浮窗
+                    showCallOverlay(eventData)
+                    result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
+        
+        // 唤醒相关通道
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WAKEUP_CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == "wakeUp") {
+                // 唤醒应用
+                val intent = packageManager.getLaunchIntentForPackage(packageName)
+                intent?.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                startActivity(intent)
+                result.success(true)
+            } else {
+                result.notImplemented()
+            }
+        }
         GeneratedPluginRegistrant.registerWith(flutterEngine);
         val messenger = flutterEngine.dartExecutor.binaryMessenger
         // Channel 对象
@@ -309,5 +352,11 @@ class MainActivity: FlutterFragmentActivity() {
                 }
             }
         }
+    }
+    // 显示通话浮窗
+    private fun showCallOverlay(eventData: String?) {
+        // 实现浮窗显示逻辑
+        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        // 浮窗布局参数等设置...
     }
 }

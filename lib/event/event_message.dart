@@ -2,6 +2,8 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
@@ -32,6 +34,7 @@ class EventMessage {
 
   // 处理接收到的消息
   Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
+    print("收到新消息:" + pushData.toString());
     // 历史消息
     ChatHis? chatHis = _initChatHis(pushData);
     if (chatHis == null) {
@@ -45,6 +48,14 @@ class EventMessage {
         return;
       // 语音/视频
       case MsgType.call:
+        // 新增判断：如果AppConfig.open为false，唤醒应用并触发全屏
+        if (!AppConfig.open) {
+          // 唤醒应用
+          await wakeUpApp();
+          // 触发全屏操作（假设通过SystemChrome设置全屏模式）
+          await SystemChrome.setEnabledSystemUIMode(
+              SystemUiMode.immersiveSticky);
+        }
         // 通话中
         if (AppConfig.callKit.isNotEmpty) {
           // 挂断
@@ -100,6 +111,16 @@ class EventMessage {
         label: 'message',
         value: '0',
       ));
+    }
+  }
+
+  // 唤醒应用
+  Future<void> wakeUpApp() async {
+    const platform = MethodChannel('vip.myim/wakeup');
+    try {
+      await platform.invokeMethod('wakeUp');
+    } on PlatformException catch (e) {
+      debugPrint("唤醒应用失败: ${e.message}");
     }
   }
 

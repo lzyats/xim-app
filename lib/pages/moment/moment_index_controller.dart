@@ -1,90 +1,49 @@
-// lib/pages/moment/moment_index_controller.dart
-import 'package:alpaca/pages/base/base_controller.dart';
-import 'package:alpaca/tools/tools_comment.dart';
-import 'package:get/get.dart' hide Response, FormData, MultipartFile;
-//添加通用网络请求
-import 'package:alpaca/request/request_moment.dart';
+import 'dart:async';
 
+import 'package:alpaca/event/event_moment.dart';
+import 'package:alpaca/request/request_common.dart';
+import 'package:alpaca/request/request_moment.dart';
+import 'package:alpaca/tools/tools_comment.dart';
+import 'package:get/get.dart';
+import 'package:get/state_manager.dart';
+import 'package:alpaca/event/event_setting.dart';
+import 'package:alpaca/pages/base/base_controller.dart';
+import 'package:alpaca/request/request_moment.dart';
+import 'package:alpaca/tools/tools_badger.dart';
+import 'package:alpaca/tools/tools_enum.dart';
+import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:alpaca/tools/tools_submit.dart';
+import 'dart:convert';
 
 class MomentIndexController extends BaseController {
   // 朋友圈列表
   final RxList<MomentModel> momentList = RxList<MomentModel>([]);
 
-  // 数据加载状态
-  final Rx<bool> isLoading = Rx<bool>(false);
-
-  // 下滑加载状态
-  final Rx<bool> isLoadingMore = Rx<bool>(false);
-
   LocalUser localUser = ToolsStorage().local();
 
-  // 当前页码
-  int currentPage = 1;
+  String userId = ToolsStorage().local().userId;
+  RxString notice = ''.obs;
+  final Map<String, MomentModel> _dataMap = {};
 
-  // 每页数量
-  int pageSize = 10;
+  // 添加是否有更多数据的标志
+  final RxBool _hasMore = true.obs;
+  bool get hasMore => _hasMore.value;
 
-  // 记录已经加载过的页码
-  final Set<int> loadedPages = Set<int>();
-
-  @override
-  void onInit() {
-    super.onInit();
-    _loadMoments(1, isRefresh: true);
-  }
-
-  // 刷新
-  Future<void> _onRefresh() async {
-    await _loadMoments(1, isRefresh: true);
-  }
-
-  // 重新加载数据
-  Future<void> reloadData() async {
-    await _loadMoments(1, isRefresh: true);
-  }
-
-  // 下滑加载更多（确保此方法存在）
-  Future<void> onLoadMore() async {
-    if (isLoadingMore.value) return;
-    await _loadMoments(currentPage, isRefresh: false);
-  }
-
-  // 统一的加载数据方法
-  Future<void> _loadMoments(int page, {bool isRefresh = false}) async {
-    if (isRefresh) {
-      currentPage = 1;
-      loadedPages.clear();
-      isLoading.value = true;
-      momentList.clear();
-    } else {
-      isLoadingMore.value = true;
-    }
-    update();
-
-    try {
-      if (!loadedPages.contains(page)) {
-        List<MomentModel> newMoments = await getMoments(page, pageSize);
-        if (isRefresh) {
-          momentList.value = newMoments;
-        } else {
-          momentList.addAll(newMoments);
-        }
-        loadedPages.add(page);
-      }
-    } catch (e) {
-      print('Error loading moments: $e');
-      if (!isRefresh) {
-        currentPage--;
-      }
-    } finally {
-      if (isRefresh) {
-        isLoading.value = false;
-      } else {
-        isLoadingMore.value = false;
-      }
-      update();
-    }
+  // 不显示
+  Future<void> setDelete(String chatId) async {
+    // 删除
+    await ToolsSqlite().msg.delete(chatId);
+    // 移除
+    refreshList.remove(_dataMap[chatId]);
+    // 删除
+    ToolsStorage().draft(chatId);
+    // 删除
+    ToolsStorage().reply(chatId);
+    // 删除
+    doRead(chatId);
+    // 取消
+    ToolsSubmit.cancel();
   }
 
   /**
@@ -105,28 +64,163 @@ class MomentIndexController extends BaseController {
     return true;
   }
 
-  /**
-   * 模拟API请求（确保参数正确）
-   */
-  Future<List<MomentModel>> getMoments(int page, int pageSize) async {
-    print('当前请求页：' + page.toString());
-    dynamic responseDataa = await RequestMoment.getMomentList(page, pageSize);
-    // 处理分页信息
-    List<dynamic> responseData = responseDataa['list'];
-    if (responseData != null && responseData is List) {
-      List<MomentModel> list =
-          responseData.map((item) => MomentModel.fromJson(item)).toList();
-      //判断是否存在下一页
-      if (responseDataa['hasNextPage']) {
-        currentPage++;
-        print('下个请求页：' + currentPage.toString());
-        isLoadingMore.value = false;
-      } else {
-        isLoadingMore.value = true;
-      }
-      return list;
+  // 已读
+  Future<void> doRead(String chatId) async {
+    // 更新
+    ToolsBadger().reset(chatId);
+    // 已读
+    await ToolsSqlite().his.update(chatId, {'badger': 'N'});
+    // 更新
+    update();
+    // 取消
+    ToolsSubmit.cancel();
+    // 消息
+    EventSetting().handle(SettingModel(
+      SettingType.badger,
+      label: 'message',
+      value: '0',
+    ));
+  }
+
+  // 消息刷新
+  Future onRefresh() async {
+    //print("开始获取数据");
+    // 更新
+    refreshList = await ToolsSqlite().moment.getList();
+    momentList.clear();
+    int momentbadger = 0;
+    for (Moment data in refreshList) {
+      //print("媒体文件：" + data.images);
+      MomentModel momentModel = addMomentToModelList(data);
+      // 添加到列表
+      _dataMap[data.momentId] = momentModel;
+      momentList.add(momentModel);
     }
-    isLoadingMore.value = true;
-    return [];
+    momentbadger = ToolsStorage().momentbadger();
+    updateMomentBadger(momentbadger);
+    update();
+  }
+
+  /**
+   * 更新朋友圈未读徽章数量
+   * @param count 未读数量
+   */
+  void updateMomentBadger(int count) {
+    EventSetting().handle(SettingModel(
+      SettingType.badger,
+      label: 'moment',
+      value: count.toString(),
+    ));
+  }
+
+  // 新增：将Moment转换为MomentModel并添加到列表的方法
+  MomentModel addMomentToModelList(Moment data) {
+    // 解析图片JSON并转换为Media列表
+    List<dynamic> jsonList = json.decode(data.images);
+    List<Media> media = jsonList.map((json) => Media.fromJson(json)).toList();
+    // 解析评论
+    jsonList = json.decode(data.comments);
+    List<FriendCommentModel> comment =
+        jsonList.map((json) => FriendCommentModel.fromJson(json)).toList();
+    // 解析点赞
+    // 解析点赞（修复类型转换问题）
+    List<dynamic> likeDynamicList = json.decode(data.likes);
+    List<String> like = likeDynamicList.map((item) => item.toString()).toList();
+
+    // 创建MomentModel
+    MomentModel momentModel = MomentModel(
+        momentId: int.parse(data.momentId),
+        userId: int.parse(data.userId),
+        portrait: data.portrait,
+        nickname: data.nickname,
+        content: data.content,
+        createTime: DateTime.parse(data.createTime),
+        location: data.location,
+        visibility: int.parse(data.visibility),
+        images: media,
+        comments: comment,
+        likes: like);
+    return momentModel;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    // 监听消息
+    _listenMessage();
+    _listenSetting();
+    // 消息刷新
+    //onRefresh();
+    // 定时任务
+    _listenTimer();
+  }
+
+  // 监听设置（处理最新通知/处理消息刷新）
+  _listenSetting() {
+    // 监听通知
+    subscription2 = EventSetting().event.stream.listen((model) {
+      if (SettingType.message == model.setting) {
+        // 消息刷新
+        onRefresh();
+      }
+    });
+  }
+
+  // 监听消息（当有新消息，显示到消息顶部）
+  _listenMessage() {
+    subscription1 = EventMoment().listenMoment.stream.listen((moment) async {
+      // 对信息进行判断，看是更新还是新增
+      // 判断 _dataMap 中是否存在 moment.momentId 这个键
+      bool exists = _dataMap.containsKey(moment.momentId);
+      MomentModel momentModel = addMomentToModelList(moment);
+      if (exists) {
+        print("已有数据:" + moment.momentId);
+        // 如果存在，说明是更新操作，先移除旧数据
+        refreshList.remove(_dataMap[moment.momentId]);
+        // 获取要移除数据的索引
+        int index = momentList.indexOf(_dataMap[moment.momentId]);
+        if (index != -1) {
+          // 更新数据库记录
+          await ToolsSqlite().moment.update(moment.momentId, moment.toJson());
+          bool removed = momentList.remove(_dataMap[moment.momentId]);
+          if (removed) {
+            print("被移除元素的序列号（索引）是：$index");
+            momentList.insert(index, momentModel); // 最新数据显示在最前面
+          }
+        }
+      } else {
+        // 如果不存在，说明是新增操作（可选：添加新增逻辑）
+        momentList.insert(0, momentModel); // 最新数据显示在最前面
+        refreshList.add(moment);
+        print("新增数据: ${moment.momentId}");
+        int momentbadger = ToolsStorage().momentbadger(update: 1);
+        updateMomentBadger(momentbadger);
+      }
+      // 插入
+      // 添加到列表
+      _dataMap[moment.momentId] = momentModel;
+      // 更新
+
+      update();
+    });
+  }
+
+  // 定时任务（每间隔1分钟，刷新一次页面时间显示）
+  _listenTimer() {
+    refreshTimer?.cancel();
+    refreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      update();
+    });
+  }
+
+  // 下拉刷新
+  Future onRefresh1() async {
+    // 获取配置
+    RequestCommon.getConfig();
+    print('onRefresh method called');
+    // 获取消息
+    superRefresh(
+      RequestMoment.pullMsg(),
+    );
   }
 }

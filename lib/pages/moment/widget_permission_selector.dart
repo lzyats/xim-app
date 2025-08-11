@@ -56,10 +56,11 @@ class _PermissionSelectionPageState extends State<PermissionSelectionPage> {
         color: Colors.white,
         child: ListView(
           children: [
-            if (localUser.isvip > 0)
-              _buildPermissionItem('广场可见(VIP功能)', Icons.public),
+            if (localUser.isvip > 0) _buildPermissionItem('广场公开', Icons.public),
             _buildPermissionItem('好友可见', Icons.group),
-            _buildPermissionItem('仅自己可见', Icons.lock),
+            _buildPermissionItem('自己可见', Icons.lock),
+            _buildPermissionItem('部分可见', Icons.people_alt),
+            _buildPermissionItem('不给谁看', Icons.do_not_disturb_on),
           ],
         ),
       ),

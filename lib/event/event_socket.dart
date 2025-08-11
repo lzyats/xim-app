@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/event/event_setting.dart';
+import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 
 // 监听Socket消息
@@ -18,7 +19,7 @@ class EventSocket {
   addListen() {
     return event.stream.listen((message) async {
       // 打印消息
-      debugPrint(message.pushData);
+      //debugPrint('socket消息:' + message.pushData);
       // 解析消息
       Map<String, dynamic>? data = isJson(message.pushData);
       if (data == null) {
@@ -33,7 +34,12 @@ class EventSocket {
       // 聊天消息
       if ('msg' == pushType) {
         await EventMessage().handle(message.pushAudio, pushData);
+      } else if ('moment' == pushType) {
+        print('处理朋友圈信息');
+        await EventMoment().handle(message.pushAudio, pushData);
       }
+      //朋友圈
+
       // 设置消息
       else if ('setting' == pushType) {
         SettingType setting = SettingType.init(pushData['type']);

@@ -100,8 +100,32 @@ class ToolsPerms {
     return result;
   }
 
+  // 浮窗权限（仅Android有效）
+  static Future<bool> overlay() async {
+    if (Platform.isIOS) {
+      // iOS 无浮窗权限概念，直接返回true
+      return true;
+    }
+
+    ToolsSubmit.show();
+    bool result = await _perms(Permission.systemAlertWindow, '悬浮窗');
+    ToolsSubmit.dismiss();
+    return result;
+  }
+
   // 权限
   static Future<bool> _perms(Permission permission, String label) async {
+    // 浮窗权限特殊处理
+    if (permission == Permission.systemAlertWindow) {
+      // 检查是否已授权
+      bool hasPermission = await permission.isGranted;
+      if (hasPermission) {
+        return true;
+      }
+      // 未授权时直接引导至设置页
+      _showDialog(label);
+      return false;
+    }
     // 获取权限
     PermissionStatus status = await permission.status;
     // 已授权
@@ -123,6 +147,15 @@ class ToolsPerms {
     }
     // 已永久拒绝
     else if (status.isPermanentlyDenied) {
+      _showDialog(label);
+    }
+    if (status.isGranted || status.isLimited) {
+      return true;
+    }
+    if (status.isDenied) {
+      PermissionStatus newStatus = await permission.request();
+      return newStatus.isGranted || newStatus.isLimited;
+    } else if (status.isRestricted || status.isPermanentlyDenied) {
       _showDialog(label);
     }
     return false;

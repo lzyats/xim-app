@@ -62,6 +62,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
             child: GetBuilder<MsgIndexController>(builder: (builder) {
               return SmartRefresher(
                 enablePullDown: true,
+                enablePullUp: false, // 禁用上拉加载
                 controller: controller.refreshController,
                 onRefresh: () {
                   print('onRefresh method called');

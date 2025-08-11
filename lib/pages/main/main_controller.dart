@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:alpaca/tools/tools_perms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/config/app_fonts.dart';
@@ -40,7 +42,6 @@ class MainController extends BaseController {
   // 静态属性
   static final List<_TabsModel> _pageList = [
     const _TabsModel('消息', AppFonts.e67e, MsgIndexPage()),
-    //const _TabsModel('圈子', AppFonts.qz01, DemoTest()),
     const _TabsModel('朋友圈', AppFonts.qz01, MomentIndexPage()),
     const _TabsModel('好友', AppFonts.e689, FriendIndexPage()),
     const _TabsModel('我的', AppFonts.e70f, MineIndexPage()),
@@ -57,7 +58,7 @@ class MainController extends BaseController {
   List<BottomNavigationBarItem> items = [];
 
   // 初始化
-  _initItem(int index, {int badger = 0}) {
+  initItem(int index, {int badger = 0}) {
     _TabsModel model = _pageList[index];
     return BottomNavigationBarItem(
       label: model.label,
@@ -101,8 +102,10 @@ class MainController extends BaseController {
     super.onInit();
     // 初始化
     for (var i = 0; i < (_pageList.length - (AppConfig.debug ? 0 : 1)); i++) {
-      items.add(_initItem(i));
+      items.add(initItem(i));
     }
+    // 检查并请求浮窗权限
+    //_checkOverlayPermission();
     // 查询自己
     await RequestMine.getInfo();
     // 好友列表
@@ -127,6 +130,26 @@ class MainController extends BaseController {
     RequestMine.refresh();
   }
 
+  // 请求浮窗权限
+  Future<void> _requestOverlayPermission() async {
+    const platform = MethodChannel('vip.myim/overlay');
+    try {
+      await platform.invokeMethod('requestOverlayPermission');
+    } on PlatformException catch (e) {
+      debugPrint("请求浮窗权限失败: ${e.message}");
+    }
+  }
+
+  // 唤醒应用
+  Future<void> wakeUpApp() async {
+    const platform = MethodChannel('vip.myim/wakeup');
+    try {
+      await platform.invokeMethod('wakeUp');
+    } on PlatformException catch (e) {
+      debugPrint("唤醒应用失败: ${e.message}");
+    }
+  }
+
   _listenSetting() {
     // 系统设置
     _listenConfig();
@@ -146,6 +169,12 @@ class MainController extends BaseController {
         switch (model.label) {
           case 'friend':
           case 'group':
+            _badgerMap[label] = value;
+            // 系统设置
+            _listenThird();
+            break;
+          case 'moment':
+            printError(info: "moment");
             _badgerMap[label] = value;
             // 系统设置
             _listenSecond();
@@ -183,16 +212,23 @@ class MainController extends BaseController {
   _listenFirst() async {
     // 更新消息
     ToolsBadger().listen((value) {
-      items[0] = _initItem(0, badger: value);
+      items[0] = initItem(0, badger: value);
       update();
     });
   }
 
   // 系统设置
   _listenSecond() async {
+    int moment = _badgerMap['moment'] ?? 0;
+    items[1] = initItem(1, badger: moment);
+    update();
+  }
+
+  // 系统设置
+  _listenThird() async {
     int friend = _badgerMap['friend'] ?? 0;
     int group = _badgerMap['group'] ?? 0;
-    items[2] = _initItem(2, badger: friend + group);
+    items[2] = initItem(2, badger: friend + group);
     update();
   }
 
@@ -229,5 +265,18 @@ class MainController extends BaseController {
           break;
       }
     });
+  }
+
+  // 检查并请求浮窗权限
+  Future<void> _checkOverlayPermission() async {
+    // 使用专用方法判断首次启动
+    bool isFirstLaunch = ToolsStorage().firstLaunch();
+
+    if (isFirstLaunch) {
+      // 请求浮窗权限
+      await ToolsPerms.overlay();
+      // 标记为已启动过（更新存储）
+      ToolsStorage().firstLaunch(value: false);
+    }
   }
 }

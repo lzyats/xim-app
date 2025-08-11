@@ -139,14 +139,16 @@ class MomentAddController extends GetxController {
   // 新增的判断方法
   int getPermissionValue(String permission) {
     switch (permission) {
-      case '完全公开':
-        return 0;
       case '好友可见':
         return 1;
-      case '仅自己可见':
+      case '自己可见':
         return 2;
+      case '部分可见':
+        return 3;
+      case '不给谁看':
+        return 4;
       default:
-        return 3; // 隐私及保留
+        return 0; // 隐私及保留
     }
   }
 

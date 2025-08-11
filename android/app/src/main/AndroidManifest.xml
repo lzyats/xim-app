@@ -3,6 +3,7 @@
     
     <!-- 网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
     <!-- 允许程序访问有关GSM网络信息 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- 获取使用Wi-Fi等WLAN无线网络 -->
@@ -38,6 +39,9 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- 系统广播 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- 浮窗权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     
     <application
         android:label="语聊"
@@ -53,6 +57,8 @@
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"

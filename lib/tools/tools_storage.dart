@@ -86,6 +86,30 @@ class ToolsStorage {
     return SysConfig.fromJson(data);
   }
 
+  // 朋友圈提醒
+  // 动态数字存储（momentbadger）
+  int momentbadger({int update = 2}) {
+    // 存储键名
+    String type = 'momentbadger';
+
+    // 读取当前值（为空则默认1）
+    int currentValue = int.tryParse(_storage.read(type) ?? '0') ?? 0;
+
+    // 如果需要更新（写入操作），则自动加1
+    if (update == 1) {
+      int newValue = currentValue + 1;
+      _storage.write(type, newValue.toString());
+      return newValue;
+    } else if (update == 0) {
+      int newValue = 0;
+      _storage.write(type, newValue.toString());
+      return newValue;
+    }
+
+    // 读取操作直接返回当前值
+    return currentValue;
+  }
+
   // config
   LocalConfig config({LocalConfig? value}) {
     // 类型
@@ -100,6 +124,35 @@ class ToolsStorage {
     Map<String, dynamic> data = _storage.read(type) ?? {};
     // 转换
     return LocalConfig.fromJson(data);
+  }
+
+  // 首次启动标记存储
+  bool firstLaunch({bool? value}) {
+    // 存储键名
+    String type = 'first_launch';
+    if (value != null) {
+      // 写入：将布尔值转换为字符串存储（保持与现有配置风格一致）
+      _storage.write(type, value ? 'Y' : 'N');
+      return value;
+    }
+    // 读取：默认未启动过（true）
+    String storedValue = _storage.read(type) ?? 'Y';
+    return storedValue == 'Y';
+  }
+
+// 通话事件存储
+  List<Map<String, dynamic>> callEvents({List<Map<String, dynamic>>? value}) {
+    // 存储键名
+    String type = 'call_events';
+    if (value != null) {
+      // 写入：将列表转换为JSON字符串存储
+      _storage.write(type, value);
+      return value;
+    }
+    // 读取：默认空列表
+    List<dynamic> storedList = _storage.read(type) ?? [];
+    // 安全转换为Map列表
+    return storedList.map((item) => Map<String, dynamic>.from(item)).toList();
   }
 
   // 置顶

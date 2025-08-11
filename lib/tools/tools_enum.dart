@@ -59,6 +59,26 @@ enum ChatTalk {
   }
 }
 
+// 添加朋友圈枚举
+
+enum MomentType {
+  moment("moment", '朋友圈'),
+  likes("likes", '点赞'),
+  comments("comments", '评论'),
+  medias("medias", '媒体');
+
+  const MomentType(this.value, this.label);
+  final String value;
+  final String label;
+
+  static MomentType init(String value) {
+    return MomentType.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => MomentType.moment,
+    );
+  }
+}
+
 // 消息枚举
 enum MsgType {
   // 全部

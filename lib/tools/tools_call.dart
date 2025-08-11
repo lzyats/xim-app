@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -15,6 +16,7 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:alpaca/pages/main/main_controller.dart';
 
 // 音视频
 class ToolsCall extends StatefulWidget {
@@ -59,7 +61,7 @@ class _ToolsCallState extends State<ToolsCall> {
     // 初始化
     _initSetting();
     // 监听关闭
-    _subscription = EventSetting().event.stream.listen((model) {
+    _subscription = EventSetting().event.stream.listen((model) async {
       if (SettingType.sys != model.setting) {
         return;
       }
@@ -73,6 +75,7 @@ class _ToolsCallState extends State<ToolsCall> {
         return;
       }
       value = model.value;
+
       // 转换
       Map<String, dynamic> content = jsonDecode(model.value);
       CallStatus status = CallStatus.init(content['callStatus']);
@@ -276,6 +279,50 @@ class _ToolsCallState extends State<ToolsCall> {
       ToolsBadger().subtraction(widget.chatId);
     }
     _back = true;
+  }
+
+  // 记录通话事件
+  Future<void> _recordCallEvent(String eventData) async {
+    // 1. 读取现有事件列表
+    List<Map<String, dynamic>> events = ToolsStorage().callEvents();
+
+    // 2. 添加新事件（包含时间戳）
+    events.add({
+      'data': eventData,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+
+    // 3. 限制列表长度（可选，防止数据过大）
+    if (events.length > 100) {
+      events = events.sublist(events.length - 100);
+    }
+
+    // 4. 保存更新后的列表
+    ToolsStorage().callEvents(value: events);
+  }
+
+  // 显示通话浮窗（适配原生层已有的showCallOverlay实现）
+  Future<void> _showCallOverlay(String eventData) async {
+    // 1. 检查浮窗权限
+    bool hasOverlayPermission = await ToolsPerms.overlay();
+    if (!hasOverlayPermission) {
+      debugPrint("没有浮窗权限，无法显示通话浮窗");
+      return;
+    }
+
+    try {
+      // 2. 直接使用原生层要求的参数名"eventData"传递数据
+      // 通道名称需与原生层OVERLAY_CHANNEL保持一致（假设为"com.example/overlay"）
+      const platform = MethodChannel('vip.myim/overlay');
+      await platform.invokeMethod('showCallOverlay', {
+        'eventData': eventData, // 与原生层call.argument<String>("eventData")对应
+      });
+      debugPrint("通话浮窗显示指令已发送");
+    } on PlatformException catch (e) {
+      debugPrint("显示通话浮窗失败: ${e.message}");
+    } catch (e) {
+      debugPrint("显示通话浮窗异常: $e");
+    }
   }
 }
 

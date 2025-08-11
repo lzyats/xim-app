@@ -1,5 +1,8 @@
 import 'dart:ffi';
 
+import 'package:alpaca/config/app_config.dart';
+import 'package:alpaca/event/event_moment.dart';
+import 'package:alpaca/event/event_socket.dart';
 import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_comment.dart'; // 假设数据模型文件路径
 import 'package:alpaca/tools/tools_storage.dart';
@@ -64,6 +67,36 @@ class RequestMoment {
     }
   }
 
+  // 拉取消息
+  static Future<void> pullMsg() async {
+    // 没有网络
+    if (!AppConfig.network) {
+      return;
+    }
+    // 执行
+    AjaxData ajaxData = await ToolsRequest().get(
+      '$_prefix/pullMsg',
+      showError: false,
+    );
+    // 转换
+    List<SocketModel> dataList = ajaxData.getList(
+      (data) => SocketModel.fromJson(data),
+    );
+    List<Map<String, dynamic>> messageList = [];
+    for (var data in dataList) {
+      print(data);
+      messageList.add(data.pushData);
+    }
+
+    // 存储
+    await EventMoment().addBatch(messageList);
+    // 循环
+    int messageLimit = ToolsStorage().config().messageLimit;
+    if (dataList.length > messageLimit) {
+      await pullMsg();
+    }
+  }
+
   // 点赞朋友圈
   static Future<dynamic> likeMoment(int momentId) async {
     // 获取当前用户的 user_id
@@ -89,8 +122,8 @@ class RequestMoment {
     // 获取当前用户的 user_id
     String userId = ToolsStorage().local().userId;
     // 判断是否发贴人回复
-    int source = 1;
-    if (replyTo == int.parse(userId)) source = 0;
+    int source = 0;
+    if (replyTo == int.parse(userId)) source = 1;
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/comment',

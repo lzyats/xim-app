@@ -42,6 +42,9 @@ class ToolsSqlite {
         // 创建服务表
         await db.execute(
             'CREATE TABLE chat_robot (robotId TEXT, nickname TEXT, portrait TEXT, menu TEXT, top TEXT, disturb TEXT, PRIMARY KEY(robotId))');
+        // 创建朋友圈表
+        await db.execute(
+            'CREATE TABLE friend_moments (momentId TEXT,msgId TEXT, userId TEXT, content TEXT, location TEXT, visibility TEXT,portrait TEXT,nickname TEXT, createTime TEXT , visuser TEXT,isDeleted TEXT,images TEXT,comments TEXT,likes TEXT, PRIMARY KEY(momentId,msgId))');
         batch.commit();
       },
       onUpgrade: (Database db, int v1, int v2) async {
@@ -119,6 +122,11 @@ class ToolsSqlite {
   // 扩展处理
   get extend {
     return _ChatExtendHander();
+  }
+
+  // 朋友圈处理
+  get moment {
+    return _MomentHander();
   }
 }
 
@@ -1372,5 +1380,291 @@ class _ChatExtendHander {
     );
     // 提交
     await batch.commit();
+  }
+}
+
+// 朋友圈处理类
+class _MomentHander {
+  static String tableName = 'friend_moments';
+
+  // 新增朋友圈动态
+  add(Moment moment) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 插入数据（存在则替换）
+    await db.insert(
+      tableName,
+      moment.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // 通过ID查询朋友圈动态
+  Future<Moment?> getById(String momentId) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 执行查询
+    List<Map<String, dynamic>> dataList = await db.query(
+      tableName,
+      where: 'momentId = ?',
+      whereArgs: [momentId],
+      limit: 1,
+    );
+    if (dataList.isEmpty) {
+      return null;
+    }
+    return Moment.fromJson(dataList.first);
+  }
+
+  // 更新朋友圈动态信息
+  update(String momentId, Map<String, Object?> values) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 执行更新
+    await db.update(
+      tableName,
+      values,
+      where: 'momentId = ?',
+      whereArgs: [momentId],
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  // 批量新增朋友圈动态
+  addBatch(List<Moment> dataList) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 开启批量操作
+    Batch batch = db.batch();
+    // 先清空现有数据（可选，根据业务需求调整）
+    //batch.delete(tableName);
+    // 批量插入新数据
+    for (var data in dataList) {
+      batch.insert(
+        tableName,
+        data.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    // 提交批量操作
+    await batch.commit();
+  }
+
+  // 获取朋友圈动态列表（支持按时间排序）
+  Future<List<Moment>> getList({bool orderByCreateTime = true}) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 执行查询
+    List<Map<String, dynamic>> resultList = await db.query(
+      tableName,
+      // 筛选未删除的动态（可选）
+      where: 'isDeleted = ?',
+      whereArgs: ['N'],
+      // 按创建时间排序（默认降序，最新的在前）
+      orderBy: orderByCreateTime ? 'createTime DESC' : null,
+    );
+    List<Moment> dataList = [];
+    if (resultList.isEmpty) {
+      return dataList;
+    }
+    // 转换为Moment对象列表
+    for (var data in resultList) {
+      dataList.add(Moment.fromJson(data));
+    }
+    return dataList;
+  }
+
+  // 根据用户ID查询朋友圈动态
+  Future<List<Moment>> getByUserId(String userId) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 执行查询
+    List<Map<String, dynamic>> resultList = await db.query(
+      tableName,
+      where: 'userId = ? and isDeleted = ?',
+      whereArgs: [userId, 'N'],
+      orderBy: 'createTime DESC',
+    );
+    List<Moment> dataList = [];
+    if (resultList.isEmpty) {
+      return dataList;
+    }
+    // 转换为Moment对象列表
+    for (var data in resultList) {
+      dataList.add(Moment.fromJson(data));
+    }
+    return dataList;
+  }
+
+  // 删除朋友圈动态（物理删除，或更新isDeleted标记为'Y'）
+  delete(String momentId, {bool logicDelete = true}) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    if (logicDelete) {
+      // 逻辑删除：仅标记isDeleted为'Y'
+      await db.update(
+        tableName,
+        {'isDeleted': 'Y'},
+        where: 'momentId = ?',
+        whereArgs: [momentId],
+      );
+    } else {
+      // 物理删除：直接从表中移除
+      await db.delete(
+        tableName,
+        where: 'momentId = ?',
+        whereArgs: [momentId],
+      );
+    }
+  }
+
+  // 更新朋友圈动态的评论
+  updateComments(String momentId, List<dynamic> comments) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 将评论列表转为JSON字符串存储
+    await db.update(
+      tableName,
+      {'comments': jsonEncode(comments)},
+      where: 'momentId = ?',
+      whereArgs: [momentId],
+    );
+  }
+
+  // 更新朋友圈动态的点赞
+  updateLikes(String momentId, List<dynamic> likes) async {
+    // 连接数据库
+    Database db = await ToolsSqlite().database;
+    // 将点赞列表转为JSON字符串存储
+    await db.update(
+      tableName,
+      {'likes': jsonEncode(likes)},
+      where: 'momentId = ?',
+      whereArgs: [momentId],
+    );
+  }
+}
+
+class Moment {
+  // 动态ID（主键）
+  String momentId;
+  // 消息ID 主键
+  String msgId;
+  // 发布者用户ID
+  String userId;
+  // 动态内容
+  String content;
+  // 发布地点
+  String location;
+  // 可见性（如"all"、"friends"、"private"）
+  String visibility;
+  // 发布者头像
+  String portrait;
+  // 发布者昵称
+  String nickname;
+  // 创建时间（时间戳字符串）
+  String createTime;
+  // 是否删除（"Y"表示删除，"N"表示未删除）
+  String isDeleted;
+  // 可见用户列表（JSON字符串）
+  String visuser;
+  // 图片列表（JSON字符串，存储图片URL）
+  String images;
+  // 评论列表（JSON字符串）
+  String comments;
+  // 点赞列表（JSON字符串）
+  String likes;
+
+  // 构造函数
+  Moment({
+    required this.momentId,
+    required this.msgId,
+    required this.userId,
+    required this.content,
+    required this.location,
+    required this.visibility,
+    required this.portrait,
+    required this.nickname,
+    required this.createTime,
+    this.isDeleted = 'N',
+    this.visuser = '[]',
+    this.images = '[]',
+    this.comments = '[]',
+    this.likes = '[]',
+  });
+
+  // 从JSON映射构造Moment对象
+  factory Moment.fromJson(Map<String, dynamic> data) {
+    return Moment(
+      momentId: data['momentId'] ?? '',
+      msgId: data['msgId'] ?? '',
+      userId: data['userId'] ?? '',
+      content: data['content'] ?? '',
+      location: data['location'] ?? '',
+      visibility: data['visibility'] ?? 'all',
+      portrait: data['portrait'] ?? '',
+      nickname: data['nickname'] ?? '',
+      createTime: data['createTime'] ?? '',
+      isDeleted: data['isDeleted'] ?? 'N',
+      visuser: data['visuser'] ?? '[]',
+      images: data['images'] ?? '[]',
+      comments: data['comments'] ?? '[]',
+      likes: data['likes'] ?? '[]',
+    );
+  }
+
+  // 转换为JSON映射（用于数据库存储）
+  Map<String, dynamic> toJson() => {
+        'momentId': momentId,
+        'msgId': msgId,
+        'userId': userId,
+        'content': content,
+        'location': location,
+        'visibility': visibility,
+        'portrait': portrait,
+        'nickname': nickname,
+        'createTime': createTime,
+        'isDeleted': isDeleted,
+        'visuser': visuser,
+        'images': images,
+        'comments': comments,
+        'likes': likes,
+      };
+
+  // 辅助方法：解析图片列表为List<String>
+  List<String> getImagesList() {
+    try {
+      return (jsonDecode(images) as List<dynamic>).cast<String>();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // 辅助方法：解析评论列表为List<Map<String, dynamic>>
+  List<Map<String, dynamic>> getCommentsList() {
+    try {
+      return (jsonDecode(comments) as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // 辅助方法：解析点赞列表为List<Map<String, dynamic>>
+  List<Map<String, dynamic>> getLikesList() {
+    try {
+      return (jsonDecode(likes) as List<dynamic>).cast<Map<String, dynamic>>();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // 辅助方法：解析可见用户列表为List<String>
+  List<String> getVisuserList() {
+    try {
+      return (jsonDecode(visuser) as List<dynamic>).cast<String>();
+    } catch (e) {
+      return [];
+    }
   }
 }
