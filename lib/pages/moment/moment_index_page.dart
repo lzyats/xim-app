@@ -684,7 +684,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
             final controller = Get.find<MomentIndexController>();
             final success = await controller
                 .likeMoment(moment.momentId ?? 0); // 假设 MomentModel 有一个 id 属性
-            if (success) {
+            /* if (success) {
               setState(() {
                 // 关键：确保 likes 不为 null（初始化空列表）
                 moment.likes ?? [];
@@ -696,7 +696,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                   // 此时 likes 列表已非空，_renderLikes 会自动显示点赞区域
                 }
               });
-            }
+            } */
           }
           onTap();
         },

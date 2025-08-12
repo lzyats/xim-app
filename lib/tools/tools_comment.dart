@@ -11,6 +11,7 @@ class FriendMomentModel {
   final int? isDeleted; // 逻辑删除标记
   // 新增字段：非必需的momId
   final int? momId; // 动态额外ID（非必需）
+  final List<String>? visuser;
 
   FriendMomentModel({
     this.momentId,
@@ -23,6 +24,7 @@ class FriendMomentModel {
     this.isDeleted,
     // 新增momId参数，默认值为null
     this.momId,
+    this.visuser,
   });
 
   // 从JSON创建实例
@@ -38,6 +40,7 @@ class FriendMomentModel {
       isDeleted: json['is_deleted'],
       // 解析mom_id字段（JSON中为下划线命名）
       momId: json['mom_id'],
+      visuser: json['visuser'],
     );
   }
 
@@ -54,6 +57,7 @@ class FriendMomentModel {
       'is_deleted': isDeleted,
       // 转换momId为mom_id
       if (momId != null) 'mom_id': momId,
+      'visuser': visuser,
     };
   }
 
@@ -68,6 +72,7 @@ class FriendMomentModel {
     DateTime? updateTime,
     int? isDeleted,
     int? momId,
+    List<String>? visuser,
   }) {
     return FriendMomentModel(
       momentId: momentId ?? this.momentId,
@@ -79,6 +84,7 @@ class FriendMomentModel {
       updateTime: updateTime ?? this.updateTime,
       isDeleted: isDeleted ?? this.isDeleted,
       momId: momId ?? this.momId,
+      visuser: visuser ?? this.visuser,
     );
   }
 }
@@ -424,6 +430,7 @@ class MomentModel {
   final List<FriendCommentModel>? comments; // 评论内容，改为可选类型
   final List<String>? likes; // 点赞列表，改为可选类型
   final int? visibility; // 新增：可见性（非必需，int类型）0-公开，1-私密，2-部分可见，3-不给谁看
+  final List<String>? visuser;
 
   // 构造函数使用可选参数，并设置默认值
   MomentModel({
@@ -439,8 +446,10 @@ class MomentModel {
     List<Media>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
+    List<String>? visuser,
   })  : images = images ?? const [], // 列表类型设置默认空列表
         comments = comments ?? const [],
+        visuser = visuser ?? const [],
         likes = likes ?? const [];
 
   // 从JSON创建实例，添加全面的空值判断
@@ -457,6 +466,7 @@ class MomentModel {
       images: _parseMediaResourceList(json['images']),
       comments: _parseCommentList(json['comments']),
       likes: _parseStringList(json['likes']),
+      visuser: _parseStringList(json['visuser']),
     );
   }
 
@@ -465,6 +475,7 @@ class MomentModel {
     final localImages = images;
     final localcomments = comments;
     final locallikes = likes;
+    final localvisuser = visuser;
     return {
       if (momentId != null) 'momentId': momentId,
       if (userId != null) 'userId': userId,
@@ -482,6 +493,7 @@ class MomentModel {
       if (localcomments != null && localcomments.isNotEmpty)
         'comments': localcomments.map((comment) => comment.toJson()).toList(),
       if (locallikes != null && locallikes.isNotEmpty) 'likes': likes,
+      if (localvisuser != null && localvisuser.isNotEmpty) 'visuser': visuser,
     };
   }
 
@@ -498,6 +510,7 @@ class MomentModel {
     List<Media>? images,
     List<FriendCommentModel>? comments,
     List<String>? likes,
+    List<String>? visuser,
   }) {
     return MomentModel(
       momentId: momentId ?? this.momentId,
@@ -511,6 +524,7 @@ class MomentModel {
       images: images ?? this.images,
       comments: comments ?? this.comments,
       likes: likes ?? this.likes,
+      visuser: visuser ?? this.visuser,
     );
   }
 

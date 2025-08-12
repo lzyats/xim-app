@@ -16,10 +16,14 @@ class MomentAddPage extends GetView<MomentAddController> {
     Get.lazyPut(() => MomentAddController());
 
     // 监听页面返回事件
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      // 允许返回（对应 WillPopScope 中 onWillPop 返回 true 的场景）
+      canPop: true,
+      // 处理返回事件（替代原 onWillPop 回调）
+      onPopInvoked: (bool didPop) {
+        // didPop 表示是否已经执行了返回操作
+        // 此处逻辑与原 onWillPop 保持一致：删除 ImagePickerController
         Get.delete<ImagePickerController>();
-        return true;
       },
       child: Scaffold(
         appBar: PreferredSize(
@@ -217,8 +221,10 @@ class MomentAddPage extends GetView<MomentAddController> {
       onTap: () {
         Get.to(() => PermissionSelectionPage(
               currentPermission: controller.currentPermission,
-              onPermissionSelected: (permission) {
+              onPermissionSelected: (permission, selectedFriends) {
                 controller.updatePermission(permission);
+                // 保存选择的好友列表到控制器
+                controller.updateSelectedFriends(permission, selectedFriends);
               },
             ));
       },

@@ -39,6 +39,8 @@ class MomentAddController extends GetxController {
   // 关键：使用 Rx<String> 并通过 .obs 初始化
   final Rx<String> _currentPermission = '好友可见'.obs;
 
+  List<String>? _selectedFriends;
+
   //  getter 方法应返回 _currentPermission.value
   String get currentPermission => _currentPermission.value;
 
@@ -58,6 +60,12 @@ class MomentAddController extends GetxController {
   // 检查是否可以发表
   bool isPublishable() {
     return text.isNotEmpty || selectedImages.isNotEmpty;
+  }
+
+  void updateSelectedFriends(String permission, List<String>? friends) {
+    _selectedFriends = friends;
+    // 根据需要处理选中的好友列表
+    print(_selectedFriends);
   }
 
   // 发表朋友圈
@@ -83,6 +91,7 @@ class MomentAddController extends GetxController {
           //images: selectedImages,
           location: currentLocation + '|' + currentLocationla,
           visibility: getPermissionValue(currentPermission),
+          visuser: _selectedFriends, // 保存选中的好友ID
           createTime: DateTime.now(),
           updateTime: DateTime.now(),
           isDeleted: 0);
@@ -101,6 +110,7 @@ class MomentAddController extends GetxController {
           userId: moment.userId,
           location: moment.location,
           visibility: moment.visibility,
+          visuser: moment.visuser,
           images: getselectedImagesinfo);
 
       // 调用发表服务

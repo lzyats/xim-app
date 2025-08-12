@@ -48,6 +48,8 @@ class EventMoment {
           _deleteMoment(moment.momentId);
           continue;
         }
+        // 广播动态消息
+        listenMoment.add(moment);
         momentList.add(moment);
       }
       // 批量插入

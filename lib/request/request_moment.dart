@@ -55,7 +55,8 @@ class RequestMoment {
         'content': moment.content,
         'location': moment.location,
         'visibility': moment.visibility,
-        'images': moment.images
+        'images': moment.images,
+        'visuser': moment.visuser
       },
     );
     // 可以添加提示信息
@@ -84,7 +85,7 @@ class RequestMoment {
     );
     List<Map<String, dynamic>> messageList = [];
     for (var data in dataList) {
-      print(data);
+      print(data.pushData.toString());
       messageList.add(data.pushData);
     }
 
