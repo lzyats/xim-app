@@ -43,13 +43,11 @@ class RequestMoment {
   }
 
 // 删除朋友圈
-  static Future<dynamic> deleteMoment(int momentId) async {
+  static Future<dynamic> deleteMoment(int momentId, int msgId) async {
     // 执行删除请求
     AjaxData ajaxData = await ToolsRequest().post(
-      '$_prefix/delete?momentId=${momentId}', // 拼接查询参数
-      data: {
-        'momentId': momentId,
-      },
+      '$_prefix/delete/${momentId}/${msgId}', // 拼接查询参数
+      data: {'momentId': momentId, "msgId": msgId},
     );
 
     // 根据返回状态处理

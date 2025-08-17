@@ -1469,7 +1469,7 @@ class _MomentHander {
     }
     // 转换为Moment对象列表
     for (var data in resultList) {
-      print(data.toString());
+      //print(data.toString());
       dataList.add(Moment.fromJson(data));
     }
     return dataList;

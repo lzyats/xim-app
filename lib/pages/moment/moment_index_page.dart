@@ -719,7 +719,8 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
 
     // 如果用户确认删除，调用控制器的删除方法
     if (result == true) {
-      final success = await controller.deleteMoment(moment.momentId ?? 0);
+      final success = await controller.deleteMoment(
+          moment.momentId ?? 0, moment.msgId ?? 0);
       if (success) {
         Get.snackbar('成功', '朋友圈已删除');
       } else {

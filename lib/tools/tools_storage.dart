@@ -249,6 +249,23 @@ class ToolsStorage {
     return value;
   }
 
+  // 存放朋友圈消息ID
+  // 朋友圈消息ID存储（用于记录已处理的消息）
+  List<String> momentMsg({List<String>? value}) {
+    // 存储键名
+    String type = 'momentMsg';
+
+    if (value != null) {
+      // 写入操作：直接存储字符串列表
+      _storage.write(type, value);
+      return value;
+    }
+
+    // 读取操作：默认空列表，安全转换为String列表
+    List<dynamic> storedList = _storage.read(type) ?? [];
+    return storedList.map((item) => item.toString()).toList();
+  }
+
   // 引用
   Map<String, dynamic> reply(
     String key, {

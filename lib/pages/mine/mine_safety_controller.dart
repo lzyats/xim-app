@@ -65,6 +65,8 @@ class MineSafetyController extends BaseController {
     EventSetting().handle(SettingModel(SettingType.message));
     // 取消
     ToolsSubmit.cancel();
+    // 清除消息列表缓存
+    await ToolsStorage().momentMsg(value: []);
     // 提醒
     EasyLoading.showToast('清空成功');
     // 返回

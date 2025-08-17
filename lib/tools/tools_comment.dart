@@ -420,6 +420,7 @@ class Media {
 /// 朋友圈动态模型，支持空值判断和可选字段
 class MomentModel {
   final int? momentId; // 动态ID，改为可选类型
+  final int? msgId; // 动态ID，改为可选类型
   final int? userId; // 用户ID，改为可选类型
   final String? portrait; // 用户头像，改为可选类型
   final String? nickname; // 用户昵称，改为可选类型
@@ -435,6 +436,7 @@ class MomentModel {
   // 构造函数使用可选参数，并设置默认值
   MomentModel({
     this.momentId,
+    this.msgId,
     this.userId,
     this.portrait = '', // 字符串类型设置默认空字符串
     this.nickname = '',
@@ -456,6 +458,7 @@ class MomentModel {
   factory MomentModel.fromJson(Map<String, dynamic> json) {
     return MomentModel(
       momentId: _parseInt(json['momentId']),
+      msgId: _parseInt(json['msgId']),
       userId: _parseInt(json['userId']),
       portrait: _parseString(json['portrait']),
       nickname: _parseString(json['nickname']),
@@ -500,6 +503,7 @@ class MomentModel {
   // 复制实例，支持字段更新
   MomentModel copyWith({
     int? momentId,
+    int? msgId,
     int? userId,
     String? portrait,
     String? nickname,
@@ -514,6 +518,7 @@ class MomentModel {
   }) {
     return MomentModel(
       momentId: momentId ?? this.momentId,
+      msgId: msgId ?? this.msgId,
       userId: userId ?? this.userId,
       portrait: portrait ?? this.portrait,
       nickname: nickname ?? this.nickname,

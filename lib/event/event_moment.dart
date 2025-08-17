@@ -2,9 +2,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:alpaca/event/event_setting.dart';
-import 'package:alpaca/tools/tools_badger.dart';
-import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:uuid/uuid.dart';
@@ -20,17 +17,53 @@ class EventMoment {
 
   // 处理接收到的朋友圈消息
   Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
-    print("收到新动态:" + pushData.toString());
+    print("收到新动态 => ");
     // 组装动态对象
     Moment? moment = _initMoment(pushData);
     if (moment == null) {
       return;
     }
+    // 避免消息重复处理
+    bool donext = await handleMomentMsgId(moment.msgId);
+    if (!donext) {
+      print("该消息不重复处理");
+      return;
+    }
+    print("处理新动态:" + pushData.toString());
     // 插入数据库
     await ToolsSqlite().moment.add(moment); // 假设数据库有对应的moment表操作
     // 广播动态消息
     listenMoment.add(moment);
     // 假设存在验证动态ID的方法
+  }
+
+  /// 处理消息ID存储，确保去重存储
+  Future<bool> handleMomentMsgId(String msgId) async {
+    bool back = false;
+    // 获取已存储的消息ID列表
+    List<String> existingMsgIds = ToolsStorage().momentMsg();
+
+    // 无论是否存在，都将msgId存入（若已存在则覆盖/保持，根据实际存储逻辑）
+    if (!existingMsgIds.contains(msgId)) {
+      back = true;
+      existingMsgIds.add(msgId);
+      // 保存更新后的消息ID列表
+      await ToolsStorage().momentMsg(value: existingMsgIds);
+    }
+    return back;
+  }
+
+  /// 从存储中删除指定的msgId
+  static Future<void> removeMomentMsgId(String msgId) async {
+    // 获取已存储的消息ID列表
+    List<String> existingMsgIds = ToolsStorage().momentMsg();
+
+    // 如果列表中包含该msgId，则移除
+    if (existingMsgIds.contains(msgId)) {
+      existingMsgIds.remove(msgId);
+      // 保存更新后的消息ID列表
+      await ToolsStorage().momentMsg(value: existingMsgIds);
+    }
   }
 
   // 处理离线动态
@@ -44,13 +77,17 @@ class EventMoment {
           continue;
         }
         // 处理删除动态
-        if (moment.isDeleted == 'Y') {
+        if (moment.isDeleted == 1) {
           _deleteMoment(moment.momentId);
+          await removeMomentMsgId(moment.msgId);
           continue;
         }
-        // 广播动态消息
-        listenMoment.add(moment);
-        momentList.add(moment);
+        bool donext = await handleMomentMsgId(moment.msgId);
+        if (donext) {
+          // 广播动态消息
+          listenMoment.add(moment);
+          momentList.add(moment);
+        }
       }
       // 批量插入
       await ToolsSqlite().moment.addBatch(momentList); // 假设存在批量插入方法
@@ -109,7 +146,7 @@ class EventMoment {
   // 处理动态删除
   void _deleteMoment(String momentId) {
     // 实现删除动态的逻辑，如从数据库移除
-    ToolsSqlite().moment.delete(momentId); // 假设存在删除方法
+    ToolsSqlite().moment.delete(momentId, logicDelete: true); // 假设存在删除方法
   }
 
   // 处理动态相关操作（如点赞、评论）
@@ -162,7 +199,7 @@ class EventMoment {
   Future<void> _handleDelete(String momentId) async {
     Moment? moment = await ToolsSqlite().moment.getById(momentId);
     if (moment != null) {
-      moment.isDeleted = 'Y';
+      moment.isDeleted = '1';
       await ToolsSqlite().moment.update(moment);
       listenMoment.add(moment); // 广播更新
     }

@@ -54,14 +54,15 @@ class MomentIndexController extends BaseController {
   /**
  * 删除指定momentId的朋友圈信息
  */
-  Future<bool> deleteMoment(int momentId) async {
+  Future<bool> deleteMoment(int momentId, int msgId) async {
     print('开始删除朋友圈: $momentId');
     try {
       // 调用删除接口
-      bool deleteSuccess = await RequestMoment.deleteMoment(momentId);
+      bool deleteSuccess = await RequestMoment.deleteMoment(momentId, msgId);
       if (deleteSuccess) {
         // 从内存列表中移除
         momentList.removeWhere((model) => model.momentId == momentId);
+        EventMoment.removeMomentMsgId(msgId.toString());
         // 从数据映射中移除
         _dataMap.remove(momentId.toString());
         // 从数据库中删除
@@ -128,6 +129,7 @@ class MomentIndexController extends BaseController {
     // 创建MomentModel
     MomentModel momentModel = MomentModel(
         momentId: int.parse(data.momentId),
+        msgId: int.parse(data.msgId),
         userId: int.parse(data.userId),
         portrait: data.portrait,
         nickname: data.nickname,
