@@ -53,6 +53,24 @@ class MineSafetyController extends BaseController {
     Get.back();
   }
 
+  // 清空朋友圈
+  Future<void> deleteMoMsg() async {
+    // 执行清空
+    // await RequestMessage.deleteMsg();
+    // 清空消息
+    await ToolsSqlite().moment.clearAll();
+    // 清空角标
+    ToolsBadger().clear();
+    // 写入事件
+    EventSetting().handle(SettingModel(SettingType.message));
+    // 取消
+    ToolsSubmit.cancel();
+    // 提醒
+    EasyLoading.showToast('清空成功');
+    // 返回
+    Get.back();
+  }
+
   @override
   void onInit() {
     super.onInit();

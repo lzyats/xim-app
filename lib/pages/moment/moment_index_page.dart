@@ -181,14 +181,6 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                                               commentContent);
                                       if (success) {
                                         setState(() {
-                                          _currentMoment?.comments ?? [];
-                                          _currentMoment?.comments!.add(
-                                            FriendCommentModel(
-                                              fromUser:
-                                                  controller.localUser.nickname,
-                                              content: commentContent,
-                                            ),
-                                          );
                                           _commentController.clear();
                                           _isCommentInputVisible = false;
                                           _isEmojiPickerVisible = false;
@@ -601,25 +593,40 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  // 修改 _buildMomentFooter 方法，添加删除图标
   Widget _buildMomentFooter(MomentModel moment) {
     timeago.setLocaleMessages('en', ToolsFormat());
+    // 获取当前登录用户ID（假设从控制器中获取）
+    final currentUserId = controller.userId; // 需确保控制器中有此属性
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 15), // 新增下边距15
+      margin: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // 时间和删除图标
+          Row(
             children: [
               Text(
                 moment.createTime != null
-                    ? timeago.format(moment.createTime!) // 非空时格式化
-                    : '', // 为空时显示空文本
+                    ? timeago.format(moment.createTime!)
+                    : '',
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
+              // 只有当前用户发布的朋友圈才显示删除图标
+              if (moment.userId != null &&
+                  currentUserId != null &&
+                  moment.userId.toString() == currentUserId)
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.black, size: 16),
+                  onPressed: () => _showDeleteConfirmation(moment),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
             ],
           ),
           WidgetMoment.buildLocationWidget(moment.location, strlen: 20),
+          // 更多操作按钮（保持不变）
           GestureDetector(
             onTapDown: (TapDownDetails details) async {
               // 获取点击位置的坐标（屏幕坐标系）
@@ -673,6 +680,52 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
         ],
       ),
     );
+  }
+
+// 添加删除确认对话框方法
+  Future<void> _showDeleteConfirmation(MomentModel moment) async {
+    final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              // 设置圆角（默认值较大，这里改为8）
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12), // 减小圆角半径
+              ),
+              // 设置标题居中
+              title: const Center(
+                child: Text('确认删除'),
+              ),
+              content: const Text('确定要删除这条朋友圈吗？此操作不可撤销。'),
+              // 调整actions布局使按钮居中
+              actions: [
+                // 使用Row包裹按钮，并设置主轴对齐方式为居中
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('取消'),
+                    ),
+                    const SizedBox(width: 20), // 增加按钮间距
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child:
+                          const Text('删除', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              ],
+            ));
+
+    // 如果用户确认删除，调用控制器的删除方法
+    if (result == true) {
+      final success = await controller.deleteMoment(moment.momentId ?? 0);
+      if (success) {
+        Get.snackbar('成功', '朋友圈已删除');
+      } else {
+        Get.snackbar('失败', '删除失败，请稍后重试');
+      }
+    }
   }
 
   Widget _buildMenuItem(

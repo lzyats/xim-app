@@ -12,11 +12,11 @@ class FriendDetailsController extends BaseController {
   TextEditingController nicknameController = TextEditingController();
   late String userId;
   FriendSource? friendSource;
-
+  late ChatFriend? friend;
   // 获取本地详情
   Future<ChatFriend?> _onRefresh1() async {
     // 执行
-    ChatFriend? friend = await ToolsSqlite().friend.getById(userId);
+    friend = await ToolsSqlite().friend.getById(userId);
     // 格式化
     _format(friend);
     // 返回
@@ -64,7 +64,7 @@ class FriendDetailsController extends BaseController {
     refreshData.remark = remark;
     update();
     // 执行
-    await RequestFriend.setRemark(userId, remark);
+    await RequestFriend.setRemark(userId, remark, friend!.nickname);
     // 取消
     ToolsSubmit.cancel();
     // 返回

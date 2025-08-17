@@ -502,7 +502,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
+                            borderRadius: BorderRadius.circular(18.0),
                             border: Border.all(color: Colors.pink),
                           ),
                           child: Center(

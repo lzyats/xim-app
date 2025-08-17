@@ -455,6 +455,7 @@ class LocalConfig {
   String beian;
   int messageLimit;
   double invo; //邀请奖励
+  String invoadus; //邀请自动添加邀请人为好友
   double sign; //签到奖励
   String cashname;
   String cashstr;
@@ -471,6 +472,7 @@ class LocalConfig {
     this.beian,
     this.messageLimit,
     this.invo,
+    this.invoadus,
     this.sign,
     this.cashname,
     this.cashstr,
@@ -501,6 +503,7 @@ class LocalConfig {
       data['beian'] ?? '',
       data['messageLimit'] ?? 1000,
       _toDouble(data['invo']), // 用工具方法转换
+      data['invoadus'] ?? 'Y',
       _toDouble(data['sign']), // 用工具方法转换
       data['cashname'] ?? '元',
       data['cashstr'] ?? '￥',
@@ -520,6 +523,7 @@ class LocalConfig {
       'beian': beian,
       'messageLimit': messageLimit,
       'invo': invo,
+      'invoadus': invoadus,
       'sign': sign,
       'cashname': cashname,
       'cashstr': cashstr,

@@ -4,6 +4,7 @@ import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/request/request_moment.dart';
 import 'package:alpaca/tools/tools_comment.dart';
+import 'package:date_format/date_format.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:alpaca/event/event_setting.dart';
@@ -22,6 +23,8 @@ class MomentIndexController extends BaseController {
 
   LocalUser localUser = ToolsStorage().local();
 
+  final RxBool isLoading = true.obs;
+
   String userId = ToolsStorage().local().userId;
   RxString notice = ''.obs;
   final Map<String, MomentModel> _dataMap = {};
@@ -29,22 +32,6 @@ class MomentIndexController extends BaseController {
   // 添加是否有更多数据的标志
   final RxBool _hasMore = true.obs;
   bool get hasMore => _hasMore.value;
-
-  // 不显示
-  Future<void> setDelete(String chatId) async {
-    // 删除
-    await ToolsSqlite().msg.delete(chatId);
-    // 移除
-    refreshList.remove(_dataMap[chatId]);
-    // 删除
-    ToolsStorage().draft(chatId);
-    // 删除
-    ToolsStorage().reply(chatId);
-    // 删除
-    doRead(chatId);
-    // 取消
-    ToolsSubmit.cancel();
-  }
 
   /**
    * 发起点赞
@@ -64,22 +51,33 @@ class MomentIndexController extends BaseController {
     return true;
   }
 
-  // 已读
-  Future<void> doRead(String chatId) async {
-    // 更新
-    ToolsBadger().reset(chatId);
-    // 已读
-    await ToolsSqlite().his.update(chatId, {'badger': 'N'});
-    // 更新
-    update();
-    // 取消
-    ToolsSubmit.cancel();
-    // 消息
-    EventSetting().handle(SettingModel(
-      SettingType.badger,
-      label: 'message',
-      value: '0',
-    ));
+  /**
+ * 删除指定momentId的朋友圈信息
+ */
+  Future<bool> deleteMoment(int momentId) async {
+    print('开始删除朋友圈: $momentId');
+    try {
+      // 调用删除接口
+      bool deleteSuccess = await RequestMoment.deleteMoment(momentId);
+      if (deleteSuccess) {
+        // 从内存列表中移除
+        momentList.removeWhere((model) => model.momentId == momentId);
+        // 从数据映射中移除
+        _dataMap.remove(momentId.toString());
+        // 从数据库中删除
+        await ToolsSqlite().moment.delete(momentId.toString());
+        // 更新未读徽章数量
+        int momentbadger = ToolsStorage().momentbadger(update: -1);
+        updateMomentBadger(momentbadger);
+        // 通知UI更新
+        update();
+        print('删除朋友圈成功: $momentId');
+        return true;
+      }
+    } catch (e) {
+      print('删除朋友圈失败: $e');
+    }
+    return false;
   }
 
   // 消息刷新
@@ -173,6 +171,7 @@ class MomentIndexController extends BaseController {
       // 判断 _dataMap 中是否存在 moment.momentId 这个键
       bool exists = _dataMap.containsKey(moment.momentId);
       MomentModel momentModel = addMomentToModelList(moment);
+      String isdel = moment.isDeleted;
       if (exists) {
         print("已有数据:" + moment.momentId);
         // 如果存在，说明是更新操作，先移除旧数据
@@ -185,7 +184,9 @@ class MomentIndexController extends BaseController {
           bool removed = momentList.remove(_dataMap[moment.momentId]);
           if (removed) {
             print("被移除元素的序列号（索引）是：$index");
-            momentList.insert(index, momentModel); // 最新数据显示在最前面
+            print("删除该记录：$isdel");
+            if (isdel == "0")
+              momentList.insert(index, momentModel); // 最新数据显示在最前面
           }
         }
       } else {
@@ -198,7 +199,7 @@ class MomentIndexController extends BaseController {
       }
       // 插入
       // 添加到列表
-      _dataMap[moment.momentId] = momentModel;
+      if (isdel == "0") _dataMap[moment.momentId] = momentModel;
       // 更新
 
       update();

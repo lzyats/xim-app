@@ -89,7 +89,7 @@ class EventMoment {
               ? DateTime.fromMillisecondsSinceEpoch(timestamp).toString()
               : '';
         }(),
-        isDeleted: pushData['isDeleted'] ?? 'N',
+        isDeleted: pushData['isDeleted'].toString(),
         visuser: pushData['visuser'] != null
             ? jsonEncode(pushData['visuser'])
             : '[]',

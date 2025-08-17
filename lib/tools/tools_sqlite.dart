@@ -44,7 +44,7 @@ class ToolsSqlite {
             'CREATE TABLE chat_robot (robotId TEXT, nickname TEXT, portrait TEXT, menu TEXT, top TEXT, disturb TEXT, PRIMARY KEY(robotId))');
         // 创建朋友圈表
         await db.execute(
-            'CREATE TABLE friend_moments (momentId TEXT,msgId TEXT, userId TEXT, content TEXT, location TEXT, visibility TEXT,portrait TEXT,nickname TEXT, createTime TEXT , visuser TEXT,isDeleted TEXT,images TEXT,comments TEXT,likes TEXT, PRIMARY KEY(momentId,msgId))');
+            'CREATE TABLE friend_moments (momentId TEXT, msgId TEXT, userId TEXT, content TEXT, location TEXT, visibility TEXT,portrait TEXT,nickname TEXT, createTime TEXT , visuser TEXT,isDeleted TEXT,images TEXT,comments TEXT,likes TEXT, PRIMARY KEY(momentId))');
         batch.commit();
       },
       onUpgrade: (Database db, int v1, int v2) async {
@@ -1458,10 +1458,10 @@ class _MomentHander {
     List<Map<String, dynamic>> resultList = await db.query(
       tableName,
       // 筛选未删除的动态（可选）
-      where: 'isDeleted = ?',
-      whereArgs: ['N'],
+      where: 'isDeleted != ?',
+      whereArgs: ['1'],
       // 按创建时间排序（默认降序，最新的在前）
-      orderBy: orderByCreateTime ? 'createTime DESC' : null,
+      orderBy: 'createTime DESC',
     );
     List<Moment> dataList = [];
     if (resultList.isEmpty) {
@@ -1469,6 +1469,7 @@ class _MomentHander {
     }
     // 转换为Moment对象列表
     for (var data in resultList) {
+      print(data.toString());
       dataList.add(Moment.fromJson(data));
     }
     return dataList;
@@ -1481,8 +1482,8 @@ class _MomentHander {
     // 执行查询
     List<Map<String, dynamic>> resultList = await db.query(
       tableName,
-      where: 'userId = ? and isDeleted = ?',
-      whereArgs: [userId, 'N'],
+      where: 'userId = ? and isDeleted != ?',
+      whereArgs: [userId, '1'],
       orderBy: 'createTime DESC',
     );
     List<Moment> dataList = [];
@@ -1504,7 +1505,7 @@ class _MomentHander {
       // 逻辑删除：仅标记isDeleted为'Y'
       await db.update(
         tableName,
-        {'isDeleted': 'Y'},
+        {'isDeleted': '1'},
         where: 'momentId = ?',
         whereArgs: [momentId],
       );
@@ -1516,6 +1517,23 @@ class _MomentHander {
         whereArgs: [momentId],
       );
     }
+  }
+
+  // 清空消息
+  clearAll() async {
+    // 连接
+    Database db = await ToolsSqlite().database;
+    // 查询
+
+    // 批量
+    Batch batch = db.batch();
+    // 删除
+    batch.delete(
+      tableName,
+      where: '1=1',
+    );
+    // 提交
+    await batch.commit();
   }
 
   // 更新朋友圈动态的评论
@@ -1605,7 +1623,7 @@ class Moment {
       portrait: data['portrait'] ?? '',
       nickname: data['nickname'] ?? '',
       createTime: data['createTime'] ?? '',
-      isDeleted: data['isDeleted'] ?? 'N',
+      isDeleted: data['isDeleted'] ?? '0',
       visuser: data['visuser'] ?? '[]',
       images: data['images'] ?? '[]',
       comments: data['comments'] ?? '[]',

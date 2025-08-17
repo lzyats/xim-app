@@ -140,14 +140,12 @@ class RequestFriend {
   }
 
   // 好友备注
-  static Future<void> setRemark(String userId, String remark) async {
+  static Future<void> setRemark(
+      String userId, String remark, String nickname) async {
     // 执行
     await ToolsRequest().post(
       '$_prefix/setRemark',
-      data: {
-        "userId": userId,
-        "remark": remark,
-      },
+      data: {"userId": userId, "remark": remark, "nickname": nickname},
     );
     // 存储
     ToolsStorage().remark(userId, value: remark);

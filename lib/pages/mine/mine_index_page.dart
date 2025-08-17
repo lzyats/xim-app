@@ -7,8 +7,6 @@ import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/config/app_fonts.dart';
 // 补充图片资源配置导入
 import 'package:alpaca/pages/common/common_about_page.dart';
-import 'package:alpaca/pages/common/common_feedback_page.dart';
-import 'package:alpaca/pages/common/common_help_page.dart';
 import 'package:alpaca/pages/common/common_notices_page.dart';
 import 'package:alpaca/pages/mine/mine_collect_page.dart';
 import 'package:alpaca/pages/mine/mine_index_controller.dart';
@@ -20,10 +18,8 @@ import 'package:alpaca/pages/wallet/wallet_index_page.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_route.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
-import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/widgets/widget_common.dart';
-import 'package:alpaca/widgets/widget_line.dart';
 
 double _iconSize = 25;
 
@@ -229,7 +225,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(right: 8.0),
+                        margin: EdgeInsets.only(right: 2.0),
                         padding: EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50.withOpacity(0.8),
@@ -252,7 +248,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                     Text(
                                       '邀请好友',
                                       style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 15.0,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF0463F7),
                                       ),
@@ -284,7 +280,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 // 右侧：新增图片hltj
                                 Image.asset(
                                   AppImage.hltj,
-                                  width: 60,
+                                  width: 55,
                                   height: 60,
                                   fit: BoxFit.contain,
                                 ),
@@ -296,7 +292,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                     ),
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(left: 8.0),
+                        margin: EdgeInsets.only(left: 2.0),
                         padding: EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                           color: Colors.pink.shade50.withOpacity(0.8),
@@ -319,7 +315,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                     Text(
                                       '在线签到',
                                       style: TextStyle(
-                                        fontSize: 16.0,
+                                        fontSize: 15.0,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFC04EEB),
                                       ),
@@ -353,7 +349,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 // 右侧：新增图片hltj
                                 Image.asset(
                                   AppImage.mrqd,
-                                  width: 60,
+                                  width: 55,
                                   height: 60,
                                   fit: BoxFit.contain,
                                 ),

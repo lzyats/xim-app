@@ -14,10 +14,10 @@ class AppSetting {
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
     //AppConfig.requestHost = 'http://110.42.56.25:8080';
-    AppConfig.requestHost = 'http://192.168.1.106:8080';
+    AppConfig.requestHost = 'http://192.168.109.131:8080';
     // socket地址
-    //AppConfig.requestSocket = 'wss://myim-aojdfipuva.cn-chengdu.fcapp.run';
-    AppConfig.requestSocket = 'wss://110.42.56.25:8888';
+    AppConfig.requestSocket = 'ws://43.225.157.91:8888';
+    //AppConfig.requestSocket = 'ws://192.168.1.106:8888';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://work.weixin.qq.com/nl/eula';
     // 请求服务协议
@@ -26,9 +26,9 @@ class AppSetting {
     AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
     AppConfig.amapIos = '1d3634f089bad2aa2ace7176d29c6878';
     // 个推推送
-    AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';
-    AppConfig.pushKey = 'gkVGWe6U3e4Eals5VCSDc3';
-    AppConfig.pushSecret = 'lSklF6H6Yx6QiF8iiBNoW6';
+    AppConfig.pushId = '0RbcZP7qpW85LeTKqhtDw1';
+    AppConfig.pushKey = 'Tscywps0VSAKcjI4B1rEr3';
+    AppConfig.pushSecret = 'm0wOSAPWOp6F7ormKOvD08';
     // 群主领取红包
     AppConfig.groupTrade = true;
     // 密码登录
@@ -52,7 +52,7 @@ class AppSetting {
     // 接口请求地址
     AppConfig.requestHost = 'http://110.42.56.25:8080';
     // socket地址
-    AppConfig.requestSocket = 'ws://192.168.124.18:8888';
+    AppConfig.requestSocket = 'ws://110.42.56.25:8888';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://baidu.com/privacy.html';
     // 请求服务协议
@@ -61,9 +61,9 @@ class AppSetting {
     AppConfig.amapAndroid = 'b88f06525690d65c776f102243bde5e4';
     AppConfig.amapIos = '1d3634f089bad2aa2ace7176d29c6878';
     // 个推推送
-    AppConfig.pushId = 'PAwNNOUaZ21EYtiLkBr8EA';
-    AppConfig.pushKey = 'gkVGWe6U3e4Eals5VCSDc3';
-    AppConfig.pushSecret = 'lSklF6H6Yx6QiF8iiBNoW6';
+    AppConfig.pushId = '0RbcZP7qpW85LeTKqhtDw1';
+    AppConfig.pushKey = 'Tscywps0VSAKcjI4B1rEr3';
+    AppConfig.pushSecret = 'm0wOSAPWOp6F7ormKOvD08';
     // 群主领取红包
     AppConfig.groupTrade = false;
     // 密码登录

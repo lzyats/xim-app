@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/event/event_socket.dart';
@@ -7,7 +5,6 @@ import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_comment.dart'; // 假设数据模型文件路径
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'dart:convert';
 
 // 朋友圈接口
 class RequestMoment {
@@ -43,6 +40,26 @@ class RequestMoment {
     );
     // 转换
     return ajaxData.result['data'];
+  }
+
+// 删除朋友圈
+  static Future<dynamic> deleteMoment(int momentId) async {
+    // 执行删除请求
+    AjaxData ajaxData = await ToolsRequest().post(
+      '$_prefix/delete?momentId=${momentId}', // 拼接查询参数
+      data: {
+        'momentId': momentId,
+      },
+    );
+
+    // 根据返回状态处理
+    if (ajaxData.result['code'] == 200) {
+      EasyLoading.showToast('删除成功');
+      return true;
+    } else {
+      EasyLoading.showToast('删除失败');
+      return false;
+    }
   }
 
   // 发布朋友圈
@@ -85,7 +102,7 @@ class RequestMoment {
     );
     List<Map<String, dynamic>> messageList = [];
     for (var data in dataList) {
-      print(data.pushData.toString());
+      //print(data.pushData.toString());
       messageList.add(data.pushData);
     }
 
@@ -123,8 +140,9 @@ class RequestMoment {
     // 获取当前用户的 user_id
     String userId = ToolsStorage().local().userId;
     // 判断是否发贴人回复
-    int source = 0;
-    if (replyTo == int.parse(userId)) source = 1;
+    int source = 1;
+    if (replyTo == int.parse(userId)) source = 0;
+    print(userId + ' => ' + replyTo.toString() + " => " + source.toString());
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/comment',

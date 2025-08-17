@@ -71,7 +71,16 @@ class MineSafetyPage extends GetView<MineSafetyController> {
               ),
               WidgetCommon.border(),
               WidgetLineCenter(
-                "清空聊天",
+                "清空朋友圈",
+                color: Color(0xFFFF8600),
+                onTap: () {
+                  _clearmoment();
+                },
+                divider: false,
+              ),
+              WidgetCommon.border(),
+              WidgetLineCenter(
+                "清空聊天记录",
                 color: Color(0xFFFF8600),
                 onTap: () {
                   _clear();
@@ -80,7 +89,7 @@ class MineSafetyPage extends GetView<MineSafetyController> {
               ),
               WidgetCommon.border(),
               WidgetLineCenter(
-                '退出登录',
+                '退出软件登录',
                 divider: false,
                 color: Color(0xFFFF8600),
                 onTap: () {
@@ -167,6 +176,48 @@ class MineSafetyPage extends GetView<MineSafetyController> {
                 if (ToolsSubmit.call()) {
                   // 提交
                   controller.deleteMsg();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _clearmoment() {
+    if (ToolsSubmit.progress()) {
+      return;
+    }
+    showCupertinoDialog(
+      context: AppConfig.navigatorKey.currentContext!,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text(
+            '警告：清空后无法恢复！',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          content: const Text(
+            '确定清空朋友圈所有记录？',
+            style: TextStyle(
+              fontSize: 16,
+            ),
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('取消'),
+              onPressed: () {
+                Get.back();
+              },
+            ),
+            CupertinoDialogAction(
+              child: const Text('清空'),
+              onPressed: () {
+                if (ToolsSubmit.call()) {
+                  // 提交
+                  controller.deleteMoMsg();
                 }
               },
             ),
