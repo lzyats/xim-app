@@ -1,4 +1,4 @@
-package seim.im
+package myeim.im
 
 import androidx.annotation.NonNull
 import com.alibaba.fastjson.JSONObject
