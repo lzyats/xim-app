@@ -829,7 +829,7 @@
 					"$(PROJECT_DIR)/Runner/UniMPSDK/Core/Libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "羊驼";
+				INFOPLIST_KEY_CFBundleDisplayName = "语聊";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1037,7 +1037,7 @@
 					"$(PROJECT_DIR)/Runner/UniMPSDK/Core/Libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "羊驼";
+				INFOPLIST_KEY_CFBundleDisplayName = "语聊";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1081,7 +1081,7 @@
 					"$(PROJECT_DIR)/Runner/UniMPSDK/Core/Libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "羊驼";
+				INFOPLIST_KEY_CFBundleDisplayName = "语聊";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
