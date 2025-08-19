@@ -27,12 +27,12 @@ class ToolsPush {
       },
       onReceiveNotificationResponse: (Map<String, dynamic> message) async {},
       onAppLinkPayload: (String message) async {},
-      //onReceiveOnlineState: (bool online) async {},
-      onReceiveOnlineState: (String onlineState) async {
+      onReceiveOnlineState: (bool online) async {},
+      /* onReceiveOnlineState: (String onlineState) async {
         // 根据字符串值判断在线状态，例如：
         bool online = onlineState == "online"; // 假设返回"online"表示在线
         // 后续处理逻辑
-      },
+      }, */
       onPushModeResult: (Map<String, dynamic> message) async {},
       onSetTagResult: (Map<String, dynamic> message) async {},
       onAliasResult: (Map<String, dynamic> message) async {},

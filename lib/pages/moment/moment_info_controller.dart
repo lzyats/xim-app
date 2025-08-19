@@ -1,6 +1,4 @@
-import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:get/get.dart';
-import 'package:alpaca/pages/moment/moment_info_page.dart';
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:alpaca/request/request_moment.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
