@@ -104,6 +104,7 @@ class MainController extends BaseController {
     for (var i = 0; i < (_pageList.length - (AppConfig.debug ? 0 : 1)); i++) {
       items.add(initItem(i));
     }
+
     // 检查并请求浮窗权限
     //_checkOverlayPermission();
     // 查询自己

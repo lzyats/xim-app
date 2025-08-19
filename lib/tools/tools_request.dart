@@ -46,6 +46,7 @@ class ToolsRequest {
       baseUrl: baseUrl,
       connectTimeout: AppConfig.timeout,
     );
+    print("初始地址：" + baseUrl);
     _dio = Dio(options);
     _dio.interceptors.add(_AuthInterCeptor());
     // 初始化完成后，将标志位设为true
@@ -75,7 +76,6 @@ class ToolsRequest {
     bool showError = true,
     Map<String, dynamic>? param,
   }) async {
-    await _ensureDioInitialized(); // 确保Dio已初始化
     return await _request(url, showError: showError, param: param);
   }
 
@@ -87,7 +87,6 @@ class ToolsRequest {
     int pageSize = 10,
     bool showError = true,
   }) async {
-    await _ensureDioInitialized();
     if (pageNum < 1) {
       pageNum = 1;
     }
@@ -104,7 +103,6 @@ class ToolsRequest {
     Map<String, dynamic>? data,
     bool showError = true,
   }) async {
-    await _ensureDioInitialized();
     return await _request(url, data: data, method: _post, showError: showError);
   }
 
@@ -114,7 +112,6 @@ class ToolsRequest {
     MultipartFile multipartFile, {
     bool showError = true,
   }) async {
-    await _ensureDioInitialized();
     FormData data = FormData.fromMap({'file': multipartFile});
     return await _request(url, data: data, method: _post, showError: showError);
   }
@@ -134,6 +131,7 @@ class ToolsRequest {
         EasyLoading.showToast('当前网络不可用', dismissOnTap: false);
         return Future.error('');
       }
+      await _ensureDioInitialized(); // 确保Dio已初始化
       debugPrint('请求地址：$baseUrl$url'); // 打印完整地址（验证baseUrl是否正确）
       debugPrint('请求方式：$method');
       // 发起请求

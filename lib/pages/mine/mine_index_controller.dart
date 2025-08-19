@@ -8,13 +8,17 @@ import 'package:alpaca/tools/tools_storage.dart';
 class MineIndexController extends BaseController {
   Rx<LocalUser> localUser = ToolsStorage().local().obs;
   RxString balance = '0.00'.obs;
+  var duration = const Duration(seconds: 10);
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     // 监听我的
     _listenMine();
-    getInfo();
+    // 延迟2秒（ Duration(seconds: 2) ）
+    Future.delayed(Duration(seconds: 3), () {
+      getInfo(); // 延时后执行的方法
+    });
   }
 
   // 监听我的

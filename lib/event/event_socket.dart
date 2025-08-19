@@ -19,7 +19,7 @@ class EventSocket {
   addListen() {
     return event.stream.listen((message) async {
       // 打印消息
-      //debugPrint('socket消息:' + message.pushData);
+      debugPrint('socket消息:' + message.pushData);
       // 解析消息
       Map<String, dynamic>? data = isJson(message.pushData);
       if (data == null) {

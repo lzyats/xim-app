@@ -4,17 +4,13 @@ import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/request/request_moment.dart';
 import 'package:alpaca/tools/tools_comment.dart';
-import 'package:date_format/date_format.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:alpaca/event/event_setting.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
-import 'package:alpaca/request/request_moment.dart';
-import 'package:alpaca/tools/tools_badger.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
-import 'package:alpaca/tools/tools_submit.dart';
 import 'dart:convert';
 
 class MomentIndexController extends BaseController {
@@ -146,13 +142,17 @@ class MomentIndexController extends BaseController {
   @override
   void onInit() {
     super.onInit();
+    // 消息刷新
+    onRefresh();
     // 监听消息
     _listenMessage();
-    _listenSetting();
-    // 消息刷新
-    //onRefresh();
+    //_listenSetting();
     // 定时任务
     _listenTimer();
+    Future.delayed(Duration(seconds: 4), () {
+      print("延时消息刷新");
+      onRefresh1(); // 延时消息刷新
+    });
   }
 
   // 监听设置（处理最新通知/处理消息刷新）
@@ -161,7 +161,7 @@ class MomentIndexController extends BaseController {
     subscription2 = EventSetting().event.stream.listen((model) {
       if (SettingType.message == model.setting) {
         // 消息刷新
-        onRefresh();
+        //onRefresh();
       }
     });
   }
@@ -220,7 +220,7 @@ class MomentIndexController extends BaseController {
   Future onRefresh1() async {
     // 获取配置
     RequestCommon.getConfig();
-    print('onRefresh method called');
+    //print('onRefresh method called');
     // 获取消息
     superRefresh(
       RequestMoment.pullMsg(),

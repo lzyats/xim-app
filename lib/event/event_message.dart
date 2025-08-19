@@ -34,7 +34,7 @@ class EventMessage {
 
   // 处理接收到的消息
   Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
-    print("收到新消息:" + pushData.toString());
+    //print("收到新消息:" + pushData.toString());
     // 历史消息
     ChatHis? chatHis = _initChatHis(pushData);
     if (chatHis == null) {
