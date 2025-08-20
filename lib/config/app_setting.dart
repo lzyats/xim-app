@@ -13,10 +13,10 @@ class AppSetting {
     // secret
     AppConfig.secret = 'YTY9FRenXiJNeE2x';
     // 接口请求地址
-    AppConfig.requestHost = 'http://110.42.56.25:8080';
+    AppConfig.requestHost = 'http://api.amoa.cn';
     //AppConfig.requestHost = 'http://192.168.109.131:8080';
     // socket地址
-    AppConfig.requestSocket = 'ws://110.42.56.25:6666';
+    AppConfig.requestSocket = 'ws://ws.amoa.cn';
     //AppConfig.requestSocket = 'ws://43.225.157.91:8888';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://work.weixin.qq.com/nl/eula';
@@ -50,7 +50,7 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://110.42.56.25:8080';
+    AppConfig.requestHost = 'http://api.amoa.cn';
     // socket地址
     AppConfig.requestSocket = 'ws://ws.amoa.cn';
     // 请求隐私协议
