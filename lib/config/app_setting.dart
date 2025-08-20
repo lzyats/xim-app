@@ -7,13 +7,13 @@ class AppSetting {
     // debug
     AppConfig.debug = true;
     // appId
-    AppConfig.appId = '20240101';
+    AppConfig.appId = '20250825';
     // appSecret
     AppConfig.appSecret = '3e9f44aa8eaef18e';
     // secret
     AppConfig.secret = 'YTY9FRenXiJNeE2x';
     // 接口请求地址
-    AppConfig.requestHost = 'http://api.amoa.cn';
+    AppConfig.requestHost = 'https://api.amoa.cn';
     //AppConfig.requestHost = 'http://192.168.109.131:8080';
     // socket地址
     AppConfig.requestSocket = 'ws://ws.amoa.cn';
