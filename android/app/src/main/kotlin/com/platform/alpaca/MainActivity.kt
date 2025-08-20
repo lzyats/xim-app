@@ -26,6 +26,8 @@ import io.flutter.plugin.common.MethodCall  // 导入MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import java.util.WeakHashMap  // 必须添加此导入
+// 在文件开头的导入区域添加
+import android.os.PowerManager
 
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
@@ -153,13 +155,16 @@ class MainActivity : FlutterFragmentActivity() {
         if (call.method == "wakeUp") {
             packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                // 唤醒屏幕并解锁（需要唤醒锁权限）
+                
+                // 获取唤醒锁
                 val powerManager = getSystemService(POWER_SERVICE) as PowerManager
                 val wakeLock = powerManager.newWakeLock(
                     PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
                     "MyApp:WakeLockTag"
                 )
-                wakeLock.acquire(10*1000L) // 保持唤醒10秒
+                wakeLock.acquire(10*1000L) // 保持唤醒10秒（自动释放）
+                
+                // 启动Activity
                 startActivity(intent)
                 result.success(true)
             } ?: run {
