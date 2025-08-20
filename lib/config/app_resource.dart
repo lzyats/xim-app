@@ -2,6 +2,7 @@
 class AppImage {
   static String get _path => 'assets/image';
   static String get logo => '$_path/logo.png';
+  static String get logos => '$_path/logo.webp';
   static String get bank => '$_path/bank.png';
   static String get voice => '$_path/voice.gif';
   static String get error => '$_path/error.png';
