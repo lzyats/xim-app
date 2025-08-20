@@ -28,6 +28,8 @@ import 'package:alpaca/tools/tools_storage.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
 
+import 'package:alpaca/tools/tools_overlay.dart';
+
 import 'package:alpaca/pages/moment/moment_index_page.dart'; // 引入朋友圈页面
 
 // tables
@@ -106,7 +108,7 @@ class MainController extends BaseController {
     }
 
     // 检查并请求浮窗权限
-    //_checkOverlayPermission();
+    _checkOverlayPermission();
     // 查询自己
     await RequestMine.getInfo();
     // 好友列表
@@ -133,17 +135,24 @@ class MainController extends BaseController {
 
   // 请求浮窗权限
   Future<void> _requestOverlayPermission() async {
-    const platform = MethodChannel('vip.myim/overlay');
-    try {
-      await platform.invokeMethod('requestOverlayPermission');
-    } on PlatformException catch (e) {
-      debugPrint("请求浮窗权限失败: ${e.message}");
+    // 添加浮窗权限请求
+    if (!Platform.isAndroid) {
+      return;
+    }
+    final status = await ToolsOverlay.checkPermission();
+    if (!status) {
+      const platform = MethodChannel('myeim.im/overlay');
+      try {
+        await platform.invokeMethod('requestOverlayPermission');
+      } on PlatformException catch (e) {
+        debugPrint("请求浮窗权限失败: ${e.message}");
+      }
     }
   }
 
   // 唤醒应用
   Future<void> wakeUpApp() async {
-    const platform = MethodChannel('vip.myim/wakeup');
+    const platform = MethodChannel('myeim.im/wakeup');
     try {
       await platform.invokeMethod('wakeUp');
     } on PlatformException catch (e) {

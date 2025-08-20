@@ -23,7 +23,7 @@ import UIKit
         event.setStreamHandler(self)
 
         // 注册浮窗通道
-        let overlayChannel = FlutterMethodChannel(name: "vip.myim/overlay", binaryMessenger: controller.binaryMessenger)
+        let overlayChannel = FlutterMethodChannel(name: "myeim.im/overlay", binaryMessenger: controller.binaryMessenger)
         overlayChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
             switch call.method {
             case "requestOverlayPermission":
@@ -43,7 +43,7 @@ import UIKit
         }
         
         // 注册唤醒通道
-        let wakeupChannel = FlutterMethodChannel(name: "vip.myim/wakeup", binaryMessenger: controller.binaryMessenger)
+        let wakeupChannel = FlutterMethodChannel(name: "myeim.im/wakeup", binaryMessenger: controller.binaryMessenger)
         wakeupChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
             if call.method == "wakeUp" {
                 self?.wakeUpApp()

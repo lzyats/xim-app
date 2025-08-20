@@ -312,7 +312,7 @@ class _ToolsCallState extends State<ToolsCall> {
     try {
       // 2. 直接使用原生层要求的参数名"eventData"传递数据
       // 通道名称需与原生层OVERLAY_CHANNEL保持一致（假设为"com.example/overlay"）
-      const platform = MethodChannel('vip.myim/overlay');
+      const platform = MethodChannel('myeim.im/overlay');
       await platform.invokeMethod('showCallOverlay', {
         'eventData': eventData, // 与原生层call.argument<String>("eventData")对应
       });
