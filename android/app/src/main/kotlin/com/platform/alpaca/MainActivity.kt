@@ -1,7 +1,17 @@
 package myeim.im
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import android.view.Gravity
+import android.view.WindowManager
+import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.NonNull
-import com.alibaba.fastjson.JSONObject
+import com.alibaba.fastjson.JSONObject  // 仅保留fastjson的JSONObject
 import io.dcloud.feature.sdk.DCSDKInitConfig
 import io.dcloud.feature.sdk.DCUniMPSDK
 import io.dcloud.feature.sdk.Interface.IUniMP
@@ -9,354 +19,279 @@ import io.dcloud.feature.sdk.MenuActionSheetItem
 import io.dcloud.feature.unimp.DCUniMPJSCallback
 import io.dcloud.feature.unimp.config.UniMPOpenConfiguration
 import io.dcloud.feature.unimp.config.UniMPReleaseConfiguration
-import io.flutter.Log
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall  // 导入MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import android.os.Build
-import android.provider.Settings
-import android.content.Intent
-import android.net.Uri
-import android.view.WindowManager
+import java.util.WeakHashMap  // 必须添加此导入
 
-class MainActivity: FlutterFragmentActivity() {
-    // 注册通道
-    private val OVERLAY_CHANNEL = "vip.myim/overlay"
-    private val WAKEUP_CHANNEL = "vip.myim/wakeup"
-    /* ======================================================= */
-    /* Override/Implements Methods                             */
-    /* ======================================================= */
+class MainActivity : FlutterFragmentActivity() {
+    // ===================== 常量定义 =====================
+    private val TAG = "MainActivity"
+    private val OVERLAY_CHANNEL = "myeim.im/overlay"
+    private val WAKEUP_CHANNEL = "myeim.im/wakeup"
+    private val UNI_EVENT_CHANNEL = "flutter_uni_stream"
+    private val UNI_METHOD_CHANNEL = "flutter_uni_channel"
+
+    // ===================== 成员变量 =====================
+    private val unimpMap = WeakHashMap<String, IUniMP>()  // 已导入WeakHashMap
+    private var uniMpJsCallback: DCUniMPJSCallback? = null
+    private var eventSink: EventChannel.EventSink? = null
+    private var pendingOverlayResult: MethodChannel.Result? = null
+
+    // ===================== Activity Result 注册 =====================
+    private val overlayPermissionLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+            pendingOverlayResult?.let { result ->
+                val hasPermission = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                        Settings.canDrawOverlays(this@MainActivity)
+                result.success(hasPermission)
+                pendingOverlayResult = null
+            }
+        }
+
+    // ===================== 核心生命周期 =====================
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        // 浮窗相关通道
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, OVERLAY_CHANNEL).setMethodCallHandler { call, result ->
-            when (call.method) {
-                "requestOverlayPermission" -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, 1001)
-                        result.success(true)
-                    } else {
-                        result.success(true)
-                    }
-                }
-                "showCallOverlay" -> {
-                    val eventData = call.argument<String>("eventData")
-                    // 显示通话浮窗
-                    showCallOverlay(eventData)
+        super.configureFlutterEngine(flutterEngine)
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+        registerChannels(flutterEngine)
+        // 删除未实现的initUniMPListeners()调用
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unimpMap.clear()
+        uniMpJsCallback = null
+        eventSink = null
+        pendingOverlayResult = null
+    }
+
+    // ===================== 通道注册与处理 =====================
+    private fun registerChannels(flutterEngine: FlutterEngine) {
+        val messenger = flutterEngine.dartExecutor.binaryMessenger
+
+        MethodChannel(messenger, OVERLAY_CHANNEL).setMethodCallHandler(this::handleOverlayMethods)
+        MethodChannel(messenger, WAKEUP_CHANNEL).setMethodCallHandler(this::handleWakeupMethods)
+        EventChannel(messenger, UNI_EVENT_CHANNEL).setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
+                eventSink = events
+                Log.d(TAG, "EventChannel connected")
+            }
+
+            override fun onCancel(arguments: Any?) {
+                eventSink = null
+                Log.w(TAG, "EventChannel disconnected")
+            }
+        })
+        MethodChannel(messenger, UNI_METHOD_CHANNEL).setMethodCallHandler(this::handleUniMPMethods)
+    }
+
+    // ===================== 浮窗权限方法处理 =====================
+    private fun handleOverlayMethods(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "requestOverlayPermission" -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                    pendingOverlayResult = result
+                    overlayPermissionLauncher.launch(intent)
+                } else {
                     result.success(true)
                 }
-                else -> result.notImplemented()
             }
+            "showCallOverlay" -> {
+                val eventData = call.argument<String>("eventData")
+                showCallOverlay(eventData)
+                result.success(true)
+            }
+            else -> result.notImplemented()
         }
-        
-        // 唤醒相关通道
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, WAKEUP_CHANNEL).setMethodCallHandler { call, result ->
-            if (call.method == "wakeUp") {
-                // 唤醒应用
-                val intent = packageManager.getLaunchIntentForPackage(packageName)
-                intent?.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+    }
+
+    private fun showCallOverlay(eventData: String?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Log.w(TAG, "浮窗权限未授予，无法显示浮窗")
+            return
+        }
+
+        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        val overlayView = TextView(this).apply {
+            text = "通话浮窗: $eventData"
+            setTextColor(android.graphics.Color.WHITE)
+            // 修复withAlpha：改用argb设置透明度（兼容所有版本）
+            setBackgroundColor(android.graphics.Color.argb(180, 0, 0, 0))  // 180=透明度（0-255），0,0,0=黑色
+            // 修复dp调用：扩展函数改为方法，调用时加()
+            setPadding(16.dp(), 16.dp(), 16.dp(), 16.dp())
+            gravity = Gravity.CENTER
+        }
+
+        val params = WindowManager.LayoutParams().apply {
+            type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            } else {
+                @Suppress("DEPRECATION")
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+            }
+            flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            width = WindowManager.LayoutParams.WRAP_CONTENT
+            height = WindowManager.LayoutParams.WRAP_CONTENT
+            gravity = Gravity.TOP or Gravity.START
+            x = 100
+            y = 200
+        }
+
+        try {
+            windowManager.addView(overlayView, params)
+        } catch (e: Exception) {
+            Log.e(TAG, "浮窗添加失败: ${e.message}", e)
+        }
+    }
+
+    // ===================== 唤醒功能处理 =====================
+    private fun handleWakeupMethods(call: MethodCall, result: MethodChannel.Result) {
+        if (call.method == "wakeUp") {
+            packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                 startActivity(intent)
                 result.success(true)
-            } else {
-                result.notImplemented()
+            } ?: run {
+                result.error("LAUNCH_ERROR", "启动意图获取失败", null)
             }
+        } else {
+            result.notImplemented()
         }
-        GeneratedPluginRegistrant.registerWith(flutterEngine);
-        val messenger = flutterEngine.dartExecutor.binaryMessenger
-        // Channel 对象
-        val unimpMap = mutableMapOf<String?, IUniMP?>()
-        var eventSink: EventChannel.EventSink? = null
-        val event = EventChannel(messenger, "flutter_uni_stream")
-        var uniMpcallback: DCUniMPJSCallback? = null
-        val channel = MethodChannel(messenger, "flutter_uni_channel")
+    }
 
-        event.setStreamHandler(
-                object : EventChannel.StreamHandler {
-                    override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
-                        eventSink = events
-                        Log.d("Android", "EventChannel onListen called")
-                    }
-                    override fun onCancel(arguments: Any?) {
-                        Log.w("Android", "EventChannel onCancel called")
-                    }
-                })
-        // Channel 设置回调
-        channel.setMethodCallHandler { call, res ->
-            // 根据方法名，分发不同的处理
+    // ===================== UniMP 核心逻辑封装 =====================
+    private fun handleUniMPMethods(call: MethodCall, result: MethodChannel.Result) {
+        try {
             when (call.method) {
-                "initMP" -> {
-                    try {
-                        if (DCUniMPSDK.getInstance().isInitialize()) {
-                            res.success(true)
-                        } else {
-                            // 初始化uniMPSDK
-//                            val item = MenuActionSheetItem("关于", "about")
-                            val sheetItems = ArrayList<MenuActionSheetItem>()
-//                            sheetItems.add(item)
-
-                            val config = DCSDKInitConfig.Builder()
-                                    .setCapsule(true)
-                                    .setMenuDefFontSize("16px")
-                                    .setMenuDefFontColor("#2D2D2D")
-                                    .setMenuDefFontWeight("normal")
-                                    .setMenuActionSheetItems(sheetItems)
-                                    .build()
-                            DCUniMPSDK.getInstance().initialize(this, config)
-
-//                            //监听胶囊点击事件
-//                            DCUniMPSDK.getInstance()
-//                                    .setCapsuleMenuButtonClickCallBack { appId ->
-//                                        val backdata = JSONObject().apply {
-//                                            set("appId", appId)
-//                                            set("event", "capsuleaction")
-//                                        }
-//                                        eventSink?.success(backdata)
-//                                    }
-
-//                            // 监听小程序关闭
-//                            DCUniMPSDK.getInstance().setUniMPOnCloseCallBack { appId ->
-//                                if (unimpMap.containsKey(appId)) {
-//                                    unimpMap.remove(appId)
-//                                    unimpMap[appId]?.closeUniMP();
-//                                }
-//                                val backdata = JSONObject().apply {
-//                                    set("appId", appId)
-//                                    set("event", "close")
-//                                }
-//                                eventSink?.success(backdata)
-//                            }
-
-                            //监听小程序向原生发送事件回调方法
-                            DCUniMPSDK.getInstance()
-                                    .setOnUniMPEventCallBack { appId, event, data, callback ->
-                                        val backdata = JSONObject().apply {
-                                            set("appId", appId)
-                                            set("event", event)
-                                            set("data", data)
-                                        }
-                                        eventSink?.success(backdata)
-                                        uniMpcallback = callback
-                                    }
-
-                            res.success(true)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /** 获取指定的 UniMP 小程序版本
-                 * {
-                 *      "appId": ""
-                 * }
-                 */
-                "versionMP" -> {
-                    var name = "0.0.0"
-                    var code = 0
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId: String? = call.argument<String>("appId")
-                        if (DCUniMPSDK.getInstance().isExistsApp(appId)) {
-                        var    jsonObject = DCUniMPSDK.getInstance().getAppVersionInfo(appId)
-                            name = jsonObject.getString("name")
-                            code = jsonObject.getInt("code")
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    } finally {
-                        val version = mutableMapOf<String, Any>()
-                        version["name"] = name
-                        version["code"] = code
-                        res.success(version)
-                    }
-                }
-
-                /** 安装 UniMP 小程序
-                 * {
-                 *      "appId": ""，
-                 *      "wgtPath": ""
-                 * }
-                 */
-                "installMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId: String? = call.argument<String>("appId")
-                        val wgtPath: String? = call.argument<String>("wgtPath")
-                        val releaseConfig = UniMPReleaseConfiguration()
-                        releaseConfig.wgtPath = wgtPath
-                        DCUniMPSDK.getInstance().releaseWgtToRunPath(
-                                appId,
-                                releaseConfig
-                        ) { code, result ->
-                            if (code == 1) {
-                                res.success(true)
-                            } else {
-                                res.success(false)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /** 打开指定的 UniMP 小程序
-                 * {
-                 *      "appId": "",
-                 *      "isreload": true //重新打开
-                 *      "config": {
-                 *          "extraData": {},  //其他自定义参数JSON
-                 *          "path": "" //指定启动应用后直接打开的页面路径
-                 *      }
-                 * }
-                 */
-                "openMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId: String? = call.argument<String>("appId")
-                        if (unimpMap.containsKey(appId) == false) {
-                            val argumentConfig: HashMap<String,Any>? = call.argument<HashMap<String,Any>>("config")
-                            val uniMPOpenConfiguration = UniMPOpenConfiguration()
-                            if (argumentConfig != null && argumentConfig.containsKey("extraData")) {
-                                val jsonObject = org.json.JSONObject()
-                                var extraData = argumentConfig.get("extraData") as HashMap<String,Any>
-                                extraData.forEach { (s, any) ->  jsonObject.put(s,any) }
-                                jsonObject.put("path",argumentConfig.get("path") as String?)
-                                uniMPOpenConfiguration.extraData = jsonObject
-                            }
-                            if (argumentConfig != null && argumentConfig.containsKey("path")) {
-                                uniMPOpenConfiguration.path = argumentConfig.get("path") as String?
-                            }
-                            // 打开小程序
-                            unimpMap[appId] = DCUniMPSDK.getInstance()
-                                    .openUniMP(applicationContext, appId, uniMPOpenConfiguration)
-                            res.success(true)
-                        } else {
-                            val data = call.argument<Any>("config")
-                            val backdata = JSONObject().apply {
-                                set("appId", appId)
-                                set("data", data)
-                            }
-                            unimpMap[appId]?.sendUniMPEvent("open_app", backdata)
-                            unimpMap[appId]?.showUniMP();
-                            res.success(true)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /** 隐藏指定的 UniMP 小程序
-                 * {
-                 *      "appId": "",
-                 * }
-                 */
-                "hideMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId: String? = call.argument<String>("appId")
-                        if (unimpMap.containsKey(appId)) {
-                            unimpMap[appId]?.hideUniMP();
-                        }
-                        res.success(true)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /** 关闭指定的 UniMP 小程序
-                 * {
-                 *      "appId": "",
-                 * }
-                 */
-                "closeMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId: String? = call.argument<String>("appId")
-                        if (unimpMap.containsKey(appId)) {
-                            unimpMap[appId]?.closeUniMP();
-                            unimpMap.remove(appId)
-                        }
-                        res.success(true)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /**发送数据到指定的UniMP小程序
-                 * {
-                 *      "appId": "",
-                 *      "event": "",
-                 *      "data": {}
-                 * }
-                 */
-                "sendMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId = call.argument<String>("appId")
-                        val sendEvent = call.argument<String>("event")
-                        val data = call.argument<Any>("data")
-
-                        val backdata = JSONObject().apply {
-                            set("appId", appId)
-                            set("event", sendEvent)
-                            set("data", data)
-                        }
-                        unimpMap[appId]?.sendUniMPEvent(sendEvent, backdata)
-                        res.success(true)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-                /** 回调数据到到指定的UniMP小程序
-                 * {
-                 *      "appId": "",
-                 *      "event": "",
-                 *      "data": {}
-                 * }
-                 */
-                "callbackMP" -> {
-                    try {
-                        // 接收 Flutter 传入的参数
-                        val appId = call.argument<String>("appId")
-                        val sendEvent = call.argument<String>("event")
-                        val data = call.argument<Any>("data")
-
-                        val backdata = JSONObject().apply {
-                            set("appId", appId)
-                            set("event", sendEvent)
-                            set("data", data)
-                        }
-                        uniMpcallback?.invoke(backdata)
-                        res.success(true)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        res.error("error_code", e.message, e.printStackTrace().toString())
-                    }
-                }
-
-
-
-                else -> {
-                    // 如果有未识别的方法名，通知执行失败
-                    res.error("error_code", "error_message", null)
-                }
+                "initMP" -> initUniMP(result)
+                "versionMP" -> getUniMPVersion(call, result)
+                "installMP" -> installUniMP(call, result)
+                "openMP" -> openUniMP(call, result)
+                "hideMP" -> hideUniMP(call, result)
+                "closeMP" -> closeUniMP(call, result)
+                "sendMP" -> sendEventToUniMP(call, result)
+                "callbackMP" -> sendCallbackToUniMP(call, result)
+                else -> result.notImplemented()
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "UniMP方法执行失败: ${call.method}", e)
+            result.error("UNIMP_ERROR", e.message, e.stackTraceToString())
         }
     }
-    // 显示通话浮窗
-    private fun showCallOverlay(eventData: String?) {
-        // 实现浮窗显示逻辑
-        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        // 浮窗布局参数等设置...
+
+    private fun initUniMP(result: MethodChannel.Result) {
+        if (DCUniMPSDK.getInstance().isInitialize()) {
+            result.success(true)
+            return
+        }
+
+        val menuItems = ArrayList<MenuActionSheetItem>()
+        val config = DCSDKInitConfig.Builder()
+            .setCapsule(true)
+            .setMenuDefFontSize("16px")
+            .setMenuDefFontColor("#2D2D2D")
+            .setMenuDefFontWeight("normal")
+            .setMenuActionSheetItems(menuItems)
+            .build()
+
+        DCUniMPSDK.getInstance().initialize(this, config)
+        result.success(true)
     }
+
+    private fun getUniMPVersion(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        val versionInfo = mutableMapOf<String, Any>("name" to "0.0.0", "code" to 0)
+
+        if (DCUniMPSDK.getInstance().isExistsApp(appId)) {
+            val info = DCUniMPSDK.getInstance().getAppVersionInfo(appId)
+            versionInfo["name"] = info.getString("name")
+            versionInfo["code"] = info.getInt("code")
+        }
+        result.success(versionInfo)
+    }
+
+    private fun installUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        val wgtPath = call.argument<String>("wgtPath") ?: ""
+
+        val config = UniMPReleaseConfiguration().apply { this.wgtPath = wgtPath }
+        DCUniMPSDK.getInstance().releaseWgtToRunPath(appId, config) { code, _ ->
+            result.success(code == 1)
+        }
+    }
+
+    private fun openUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        val isReload = call.argument<Boolean>("isreload") ?: false
+        val configMap = call.argument<HashMap<String, Any>>("config") ?: hashMapOf()
+
+        if (unimpMap.containsKey(appId) && !isReload) {
+            // 明确使用com.alibaba.fastjson.JSONObject
+            val eventData = com.alibaba.fastjson.JSONObject().apply {
+                put("appId", appId)
+                put("data", configMap["extraData"])
+            }
+            unimpMap[appId]?.sendUniMPEvent("open_app", eventData)
+            unimpMap[appId]?.showUniMP()
+            result.success(true)
+            return
+        }
+
+        val openConfig = UniMPOpenConfiguration().apply {
+            val extraData = configMap["extraData"] as? HashMap<String, Any>
+            if (extraData != null) {
+                // 此处使用org.json.JSONObject（若必须），需显式导入并处理冲突
+                val json = org.json.JSONObject()
+                extraData.forEach { (k, v) -> json.put(k, v) }
+                json.put("path", configMap["path"] as? String)
+                this.extraData = json
+            }
+            this.path = configMap["path"] as? String
+        }
+
+        val uniMP = DCUniMPSDK.getInstance().openUniMP(applicationContext, appId, openConfig)
+        unimpMap[appId] = uniMP
+        result.success(true)
+    }
+
+    private fun hideUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        unimpMap[appId]?.hideUniMP()
+        result.success(true)
+    }
+
+    private fun closeUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        unimpMap.remove(appId)?.closeUniMP()
+        result.success(true)
+    }
+
+    private fun sendEventToUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val appId = call.argument<String>("appId") ?: ""
+        val event = call.argument<String>("event") ?: ""
+        val data = call.argument<Any>("data") ?: ""
+
+        // 明确使用com.alibaba.fastjson.JSONObject
+        val eventData = com.alibaba.fastjson.JSONObject().apply {
+            put("appId", appId)
+            put("event", event)
+            put("data", data)
+        }
+        unimpMap[appId]?.sendUniMPEvent(event, eventData)
+        result.success(true)
+    }
+
+    private fun sendCallbackToUniMP(call: MethodCall, result: MethodChannel.Result) {
+        val data = call.argument<Any>("data") ?: ""
+        uniMpJsCallback?.invoke(data)
+        result.success(true)
+    }
+
+    // ===================== 工具方法 =====================
+    // 修复dp扩展函数：定义为方法（需加()调用）
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 }
