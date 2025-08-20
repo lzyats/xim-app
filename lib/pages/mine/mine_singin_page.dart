@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:alpaca/pages/mine/mine_signin_controller.dart';
 import 'package:alpaca/pages/mine/mine_signlist_page.dart';
-import 'package:alpaca/tools/tools_storage.dart';
 
 class MineSigninPage extends GetView<MineSigninController> {
   static const String routeName = '/mine_signin';
