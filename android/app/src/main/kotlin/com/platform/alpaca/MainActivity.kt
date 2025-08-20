@@ -153,6 +153,13 @@ class MainActivity : FlutterFragmentActivity() {
         if (call.method == "wakeUp") {
             packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                // 唤醒屏幕并解锁（需要唤醒锁权限）
+                val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+                val wakeLock = powerManager.newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                    "MyApp:WakeLockTag"
+                )
+                wakeLock.acquire(10*1000L) // 保持唤醒10秒
                 startActivity(intent)
                 result.success(true)
             } ?: run {
