@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_page.dart';
 import 'package:alpaca/pages/view/view_page.dart';
+import 'package:alpaca/pages/splash/splash_page.dart';
 import 'package:alpaca/routers/router_base.dart';
 
 // 主路由
@@ -14,6 +15,12 @@ List<GetPage> getMainPages = [
   getPage(
     name: ViewPage.routeName,
     page: () => const ViewPage(),
+    middle: false,
+  ),
+  // 欢迎页
+  getPage(
+    name: SplashPage.routeName,
+    page: () => const SplashPage(),
     middle: false,
   ),
 ];

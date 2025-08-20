@@ -70,7 +70,7 @@ class MainPage extends GetView<MainController> {
                   if (index == 1) {
                     final momentController = Get.find<MomentIndexController>();
                     // 调用公共的刷新方法
-                    //momentController.onRefresh();
+                    momentController.onRefresh();
                     builder.items[1] = builder.initItem(1, badger: 0);
                     int momentbadger = ToolsStorage().momentbadger(update: 0);
                     builder.update();

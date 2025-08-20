@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_page.dart';
+import 'package:alpaca/pages/splash/splash_page.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/res/strings.dart';
 import 'package:alpaca/routers/router_page.dart';

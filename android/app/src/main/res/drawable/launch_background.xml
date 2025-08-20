@@ -2,7 +2,16 @@
 <!-- Modify this file to customize your launch splash screen -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 <!--     <item android:drawable="@drawable/launcher" /> -->
+
+    <item android:drawable="@color/white" />
+    <!-- 中心图片 -->
     <item>
-        <bitmap android:gravity="fill" android:src="@drawable/background"/>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/launcher" />
     </item>
+    <!-- <item>
+        <bitmap android:gravity="fill" android:src="@drawable/background"/>
+    </item> -->
+    
 </layer-list>

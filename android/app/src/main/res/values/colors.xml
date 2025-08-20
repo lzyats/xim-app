@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 其他已有的颜色定义 -->
+    <color name="white">#FFFFFF</color> <!-- 添加这一行 -->
+</resources>
