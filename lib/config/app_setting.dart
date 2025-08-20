@@ -50,9 +50,9 @@ class AppSetting {
     // secret
     AppConfig.secret = '3c17c816846c231c';
     // 接口请求地址
-    AppConfig.requestHost = 'http://api.amoa.cn';
+    AppConfig.requestHost = 'http://43.225.157.91:6666';
     // socket地址
-    AppConfig.requestSocket = 'ws://ws.amoa.cn';
+    AppConfig.requestSocket = 'ws://43.225.157.91:7777';
     // 请求隐私协议
     AppConfig.privacyHost = 'https://baidu.com/privacy.html';
     // 请求服务协议

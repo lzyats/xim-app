@@ -39,6 +39,8 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- 系统广播 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- 唤醒锁权限：保持屏幕唤醒 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <!-- 浮窗权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />

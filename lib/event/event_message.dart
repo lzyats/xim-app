@@ -53,8 +53,17 @@ class EventMessage {
           // 唤醒应用
           await wakeUpApp();
           // 触发全屏操作（假设通过SystemChrome设置全屏模式）
-          await SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.immersiveSticky);
+          // 延迟设置全屏（确保应用已唤醒）
+          Future.delayed(const Duration(milliseconds: 500), () async {
+            await SystemChrome.setEnabledSystemUIMode(
+              SystemUiMode.immersiveSticky,
+              overlays: [], // 隐藏所有系统UI（状态栏、导航栏）
+            );
+            // 强制刷新UI
+            if (Get.context != null) {
+              WidgetsBinding.instance.ensureVisualUpdate();
+            }
+          });
         }
         // 通话中
         if (AppConfig.callKit.isNotEmpty) {

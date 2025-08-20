@@ -77,6 +77,8 @@
 	<!-- 推送权限 -->
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>voip</string> <!-- 支持语音通话后台唤醒 -->
+  		<string>audio</string> <!-- 支持音频后台运行 -->
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>

@@ -209,9 +209,16 @@ import UIKit
     // 唤醒应用
     private func wakeUpApp() {
         UIApplication.shared.applicationIconBadgeNumber = 0
+        // 激活应用到前台
+        UIApplication.shared.activate(ignoringSnapshotOnResume: true)
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-            rootViewController.view.setNeedsDisplay()
+            rootViewController.setNeedsStatusBarAppearanceUpdate()
         }
+    }
+
+    // 配置视图控制器全屏（在 FlutterViewController 中）
+    override var prefersStatusBarHidden: Bool {
+        return true // 隐藏状态栏，实现全屏
     }
     
     // 显示通话浮窗
@@ -277,6 +284,4 @@ import UIKit
     //   backdata["event"] = "close"
     //   eventSink?(backdata)
     // }
-
-    // 添加语音唤醒功能
 }
