@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:amap_map_fluttify/amap_map_fluttify.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/tools/tools_submit.dart';
@@ -123,7 +124,13 @@ class ToolsPerms {
         return true;
       }
       // 未授权时直接引导至设置页
-      _showDialog(label);
+      //_showDialog(label);
+      const platform = MethodChannel('myeim.im/overlay');
+      try {
+        await platform.invokeMethod('requestOverlayPermission');
+      } on PlatformException catch (e) {
+        debugPrint("请求浮窗权限失败: ${e.message}");
+      }
       return false;
     }
     // 获取权限

@@ -108,7 +108,7 @@ class MainController extends BaseController {
     }
 
     // 检查并请求浮窗权限
-    _checkOverlayPermission();
+    //_checkOverlayPermission();
     // 查询自己
     await RequestMine.getInfo();
     // 好友列表
