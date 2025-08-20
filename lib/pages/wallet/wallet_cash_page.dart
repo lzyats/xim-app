@@ -13,8 +13,6 @@ import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/widgets/widget_common.dart';
-import 'package:alpaca/config/app_fonts.dart';
-import 'package:get_storage/get_storage.dart';
 // 导入EasyLoading
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 

@@ -3,7 +3,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_perms.dart';
-import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';

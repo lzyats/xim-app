@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
-import 'package:alpaca/config/app_fonts.dart';
 import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/pages/chat/chat_extra.dart';
 import 'package:alpaca/tools/tools_enum.dart';

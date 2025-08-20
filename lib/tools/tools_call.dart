@@ -16,7 +16,6 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:alpaca/tools/tools_storage.dart';
-import 'package:alpaca/pages/main/main_controller.dart';
 
 // 音视频
 class ToolsCall extends StatefulWidget {

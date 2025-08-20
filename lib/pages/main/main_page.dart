@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_controller.dart';
-import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/pages/moment/moment_index_controller.dart';
 
 // 主页面

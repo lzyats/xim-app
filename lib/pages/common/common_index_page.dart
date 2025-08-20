@@ -3,13 +3,9 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/tools/tools_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/pages/common/common_about_page.dart';
-import 'package:alpaca/pages/common/common_feedback_page.dart';
-import 'package:alpaca/pages/common/common_help_page.dart';
-import 'package:alpaca/pages/mine/mine_inventory_page.dart';
 import 'package:alpaca/pages/mine/mine_safety_page.dart';
 import 'package:alpaca/pages/mine/mine_setting_page.dart';
 import 'package:alpaca/pages/common/common_index_controller.dart';
@@ -19,7 +15,6 @@ import 'package:alpaca/tools/tools_submit.dart';
 
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:alpaca/widgets/widget_line.dart';
-import 'package:share_plus/share_plus.dart';
 
 // 软件设置
 class CommonSoftwarePage extends GetView<CommonSoftwareController> {

@@ -1,5 +1,3 @@
-import 'package:alpaca/config/app_resource.dart';
-import 'package:alpaca/widgets/widget_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart'; // 用于复制邀请码（Clipboard）

@@ -6,12 +6,9 @@ import 'package:alpaca/pages/view/view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:alpaca/tools/tools_regex.dart';
-import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/tools/tools_name.dart';
-import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/config/app_config.dart';
 
 class LoginRegisterPage extends StatefulWidget {

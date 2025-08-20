@@ -2,7 +2,6 @@ import 'package:alpaca/pages/mine/mine_email_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 

@@ -18,7 +18,6 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:flutter_sound_record/flutter_sound_record.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 // 聊天=底部
 class ChatBottom extends StatefulWidget {

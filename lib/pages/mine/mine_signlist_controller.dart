@@ -1,9 +1,6 @@
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
 import 'package:alpaca/request/request_mine.dart';
-import 'package:alpaca/tools/tools_enum.dart';
-import 'package:alpaca/tools/tools_submit.dart';
 
 class MineSignlistController extends BaseController {
   // 下拉刷新

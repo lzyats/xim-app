@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/common/common_notices_controller.dart';
 import 'package:alpaca/request/request_common.dart';

@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/pages/mine/mine_qrcode_controller.dart';
 import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/tools/tools_storage.dart';

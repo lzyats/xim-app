@@ -9,7 +9,6 @@ import 'package:alpaca/pages/mine/mine_city_page.dart';
 import 'package:alpaca/pages/mine/mine_gender_page.dart';
 import 'package:alpaca/pages/mine/mine_intro_page.dart';
 import 'package:alpaca/pages/mine/mine_nickname_page.dart';
-import 'package:alpaca/pages/mine/mine_privacy_page.dart';
 import 'package:alpaca/pages/mine/mine_qrcode_page.dart';
 import 'package:alpaca/pages/mine/mine_setting_controller.dart';
 import 'package:alpaca/tools/tools_storage.dart';

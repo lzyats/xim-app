@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_fonts.dart';
-import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/pages/wallet/wallet_auth_controller.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';

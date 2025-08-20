@@ -4,7 +4,6 @@ import 'package:alpaca/config/app_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
-import 'package:alpaca/config/app_fonts.dart';
 import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/event/event_setting.dart';
 import 'package:alpaca/pages/chat/chat_extra.dart';

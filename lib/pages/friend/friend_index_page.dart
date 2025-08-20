@@ -10,7 +10,6 @@ import 'package:alpaca/pages/friend/friend_details_page.dart';
 import 'package:alpaca/pages/friend/friend_index_controller.dart';
 import 'package:alpaca/pages/group/group_approve_page.dart';
 import 'package:alpaca/pages/group/group_index_page.dart';
-import 'package:alpaca/pages/robot/robot_index_page.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:alpaca/widgets/widget_contact.dart';
 import 'package:alpaca/widgets/widget_line.dart';

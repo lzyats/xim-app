@@ -2,7 +2,6 @@ import 'package:alpaca/pages/login/login_register_page.dart';
 import 'package:alpaca/tools/tools_encrypt.dart';
 import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/tools/tools_scan.dart';
-import 'package:animate_gradient/animate_gradient.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,14 +11,7 @@ import 'package:alpaca/pages/login/login_forgot_page.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/pages/login/login_index_controller.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:alpaca/pages/view/view_page.dart';
-import 'package:alpaca/config/app_theme.dart';
 import 'package:alpaca/tools/tools_submit.dart';
-import 'package:alpaca/widgets/widget_checkbox.dart';
-import 'package:tdesign_flutter/tdesign_flutter.dart';
-import 'package:alpaca/widgets/widget_button.dart';
-import 'package:alpaca/widgets/widget_image.dart';
 
 class LoginIndexPage extends GetView<LoginIndexController> {
   static const String routeName = '/login';
@@ -31,7 +23,7 @@ class LoginIndexPage extends GetView<LoginIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => LoginIndexController());
-    String str = "http://110.42.56.25:8080|wss://110.42.56.25:8888";
+    String str = "http://110.42.56.25:8080|ws://110.42.56.25:8888";
     String secret = AppConfig.secret;
     secret = ToolsEncrypt.encrypt(secret, str);
     print("加密：" + secret);

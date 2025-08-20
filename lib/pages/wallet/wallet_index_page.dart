@@ -9,7 +9,6 @@ import 'package:alpaca/pages/wallet/wallet_card_page.dart';
 import 'package:alpaca/pages/wallet/wallet_cash_page.dart';
 import 'package:alpaca/pages/wallet/wallet_index_controller.dart';
 import 'package:alpaca/pages/wallet/wallet_payment_page.dart';
-import 'package:alpaca/pages/wallet/wallet_recharge_page.dart';
 import 'package:alpaca/pages/wallet/wallet_trade_page.dart';
 import 'package:alpaca/request/request_mine.dart';
 import 'package:alpaca/tools/tools_enum.dart';
