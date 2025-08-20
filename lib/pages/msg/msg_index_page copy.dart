@@ -22,13 +22,6 @@ import 'package:tdesign_flutter/tdesign_flutter.dart';
 class MsgIndexPage extends GetView<MsgIndexController> {
   const MsgIndexPage({super.key});
 
-  // 定义顶部导航栏的渐变颜色
-  final Gradient _appBarGradient = const LinearGradient(
-    colors: [Color(0xFF4A6FE3), Color(0xFF6B4EE6)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
   @override
   Widget build(BuildContext context) {
     Get.lazyPut<MsgIndexController>(() => MsgIndexController());

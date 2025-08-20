@@ -44,7 +44,7 @@ class ToolsSqlite {
             'CREATE TABLE chat_robot (robotId TEXT, nickname TEXT, portrait TEXT, menu TEXT, top TEXT, disturb TEXT, PRIMARY KEY(robotId))');
         // 创建朋友圈表
         await db.execute(
-            'CREATE TABLE friend_moments (momentId TEXT, msgId TEXT, userId TEXT, content TEXT, location TEXT, visibility TEXT,portrait TEXT,nickname TEXT, createTime TEXT , visuser TEXT,isDeleted TEXT,images TEXT,comments TEXT,likes TEXT, PRIMARY KEY(momentId))');
+            'CREATE TABLE friend_moments (momentId TEXT, msgId TEXT, userId TEXT, current TEXT, content TEXT, location TEXT, visibility TEXT,portrait TEXT,nickname TEXT, createTime TEXT , visuser TEXT,isDeleted TEXT,images TEXT,comments TEXT,likes TEXT, PRIMARY KEY(momentId))');
         batch.commit();
       },
       onUpgrade: (Database db, int v1, int v2) async {
@@ -1386,6 +1386,8 @@ class _ChatExtendHander {
 // 朋友圈处理类
 class _MomentHander {
   static String tableName = 'friend_moments';
+  // 查询
+  String current = ToolsStorage().local().userId;
 
   // 新增朋友圈动态
   add(Moment moment) async {
@@ -1406,8 +1408,8 @@ class _MomentHander {
     // 执行查询
     List<Map<String, dynamic>> dataList = await db.query(
       tableName,
-      where: 'momentId = ?',
-      whereArgs: [momentId],
+      where: 'momentId = ? and current = ?',
+      whereArgs: [momentId, current],
       limit: 1,
     );
     if (dataList.isEmpty) {
@@ -1458,8 +1460,8 @@ class _MomentHander {
     List<Map<String, dynamic>> resultList = await db.query(
       tableName,
       // 筛选未删除的动态（可选）
-      where: 'isDeleted != ?',
-      whereArgs: ['1'],
+      where: 'isDeleted != ? and current = ?',
+      whereArgs: ['1', current],
       // 按创建时间排序（默认降序，最新的在前）
       orderBy: 'createTime DESC',
     );
@@ -1647,6 +1649,7 @@ class Moment {
         'images': images,
         'comments': comments,
         'likes': likes,
+        'current': ToolsStorage().local().userId,
       };
 
   // 辅助方法：解析图片列表为List<String>
