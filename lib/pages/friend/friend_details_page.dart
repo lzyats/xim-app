@@ -183,6 +183,14 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
                       // 拨打语音按钮
                       GestureDetector(
                         onTap: () {
+                          ToolsStorage().chat(
+                              value: LocalChat(
+                            chatId: chatFriend.userId,
+                            nickname: chatFriend.nickname,
+                            portrait: chatFriend.portrait,
+                            title: chatFriend.nickname,
+                            chatTalk: ChatTalk.friend,
+                          ));
                           _even('voice');
                         },
                         child: Column(
@@ -301,6 +309,8 @@ class FriendDetailsPage extends GetView<FriendDetailsController> {
   }
 
   Future<void> _even(String callType) async {
+    //先将接收人信息存进去
+
     // 组装对象
     EventChatModel model = EventChatModel(
       ToolsStorage().chat(),
