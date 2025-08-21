@@ -108,7 +108,7 @@ class MainController extends BaseController {
     }
 
     // 检查并请求浮窗权限
-    //_checkOverlayPermission();
+    _checkOverlayPermission();
     // 查询自己
     await RequestMine.getInfo();
     // 好友列表
@@ -280,13 +280,17 @@ class MainController extends BaseController {
   // 检查并请求浮窗权限
   Future<void> _checkOverlayPermission() async {
     // 使用专用方法判断首次启动
-    bool isFirstLaunch = ToolsStorage().firstLaunch();
+    //bool isFirstLaunch = ToolsStorage().firstLaunch();
 
-    if (isFirstLaunch) {
-      // 请求浮窗权限
+    //if (isFirstLaunch) {
+    // 请求浮窗权限
+    bool hasPermission = await ToolsOverlay.checkPermission();
+
+    if (!hasPermission) {
       await ToolsPerms.overlay();
-      // 标记为已启动过（更新存储）
-      ToolsStorage().firstLaunch(value: false);
     }
+    // 标记为已启动过（更新存储）
+    //ToolsStorage().firstLaunch(value: false);
+    //}
   }
 }
