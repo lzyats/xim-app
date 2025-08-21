@@ -174,6 +174,7 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
   // 开始播放
   Future<void> _startPlayer(String data, int second) async {
     try {
+      print(data);
       // 停止当前播放
       await _stopPlayer();
 
@@ -196,7 +197,10 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
       AudioSource audioSource;
       if (data.startsWith('http')) {
         // 网络音频
-        audioSource = AudioSource.uri(Uri.parse(data));
+        audioSource = AudioSource.uri(
+          Uri.parse(data),
+          headers: {'Content-Type': 'audio/mpeg'}, // 假设是MP3格式
+        );
       } else {
         // 本地音频，使用适当的路径格式
         audioSource = AudioSource.file(audioPath);
