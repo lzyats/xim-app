@@ -209,15 +209,17 @@ import UIKit
     // 唤醒应用
     private func wakeUpApp() {
         UIApplication.shared.applicationIconBadgeNumber = 0
-        // 激活应用到前台
-        UIApplication.shared.activate(ignoringSnapshotOnResume: true)
+
         if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
             rootViewController.setNeedsStatusBarAppearanceUpdate()
         }
+
+        // 额外：如果需要强制将应用带到前台，可通过激活主窗口实现（适用于某些场景）
+        UIApplication.shared.keyWindow?.makeKeyAndVisible()
     }
 
     // 配置视图控制器全屏（在 FlutterViewController 中）
-    override var prefersStatusBarHidden: Bool {
+    var prefersStatusBarHidden: Bool {
         return true // 隐藏状态栏，实现全屏
     }
     

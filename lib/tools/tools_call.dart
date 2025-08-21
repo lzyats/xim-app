@@ -79,7 +79,7 @@ class _ToolsCallState extends State<ToolsCall> {
       Map<String, dynamic> content = jsonDecode(model.value);
       CallStatus status = CallStatus.init(content['callStatus']);
       if (_trigger && CallStatus.connect == status) {
-        _startCall(false);
+        //_startCall(false);
         return;
       }
       switch (status) {
@@ -97,7 +97,7 @@ class _ToolsCallState extends State<ToolsCall> {
         Get.back();
       }
       // 提醒
-      EasyLoading.showToast(status.label);
+      if (status != CallStatus.connect) EasyLoading.showToast(status.label);
     });
   }
 

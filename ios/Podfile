@@ -107,6 +107,11 @@ post_install do |installer|
         ## dart: PermissionGroup.criticalAlerts
         # 'PERMISSION_ASSISTANT=1',
       ]
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      # 可选：修复 "MODULEMAP_FILE has no effect" 警告（针对awesome_notifications）
+      if target.name == 'awesome_notifications'
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+      end
 
     end
 
