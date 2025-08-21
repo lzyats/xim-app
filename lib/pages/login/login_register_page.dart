@@ -60,7 +60,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72, // 标签固定宽度
+                    width: 70, // 标签固定宽度
                     child: Text(
                       '手机号码',
                       style:
@@ -101,7 +101,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '用户昵称',
                       style:
@@ -145,7 +145,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(
-                      width: 72,
+                      width: 70,
                       child: Text(
                         '邮箱地址',
                         style: TextStyle(
@@ -185,7 +185,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '用户密码',
                       style:
@@ -233,7 +233,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '确认密码',
                       style:
@@ -281,7 +281,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '安全密码',
                       style:
@@ -322,7 +322,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '邀请码(选填)',
                       style:
@@ -362,7 +362,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    width: 72,
+                    width: 70,
                     child: Text(
                       '验 证 码',
                       style:
