@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:alpaca/config/app_fonts.dart';
@@ -26,13 +28,15 @@ class ChatMessageVoice extends StatefulWidget {
 class _ChatMessageVoiceState extends State<ChatMessageVoice> {
   // 声音状态
   bool voiceStatus = false;
-
+  // 播放进度
+  Duration? _position;
   late StreamSubscription? _subscription;
+  late StreamSubscription? _positionSubscription;
 
   @override
   void initState() {
     super.initState();
-    // 监听关闭
+    // 监听关闭事件
     _subscription = EventSetting().event.stream.listen((model) {
       if (SettingType.close != model.setting) {
         return;
@@ -40,14 +44,21 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
       // 停止播放
       _stopPlayer();
     });
+
+    // 监听播放进度
+    _positionSubscription =
+        widget.audioPlayer.positionStream.listen((position) {
+      setState(() {
+        _position = position;
+      });
+    });
   }
 
   @override
   void dispose() {
-    if (mounted) {
-      _subscription?.cancel();
-      super.dispose();
-    }
+    _subscription?.cancel();
+    _positionSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -124,7 +135,7 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
     );
   }
 
-  // 转文字
+  // 转文字标签
   _buildLabel(Map<String, dynamic> content, String msgId, bool show) {
     if (!show) {
       return Container();
@@ -162,28 +173,75 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
 
   // 开始播放
   Future<void> _startPlayer(String data, int second) async {
-    // 停止播放
-    await _stopPlayer();
-    // 声音消息
-    AudioSource audioSource = AudioSource.uri(Uri.parse(data));
-    await widget.audioPlayer.setAudioSource(audioSource);
-    // 开始播放
-    widget.audioPlayer.play();
-    setState(() {
-      voiceStatus = true;
-    });
-    Future.delayed(Duration(seconds: second), () {
+    try {
+      // 停止当前播放
+      await _stopPlayer();
+
+      // 处理iOS平台的音频路径
+      String audioPath = data;
+      if (Platform.isIOS) {
+        // 如果是本地文件，确保路径正确
+        if (data.startsWith('file://')) {
+          audioPath = data.replaceFirst('file://', '');
+        }
+
+        // 检查文件是否存在
+        final file = File(audioPath);
+        if (!await file.exists()) {
+          throw Exception("音频文件不存在: $audioPath");
+        }
+      }
+
+      // 创建音频源
+      AudioSource audioSource;
+      if (data.startsWith('http')) {
+        // 网络音频
+        audioSource = AudioSource.uri(Uri.parse(data));
+      } else {
+        // 本地音频，使用适当的路径格式
+        audioSource = AudioSource.file(audioPath);
+      }
+
+      // 设置音频源并播放
+      await widget.audioPlayer.setAudioSource(audioSource);
+      await widget.audioPlayer.play();
+
+      setState(() {
+        voiceStatus = true;
+      });
+
+      // 监听播放完成事件（更可靠的方式）
+      widget.audioPlayer.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed) {
+          setState(() {
+            voiceStatus = false;
+          });
+        }
+      });
+    } catch (e) {
+      // 捕获并打印错误信息
+      debugPrint("音频播放错误: $e");
+      // 显示错误提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("播放失败: ${e.toString()}")),
+      );
       setState(() {
         voiceStatus = false;
       });
-    });
+    }
   }
 
   // 停止播放
   Future<void> _stopPlayer() async {
-    await widget.audioPlayer.stop();
-    setState(() {
-      voiceStatus = false;
-    });
+    try {
+      await widget.audioPlayer.stop();
+      await widget.audioPlayer.seek(Duration.zero);
+    } catch (e) {
+      debugPrint("停止播放错误: $e");
+    } finally {
+      setState(() {
+        voiceStatus = false;
+      });
+    }
   }
 }
