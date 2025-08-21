@@ -199,7 +199,7 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
         // 网络音频
         audioSource = AudioSource.uri(
           Uri.parse(data),
-          headers: {'Content-Type': 'audio/mpeg'}, // 假设是MP3格式
+          headers: {'Content-Type': 'audio/m4a'}, // 假设是MP3格式
         );
       } else {
         // 本地音频，使用适当的路径格式
