@@ -19,6 +19,7 @@ import 'package:alpaca/tools/tools_submit.dart';
 class MsgIndexController extends BaseController {
   String userId = ToolsStorage().local().userId;
   RxString notice = ''.obs;
+  RxInt notype = 0.obs;
   final Map<String, ChatMsg> _dataMap = {};
 
   // 不显示
@@ -182,6 +183,7 @@ class MsgIndexController extends BaseController {
   // 获取通知
   _notice() {
     notice.value = ToolsStorage().config().notice;
+    notype.value = ToolsStorage().config().notype;
   }
 
   // 监听消息（当有新消息，显示到消息顶部）

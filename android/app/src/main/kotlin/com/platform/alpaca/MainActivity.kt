@@ -29,6 +29,9 @@ import java.util.WeakHashMap  // 必须添加此导入
 // 在文件开头的导入区域添加
 import android.os.PowerManager
 
+import android.os.Handler
+import android.os.Looper
+
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
     private val TAG = "MainActivity"
@@ -111,6 +114,7 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
+    // 在showCallOverlay方法中添加定时移除逻辑
     private fun showCallOverlay(eventData: String?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Log.w(TAG, "浮窗权限未授予，无法显示浮窗")
@@ -121,9 +125,7 @@ class MainActivity : FlutterFragmentActivity() {
         val overlayView = TextView(this).apply {
             text = "通话浮窗: $eventData"
             setTextColor(android.graphics.Color.WHITE)
-            // 修复withAlpha：改用argb设置透明度（兼容所有版本）
-            setBackgroundColor(android.graphics.Color.argb(180, 0, 0, 0))  // 180=透明度（0-255），0,0,0=黑色
-            // 修复dp调用：扩展函数改为方法，调用时加()
+            setBackgroundColor(android.graphics.Color.argb(180, 0, 0, 0))
             setPadding(16.dp(), 16.dp(), 16.dp(), 16.dp())
             gravity = Gravity.CENTER
         }
@@ -145,6 +147,17 @@ class MainActivity : FlutterFragmentActivity() {
 
         try {
             windowManager.addView(overlayView, params)
+            
+            // 添加定时移除浮窗的逻辑（例如5秒后移除）
+            Handler(Looper.getMainLooper()).postDelayed({
+                try {
+                    windowManager.removeView(overlayView)
+                    Log.d(TAG, "浮窗已定时移除")
+                } catch (e: Exception) {
+                    Log.e(TAG, "移除浮窗失败: ${e.message}", e)
+                }
+            }, 5000) // 5000毫秒 = 5秒，可根据需求调整时间
+            
         } catch (e: Exception) {
             Log.e(TAG, "浮窗添加失败: ${e.message}", e)
         }

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -13,6 +16,8 @@ import 'package:alpaca/tools/tools_upload.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart'; // 新增相机选择器依赖
 import 'package:alpaca/tools/tools_comment.dart';
+
+import 'dart:ui' as ui; // 引入dart:ui库
 
 class ImagePickerController extends GetxController {
   // 用于存储已选择的图片/视频
@@ -260,6 +265,21 @@ class ImagePickerWidget extends StatelessWidget {
         content['thumbnail1'] = thumbFile.path;
         content['type'] = 1;
 
+        final Uint8List imageBytes = await File(thumbFile.path).readAsBytes();
+
+        // 创建 Completer 用于将回调转为 Future
+        final Completer<ui.Image> completer = Completer();
+        ui.decodeImageFromList(imageBytes, (ui.Image image) {
+          completer.complete(image); // 回调触发时，完成 Future 并返回 image
+        });
+
+        // 等待 Future 完成，获取图片对象
+        final ui.Image image = await completer.future;
+        int width = image.width; // 图片宽度
+        int height = image.height; // 图片高度
+        content['width'] = width;
+        content['height'] = height;
+
         // 上传视频缩略图
         String thumbnailUrl = await ToolsUpload.uploadFile(thumbFile.path);
         content['thumbnail'] = thumbnailUrl;
@@ -269,6 +289,23 @@ class ImagePickerWidget extends StatelessWidget {
         print('图片信息：' + imgInfo.toString());
         content.addAll(imgInfo);
         content['type'] = 0;
+
+        // 新增：获取图片宽高
+        // 正确获取图片宽高：通过回调函数获取解析后的图片
+        final Uint8List imageBytes = await File(path).readAsBytes();
+
+        // 创建 Completer 用于将回调转为 Future
+        final Completer<ui.Image> completer = Completer();
+        ui.decodeImageFromList(imageBytes, (ui.Image image) {
+          completer.complete(image); // 回调触发时，完成 Future 并返回 image
+        });
+
+        // 等待 Future 完成，获取图片对象
+        final ui.Image image = await completer.future;
+        int width = image.width; // 图片宽度
+        int height = image.height; // 图片高度
+        content['width'] = width;
+        content['height'] = height;
 
         // 二维码识别
         content['scan'] = await Scan.parse(path);

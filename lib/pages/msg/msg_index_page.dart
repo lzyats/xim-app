@@ -1,3 +1,4 @@
+import 'package:alpaca/res/style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
@@ -17,6 +18,7 @@ import 'package:alpaca/widgets/widget_common.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 // 消息页面
 class MsgIndexPage extends GetView<MsgIndexController> {
@@ -25,6 +27,8 @@ class MsgIndexPage extends GetView<MsgIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut<MsgIndexController>(() => MsgIndexController());
+    final bool initialShowDialog; // 控制是否初始显示弹窗
+    final String richContent; // 富文本内容
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
@@ -56,8 +60,11 @@ class MsgIndexPage extends GetView<MsgIndexController> {
       body: Column(
         children: [
           Obx(
-            () => _buildNotice(),
+            () => _buildNotice(context),
           ),
+          Obx(() {
+            return _handleNoticeDialog(context);
+          }),
           Flexible(
             child: GetBuilder<MsgIndexController>(builder: (builder) {
               return SmartRefresher(
@@ -104,12 +111,100 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     );
   }
 
-  _buildNotice() {
-    if (controller.notice.value.isEmpty) {
+  /// 显示另一个富文本内容
+  void _showAnotherDialog(BuildContext context) {
+    _showRichTextDialog(context, content: controller.notice.value);
+  }
+
+  /// 通用富文本弹窗
+  void _showRichTextDialog(
+    BuildContext context, {
+    required String content,
+  }) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true, // 点击背景是否关闭弹窗
+      barrierColor: Colors.black54, // 背景遮罩颜色
+      barrierLabel: '关闭弹窗', // 必须添加！非空字符串（用于辅助功能）
+      transitionDuration: const Duration(milliseconds: 300), // 动画时长
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Center(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.9, // 弹窗宽度占屏幕90%
+            // 替换原来的 maxWidth 和 maxHeight 为 constraints
+            constraints: BoxConstraints(
+              maxWidth: 400,
+              maxHeight: MediaQuery.of(context).size.height * 0.55,
+            ), // 最大高度限制
+            margin: const EdgeInsets.symmetric(horizontal: 26),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 标题行（含关闭按钮）
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(TDIcons.sound, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Text(
+                          "系统公告",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => Navigator.pop(context), // 关闭弹窗
+                    ),
+                  ],
+                ),
+                const Divider(height: 2),
+                // 富文本内容区域（可滚动）
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Html(data: content, style: PageStyle.html_qi),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      // 动画效果（缩放显示）
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
+        );
+      },
+    );
+  }
+
+  _buildNotice(context) {
+    if (controller.notice.value.isEmpty || controller.notype.value == 1) {
       return Container();
     }
+    String content = controller.notice.value;
+    content = PageStyle.extractTextFromHtml(content);
     return TDNoticeBar(
-      context: controller.notice.value,
+      context: content,
       prefixIcon: TDIcons.sound,
       style: TDNoticeBarStyle(
         backgroundColor: Color(0xFF0463F7),
@@ -126,15 +221,27 @@ class MsgIndexPage extends GetView<MsgIndexController> {
         ),
         onTap: () {
           EventSetting().handle(
-            SettingModel(
-              SettingType.sys,
-              label: 'notice',
-            ),
+            SettingModel(SettingType.sys, label: 'notice', value: ""),
           );
         },
       ),
       marquee: true,
     );
+  }
+
+  // 分离出的处理公告弹窗的方法
+  Widget _handleNoticeDialog(BuildContext context) {
+    if (controller.notype.value > 0 && controller.notice.value.isNotEmpty) {
+      // 延迟一帧执行，避免在构建阶段直接弹窗导致异常
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showRichTextDialog(
+          context,
+          content: controller.notice.value,
+        );
+      });
+    }
+    // 此组件不渲染任何UI，仅用于监听状态
+    return SizedBox.shrink();
   }
 
   _buildContent() {

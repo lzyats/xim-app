@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper_null_safety_flutter3/flutter_swiper_null_safety_flutter3.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_perms.dart';
@@ -126,7 +129,7 @@ class WidgetMoment {
   static momentsItem({
     required MomentModel post,
     required Function(List<Media>, int) onImageTap,
-    required Function(String) onVideoTap,
+    required Function(List<Media>, int) onVideoTap,
   }) {
     // 1. 先声明 _buildVideoPlayerPlaceholder
     Widget _buildVideoPlayerPlaceholder(
@@ -447,7 +450,7 @@ class WidgetMoment {
       if (mediaList.isNotEmpty && mediaList.first.type == 1) {
         // 视频
         return GestureDetector(
-          onTap: () => onVideoTap(mediaList.first.url),
+          onTap: () => onVideoTap(mediaList, 0),
           child: _buildVideoPlayerPlaceholder(
             mediaList.first.url,
             mediaList.first.thumbnail ?? '',
@@ -604,7 +607,7 @@ class WidgetMoment {
   }
 
   /// 全屏播放视频
-  static void playVideoFullscreen(BuildContext context, String videoUrl) {
+  static void playVideoFullscreen(BuildContext context, Media media) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -613,7 +616,41 @@ class WidgetMoment {
           backgroundColor: Colors.black,
           body: Stack(
             children: [
-              Center(child: buildVideoPlayer(videoUrl)),
+              Center(
+                child: FutureBuilder<Widget>(
+                  future: buildVideoPlayer(media),
+                  builder: (context, snapshot) {
+                    // 加载状态处理
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      );
+                    }
+                    // 错误状态处理
+                    else if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          '视频加载失败: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
+                    // 成功状态处理
+                    else if (snapshot.hasData) {
+                      return snapshot.data!;
+                    }
+                    // 默认 fallback
+                    else {
+                      return const Center(
+                        child: Text(
+                          '无法加载视频',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
               Positioned(
                 top: 20,
                 right: 20,
@@ -634,15 +671,35 @@ class WidgetMoment {
   }
 
   // 视频播放器核心组件（使用chewie包装video_player）
-  static Widget buildVideoPlayer(String videoUrl) {
-    final videoPlayerController = VideoPlayerController.network(videoUrl);
+  static Future<Widget> buildVideoPlayer(Media media) async {
+    String videoUrl = Uri.encodeFull(media.url);
+    print(media.toJson());
+    int width = media.width ?? 1;
+    int height = media.height ?? 1;
+    late VideoPlayerController videoPlayerController;
+
+    if (Platform.isAndroid) {
+      // 安卓平台：使用缓存文件播放
+      File file = await DefaultCacheManager().getSingleFile(videoUrl);
+      videoPlayerController = VideoPlayerController.file(file);
+    } else if (Platform.isIOS) {
+      // iOS平台：直接播放网络视频
+      videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+    } else {
+      // 安卓平台：使用缓存文件播放
+      File file = await DefaultCacheManager().getSingleFile(videoUrl);
+      videoPlayerController = VideoPlayerController.file(file);
+    }
     final chewieController = ChewieController(
       videoPlayerController: videoPlayerController,
+      autoInitialize: true,
       autoPlay: true, // 自动播放
+      showControlsOnInitialize: true,
       looping: false,
       allowFullScreen: false, // 此处已全屏，禁用内部全屏按钮
-      allowMuting: true,
-      aspectRatio: 16 / 9, // 自适应比例
+      fullScreenByDefault: false,
+      aspectRatio: height / width, // 自适应比例
       errorBuilder: (context, errorMessage) {
         return Center(
           child: Text(

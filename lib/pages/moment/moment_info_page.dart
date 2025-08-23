@@ -130,9 +130,9 @@ class MomentInfoPage extends StatelessWidget {
                                     onImageTap: (mediaList, index) =>
                                         WidgetMoment.showImageViewer(
                                             context, mediaList, index),
-                                    onVideoTap: (videoUrl) =>
+                                    onVideoTap: (mediaList, index) =>
                                         WidgetMoment.playVideoFullscreen(
-                                            context, videoUrl),
+                                            context, mediaList[index]),
                                   ))
                               .toList(),
                         ],

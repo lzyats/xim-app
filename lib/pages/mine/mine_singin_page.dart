@@ -143,15 +143,25 @@ class MineSigninPage extends GetView<MineSigninController> {
 
   Widget _buildSignGrid(double sign) {
     return Obx(() {
-      final east8Today = DateTime.now().toUtc().add(const Duration(hours: 8));
-      // 生成21天的日期（从今天往前推20天到今天，共21天）
-      final dates = List.generate(21, (i) {
-        return DateTime(
-          east8Today.year,
-          east8Today.month,
-          east8Today.day - (20 - i), // 21天对应索引0-20，i=20时为今天
-        );
+      // 获取当前东八区时间
+      final east8Now = DateTime.now().toUtc().add(const Duration(hours: 8));
+      // 获取当月第一天
+      final firstDayOfMonth = DateTime(east8Now.year, east8Now.month, 1);
+      // 获取当月最后一天
+      final lastDayOfMonth = DateTime(east8Now.year, east8Now.month + 1, 0);
+      // 计算当月总天数
+      final daysInMonth = lastDayOfMonth.day;
+
+      // 生成当月所有日期
+      final dates = List.generate(daysInMonth, (i) {
+        return DateTime(east8Now.year, east8Now.month, i + 1);
       });
+
+      // 计算当月第一天是星期几（1-7，对应周一到周日）
+      int firstDayWeekday = firstDayOfMonth.weekday;
+
+      // 计算需要的前置空白格子数量（使第一天对齐正确的星期位置）
+      final leadingEmptyCount = firstDayWeekday - 1;
 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -162,8 +172,7 @@ class MineSigninPage extends GetView<MineSigninController> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  // 显示21天的日期范围
-                  '${DateFormat('yyyy年MM月dd日').format(dates.first)} - ${DateFormat('MM月dd日').format(dates.last)} 签到',
+                  '${DateFormat('yyyy年MM月').format(firstDayOfMonth)} 签到',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -185,59 +194,63 @@ class MineSigninPage extends GetView<MineSigninController> {
               crossAxisCount: 7, // 保持7列（一周）
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 0.65,
+              childAspectRatio: 0.68,
               padding: const EdgeInsets.symmetric(vertical: 4),
-              // 生成21个格子（对应21天）
-              children: List.generate(21, (index) {
-                final date = dates[index];
-                final isSigned = controller
-                    .signInStatus[index]; // 需确保控制器中signInStatus长度对应21天
-                final isToday = index == 20; // 21天中最后一天（索引20）为今天
+              // 生成日历格子（前置空白格子 + 当月日期）
+              children: [
+                // 添加前置空白格子（用于对齐星期几）
+                ...List.generate(leadingEmptyCount, (index) {
+                  return Container(); // 空白格子
+                }),
+                // 当月日期格子
+                ...List.generate(daysInMonth, (index) {
+                  final date = dates[index];
+                  final isSigned = controller.signInStatus[index];
+                  final isToday = date.year == east8Now.year &&
+                      date.month == east8Now.month &&
+                      date.day == east8Now.day;
 
-                return Container(
-                  margin: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: isSigned
-                        ? Colors.orange.shade200
-                        : isToday
-                            ? Colors.blue.shade50
-                            : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                    border: isToday && !isSigned
-                        ? Border.all(color: Colors.blue, width: 1.5)
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // +2框
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: isSigned
-                              ? const Color(0xFFFF7D3F)
-                              : const Color(0xFFE7E7E7),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '+${sign.round()}',
-                            style: TextStyle(
-                              color: isSigned ? Colors.white : Colors.grey,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                  return Container(
+                    margin: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: isSigned
+                          ? Colors.orange.shade200
+                          : isToday
+                              ? Colors.blue.shade50
+                              : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: isToday && !isSigned
+                          ? Border.all(color: Colors.blue, width: 1.5)
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // 奖励金额框
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: isSigned
+                                ? const Color(0xFFFF7D3F)
+                                : const Color(0xFFE7E7E7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '+${sign.round()}',
+                              style: TextStyle(
+                                color: isSigned ? Colors.white : Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      // 日期或“今天”标签
-                      if (!isToday)
+                        const SizedBox(height: 4),
+                        // 日期显示
                         Text(
-                          '${date.month}-${date.day}',
+                          '${date.day}',
                           style: TextStyle(
                             color: isSigned
                                 ? Colors.orange
@@ -248,30 +261,20 @@ class MineSigninPage extends GetView<MineSigninController> {
                             fontWeight:
                                 isToday ? FontWeight.w700 : FontWeight.normal,
                           ),
-                        )
-                      else
-                        Text(
-                          '今天',
-                          style: TextStyle(
-                            color: isSigned ? Colors.orange : Colors.blue,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                        ),
+                        const SizedBox(height: 2),
+                        // 已签到勾
+                        if (isSigned)
+                          const Icon(
+                            Icons.check,
+                            color: Color(0xFFFF9014),
+                            size: 12,
                           ),
-                        ),
-
-                      const SizedBox(height: 2),
-
-                      // 已签到勾
-                      if (isSigned)
-                        const Icon(
-                          Icons.check,
-                          color: Color(0xFFFF9014),
-                          size: 12,
-                        ),
-                    ],
-                  ),
-                );
-              }),
+                      ],
+                    ),
+                  );
+                }),
+              ],
             ),
           ],
         ),
@@ -280,13 +283,12 @@ class MineSigninPage extends GetView<MineSigninController> {
   }
 
   Widget _buildRules() {
-    // 外层添加灰色圆角背景框
     return Container(
-      margin: const EdgeInsets.all(16), // 与周围元素的间距
-      padding: const EdgeInsets.all(16), // 内容与背景框的内边距
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFE7E7E7), // 规则区背景色
-        borderRadius: BorderRadius.circular(10), // 圆角，视觉更柔和
+        color: const Color(0xFFE7E7E7),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +298,7 @@ class MineSigninPage extends GetView<MineSigninController> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.black87, // 标题颜色加深，与背景对比更清晰
+              color: Colors.black87,
             ),
           ),
           const SizedBox(height: 8),

@@ -465,6 +465,7 @@ class LocalConfig {
   String watermark;
   String screenshot;
   String notice;
+  int notype;
   double packet;
   String callKit;
   String groupSearch;
@@ -482,6 +483,7 @@ class LocalConfig {
     this.watermark,
     this.screenshot,
     this.notice,
+    this.notype,
     this.packet,
     this.callKit,
     this.groupSearch,
@@ -513,6 +515,7 @@ class LocalConfig {
       data['watermark'] ?? '',
       data['screenshot'] ?? 'Y',
       data['notice'] ?? '',
+      data['notype'] ?? 0,
       double.parse(data['packet'] ?? '0.00'),
       data['callKit'] ?? '',
       data['groupSearch'] ?? 'N',
@@ -533,6 +536,7 @@ class LocalConfig {
       'watermark': watermark,
       'screenshot': screenshot,
       'notice': notice,
+      'notype': notype,
       'packet': packet.toString(),
       'callKit': callKit,
       'groupSearch': groupSearch,

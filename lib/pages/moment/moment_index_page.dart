@@ -542,7 +542,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
               // 视频逻辑
               return GestureDetector(
                 onTap: () {
-                  WidgetMoment.playVideoFullscreen(context, media.url);
+                  WidgetMoment.playVideoFullscreen(context, media);
                 },
                 child: _buildVideoPlayerPlaceholder(
                   media.url,

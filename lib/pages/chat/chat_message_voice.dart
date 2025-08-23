@@ -180,27 +180,11 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
 
       // 处理iOS平台的音频路径
       String audioPath = data;
-      if (Platform.isIOS) {
-        // 如果是本地文件，确保路径正确
-        if (data.startsWith('file://')) {
-          audioPath = data.replaceFirst('file://', '');
-        }
-
-        // 检查文件是否存在
-        final file = File(audioPath);
-        if (!await file.exists()) {
-          throw Exception("音频文件不存在: $audioPath");
-        }
-      }
-
       // 创建音频源
       AudioSource audioSource;
       if (data.startsWith('http')) {
         // 网络音频
-        audioSource = AudioSource.uri(
-          Uri.parse(data),
-          headers: {'Content-Type': 'audio/m4a'}, // 假设是MP3格式
-        );
+        audioSource = AudioSource.uri(Uri.parse(data));
       } else {
         // 本地音频，使用适当的路径格式
         audioSource = AudioSource.file(audioPath);

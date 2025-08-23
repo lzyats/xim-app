@@ -79,7 +79,7 @@ class _ToolsCallState extends State<ToolsCall> {
       Map<String, dynamic> content = jsonDecode(model.value);
       CallStatus status = CallStatus.init(content['callStatus']);
       if (_trigger && CallStatus.connect == status) {
-        //_startCall(false);
+        _startCall(false);
         return;
       }
       switch (status) {

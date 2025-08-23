@@ -29,42 +29,49 @@ class _WidgetVideoState extends State<WidgetVideo> {
   }
 
   /*
-   * 初始化视频 
-   */
+ * 初始化视频 
+ */
   _initVideo(String path) async {
     ToolsSubmit.show(millisecond: 60000);
-    // 文件
-    File file;
-    // 网络路径
+
+    // 根据平台和路径类型初始化播放器
     if (ToolsRegex.isUrl(path)) {
-      file = await DefaultCacheManager().getSingleFile(path);
+      // 网络路径：区分平台处理
+      if (Platform.isIOS) {
+        // iOS 不缓存，直接使用网络播放
+        playerController = VideoPlayerController.networkUrl(Uri.parse(path));
+      } else {
+        // 安卓平台：使用缓存管理器
+        File file = await DefaultCacheManager().getSingleFile(
+          path,
+          headers: {'User-Agent': 'Mozilla/5.0'},
+        );
+        playerController = VideoPlayerController.file(file);
+      }
+    } else {
+      // 本地路径：统一使用文件播放（全平台通用）
+      File file = File(path);
+      playerController = VideoPlayerController.file(file);
     }
-    // 本地路径
-    else {
-      file = File(path);
-    }
-    // 转换路径
-    playerController = VideoPlayerController.file(file)
-      ..initialize().then(
-        (_) {
-          // 构建
-          chewieController = ChewieController(
-            videoPlayerController: playerController!,
-            // 初始化
-            autoInitialize: true,
-            // 默认播放
-            autoPlay: true,
-            // 显示控制
-            showControlsOnInitialize: true,
-            // 允许全屏
-            allowFullScreen: false,
-            // 默认全屏
-            fullScreenByDefault: false,
-          );
-          ToolsSubmit.dismiss();
-          setState(() {});
-        },
+
+    // 初始化播放器并构建Chewie控制器
+    await playerController?.initialize().then((_) {
+      chewieController = ChewieController(
+        videoPlayerController: playerController!,
+        autoInitialize: true,
+        autoPlay: true,
+        showControlsOnInitialize: true,
+        allowFullScreen: false,
+        fullScreenByDefault: false,
       );
+      ToolsSubmit.dismiss();
+      setState(() {});
+    }).catchError((error) {
+      // 增加错误处理，避免加载失败时一直显示加载框
+      ToolsSubmit.dismiss();
+      print("视频初始化失败: $error");
+      Get.snackbar('错误', '视频加载失败，请重试');
+    });
   }
 
   @override

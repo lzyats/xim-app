@@ -47,10 +47,20 @@ class RequestCommon {
   }
 
   // 获取上传凭证
-  static Future<Map<String, dynamic>> getUploadToken() async {
+  static Future<Map<String, dynamic>> getUploadToken(
+      MultipartFile multipartFile) async {
+    // 提取文件后缀
+    String fileName = multipartFile.filename ?? '';
+    String fileExt = '';
+    if (fileName.isNotEmpty) {
+      int dotIndex = fileName.lastIndexOf('.');
+      if (dotIndex != -1 && dotIndex < fileName.length - 1) {
+        fileExt = fileName.substring(dotIndex + 1).toLowerCase();
+      }
+    }
     // 执行
     AjaxData ajaxData = await ToolsRequest().get(
-      '$_prefix/getUploadToken',
+      '$_prefix/getUploadToken/' + fileExt,
     );
     // 转换
     return ajaxData.getJson();

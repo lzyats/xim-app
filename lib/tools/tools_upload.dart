@@ -61,7 +61,8 @@ class ToolsUpload {
   // 执行上传
   static Future<String> _upload(MultipartFile multipartFile) async {
     // 获取token
-    Map<String, dynamic> uploadToken = await RequestCommon.getUploadToken();
+    Map<String, dynamic> uploadToken =
+        await RequestCommon.getUploadToken(multipartFile);
     print('上传信息：' + uploadToken.toString());
     // 上传方式
     String uploadType = uploadToken['uploadType'];

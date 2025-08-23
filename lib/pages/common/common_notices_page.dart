@@ -5,6 +5,7 @@ import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:alpaca/widgets/widget_line.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 // 通知公告
 class CommonNoticesPage extends GetView<CommonNoticesController> {
@@ -121,7 +122,7 @@ class CommonNoticesItemPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16), // 卡片内边距
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // 公告标题
                   Text(
@@ -150,13 +151,24 @@ class CommonNoticesItemPage extends StatelessWidget {
                   // 公告内容（长文本支持滚动）
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Text(
-                        model.content,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          height: 1.6, // 行高（增强可读性）
-                          color: Colors.black87,
-                        ),
+                      child: Html(
+                        data: model.content,
+                        style: {
+                          // 配置对齐相关样式
+                          '.ql-align-left': Style(
+                            textAlign: TextAlign.left,
+                          ),
+                          '.ql-align-center': Style(
+                            textAlign: TextAlign.center,
+                          ),
+                          '.ql-align-right': Style(
+                            textAlign: TextAlign.right,
+                          ),
+                          '.ql-align-justify': Style(
+                            textAlign: TextAlign.justify,
+                          ),
+                          // 可以在这里添加其他全局样式
+                        },
                       ),
                     ),
                   ),
