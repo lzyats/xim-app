@@ -40,6 +40,20 @@ class ToolsStorage {
     return value;
   }
 
+  // 推送通知状态（pushnotic，值为0表示对应状态）
+  int pushnotic({int? value}) {
+    // 存储键名
+    String type = 'pushnotic';
+    // 读取操作：若value为null，则返回存储的值（默认0）
+    if (value == null) {
+      String storedValue = _storage.read(type) ?? '0';
+      return int.tryParse(storedValue) ?? 0;
+    }
+    // 写入操作：存储传入的整数值（转换为字符串存储，保持与现有风格一致）
+    _storage.write(type, value.toString());
+    return value;
+  }
+
   // 登录信息
   LocalUser local({LocalUser? value}) {
     // 类型
@@ -400,7 +414,7 @@ class LocalUser {
 
   factory LocalUser.fromJson(Map<String, dynamic>? data) {
     return LocalUser(
-      data?['userId'] ?? '',
+      data?['userId'].toString() ?? '',
       data?['nickname'] ?? '',
       data?['portrait'] ?? '',
       data?['sign'] ?? '',
@@ -460,6 +474,72 @@ class LocalUser {
   }
 }
 
+class SysHtml {
+  String id;
+  String html;
+  DateTime? ctime;
+  String roulekey;
+  String? remake;
+  String url;
+
+  SysHtml(
+    this.id,
+    this.html,
+    this.ctime,
+    this.roulekey,
+    this.remake,
+    this.url,
+  );
+
+  // 从JSON数据构建实例
+  factory SysHtml.fromJson(Map<String, dynamic> json) {
+    //print(json.toString());
+    return SysHtml(
+      json['id'].toString(),
+      json['html'] ?? "",
+      _parseDateTime(json['ctime']),
+      json['roulekey'] ?? "",
+      json['remake'] ?? "",
+      json['url'] ?? "",
+    );
+  }
+
+  // 转换为JSON数据
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'html': html,
+      'ctime': ctime?.toIso8601String(),
+      'roulekey': roulekey,
+      'remake': remake,
+      'url': url,
+    };
+  }
+
+  // 辅助方法：解析DateTime类型，处理空值和格式错误
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null; // 空值直接返回null
+
+    // 尝试将输入转换为字符串
+    String? dateString;
+    if (value is String) {
+      dateString = value.trim();
+    } else {
+      dateString = value.toString().trim(); // 非字符串类型转为字符串
+    }
+
+    if (dateString.isEmpty) return null; // 空字符串返回null
+
+    // 尝试解析日期，捕获格式错误
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      //debugPrint('日期解析失败: 输入值=$value, 错误=$e'); // 调试用日志
+      return null; // 格式错误返回null
+    }
+  }
+}
+
 class LocalConfig {
   String sharePath;
   String watermark;
@@ -516,7 +596,7 @@ class LocalConfig {
       data['screenshot'] ?? 'Y',
       data['notice'] ?? '',
       data['notype'] ?? 0,
-      double.parse(data['packet'] ?? '0.00'),
+      _toDouble(data['packet']),
       data['callKit'] ?? '',
       data['groupSearch'] ?? 'N',
       data['holdCard'] ?? 'Y',

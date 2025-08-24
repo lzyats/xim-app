@@ -17,6 +17,8 @@ import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/tools/tools_upload.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
+import 'package:path/path.dart';
 import 'package:uuid/uuid.dart';
 
 // 监听聊天消息
@@ -34,7 +36,7 @@ class EventMessage {
 
   // 处理接收到的消息
   Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
-    //print("收到新消息:" + pushData.toString());
+    //debugPrint("收到新消息:" + pushData.toString());
     // 历史消息
     ChatHis? chatHis = _initChatHis(pushData);
     if (chatHis == null) {
@@ -310,6 +312,9 @@ class EventMessage {
         content = await _doHandle(chatHis, extend);
       }
       // 发送消息
+      String contenta = ToolsEncrypt.encryptobj(AppConfig.secret, content);
+      debugPrint(contenta);
+      content = {"content": contenta};
       MessageModel00 result = await RequestMessage.sendMsg(
         localChat.chatId,
         localChat.chatTalk,

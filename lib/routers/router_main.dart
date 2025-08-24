@@ -1,3 +1,4 @@
+import 'package:alpaca/pages/view/html_page.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/main/main_page.dart';
 import 'package:alpaca/pages/view/view_page.dart';
@@ -15,6 +16,11 @@ List<GetPage> getMainPages = [
   getPage(
     name: ViewPage.routeName,
     page: () => const ViewPage(),
+    middle: false,
+  ),
+  getPage(
+    name: HtmlPage.routeName,
+    page: () => const HtmlPage(),
     middle: false,
   ),
   // 欢迎页

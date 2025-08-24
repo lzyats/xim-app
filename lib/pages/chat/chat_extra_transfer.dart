@@ -103,7 +103,7 @@ class _ChatExtraTransferItemState extends State<ChatExtraTransferItem> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              '发送转账1',
+              '发送转账',
               style: TextStyle(color: Colors.black),
             ),
           ),

@@ -281,12 +281,12 @@ class ImagePickerWidget extends StatelessWidget {
         content['height'] = height;
 
         // 上传视频缩略图
-        String thumbnailUrl = await ToolsUpload.uploadFile(thumbFile.path);
+        String thumbnailUrl = await ToolsUpload.uploadFileu(thumbFile.path);
         content['thumbnail'] = thumbnailUrl;
       } else {
         // 图片类型处理
         Map<String, dynamic> imgInfo = await WidgetCommon.calculateImage(path);
-        print('图片信息：' + imgInfo.toString());
+        debugPrint('图片信息：' + imgInfo.toString());
         content.addAll(imgInfo);
         content['type'] = 0;
 
@@ -312,7 +312,7 @@ class ImagePickerWidget extends StatelessWidget {
       }
 
       // 上传文件并获取URL
-      content['url'] = await ToolsUpload.uploadFile(path);
+      content['url'] = await ToolsUpload.uploadFileu(path);
 
       // 准备显示文件
       XFile displayFile;

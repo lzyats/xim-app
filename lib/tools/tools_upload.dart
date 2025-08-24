@@ -31,7 +31,15 @@ class ToolsUpload {
     // 转换文件
     MultipartFile multipartFile = MultipartFile.fromFileSync(path);
     // 执行上传
-    return await _upload(multipartFile);
+    return await _upload(multipartFile, false);
+  }
+
+  // 文件上传
+  static Future<String> uploadFileu(String path) async {
+    // 转换文件
+    MultipartFile multipartFile = MultipartFile.fromFileSync(path);
+    // 执行上传
+    return await _upload(multipartFile, true);
   }
 
   // 文件上传
@@ -55,15 +63,15 @@ class ToolsUpload {
     }
     MultipartFile multipartFile = MultipartFile.fromBytes(bytes);
     // 执行上传
-    return await _upload(multipartFile);
+    return await _upload(multipartFile, false);
   }
 
   // 执行上传
-  static Future<String> _upload(MultipartFile multipartFile) async {
+  static Future<String> _upload(MultipartFile multipartFile, bool usu) async {
     // 获取token
     Map<String, dynamic> uploadToken =
-        await RequestCommon.getUploadToken(multipartFile);
-    print('上传信息：' + uploadToken.toString());
+        await RequestCommon.getUploadToken(multipartFile, usu);
+    debugPrint('上传信息：' + uploadToken.toString());
     // 上传方式
     String uploadType = uploadToken['uploadType'];
     // 文件上传
@@ -130,7 +138,7 @@ class ToolsUpload {
       } else {
         errorMsg += '\n原因：${e.message}';
       }
-      print(errorMsg);
+      debugPrint(errorMsg);
 
       EasyLoading.showToast('上传失败，请稍后重试');
       return '';
@@ -212,7 +220,7 @@ class ToolsUpload {
     MultipartFile multipartFile,
     Map<String, dynamic> uploadToken,
   ) async {
-    print('使用 MINIO 上传');
+    debugPrint('使用 MINIO 上传');
 
     // 1. 从服务端返回的 uploadToken 中提取所有必要参数（关键：直接使用服务端生成的参数，不手动计算）
     final String signature = uploadToken['signature'] ?? '';
@@ -221,7 +229,7 @@ class ToolsUpload {
     // 1. 从服务端返回的 uploadToken 中提取所有必要参数
 
 // 新增：打印获取到的 Access Key，验证是否正确
-    print('从 uploadToken 中获取的 Access Key：$accessKey');
+    debugPrint('从 uploadToken 中获取的 Access Key：$accessKey');
     final String fileKey = uploadToken['fileKey'] ?? '';
     final String filePath = uploadToken['filePath'] ?? '';
     final String serverUrl = uploadToken['serverUrl'] ?? '';
@@ -274,7 +282,7 @@ class ToolsUpload {
         data: formData,
         onSendProgress: (int sent, int total) {
           final double progress = sent / total;
-          print('上传进度：${(progress * 100).toStringAsFixed(1)}%');
+          debugPrint('上传进度：${(progress * 100).toStringAsFixed(1)}%');
         },
       );
 
@@ -292,11 +300,11 @@ class ToolsUpload {
       } else {
         errorMsg += '\n原因：${e.message}';
       }
-      print(errorMsg);
+      debugPrint(errorMsg);
       EasyLoading.showToast(errorMsg);
       return '';
     } catch (e) {
-      print('上传异常：$e');
+      debugPrint('上传异常：$e');
       EasyLoading.showToast('上传异常，请稍后重试');
       return '';
     }

@@ -91,7 +91,7 @@ class WidgetUpload {
     String path = file!.path;
     if (upload) {
       // 上传
-      path = await ToolsUpload.uploadFile(file.path);
+      path = await ToolsUpload.uploadFileu(file.path);
     }
     return path;
   }

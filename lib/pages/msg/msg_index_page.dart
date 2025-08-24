@@ -62,9 +62,9 @@ class MsgIndexPage extends GetView<MsgIndexController> {
           Obx(
             () => _buildNotice(context),
           ),
-          Obx(() {
-            return _handleNoticeDialog(context);
-          }),
+          Obx(
+            () => _handleNoticeDialog(context),
+          ),
           Flexible(
             child: GetBuilder<MsgIndexController>(builder: (builder) {
               return SmartRefresher(
@@ -72,7 +72,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
                 enablePullUp: false, // 禁用上拉加载
                 controller: controller.refreshController,
                 onRefresh: () {
-                  print('onRefresh method called');
+                  debugPrint('onRefresh method called');
                   controller.onRefresh();
                 },
                 // 更新后的 WaterDropHeader 参数配置
@@ -111,16 +111,13 @@ class MsgIndexPage extends GetView<MsgIndexController> {
     );
   }
 
-  /// 显示另一个富文本内容
-  void _showAnotherDialog(BuildContext context) {
-    _showRichTextDialog(context, content: controller.notice.value);
-  }
-
   /// 通用富文本弹窗
   void _showRichTextDialog(
     BuildContext context, {
     required String content,
-  }) {
+  }) async {
+    await ToolsStorage().pushnotic(value: 0);
+    controller.pushnotic.value = 0;
     showGeneralDialog(
       context: context,
       barrierDismissible: true, // 点击背景是否关闭弹窗
@@ -170,9 +167,11 @@ class MsgIndexPage extends GetView<MsgIndexController> {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.grey),
-                      onPressed: () => Navigator.pop(context), // 关闭弹窗
-                    ),
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () => {
+                              Navigator.pop(context),
+                            } // 关闭弹窗
+                        ),
                   ],
                 ),
                 const Divider(height: 2),
@@ -198,6 +197,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
   }
 
   _buildNotice(context) {
+    debugPrint("广播状态obxB：" + controller.pushnotic.value.toString());
     if (controller.notice.value.isEmpty || controller.notype.value == 1) {
       return Container();
     }
@@ -230,8 +230,10 @@ class MsgIndexPage extends GetView<MsgIndexController> {
   }
 
   // 分离出的处理公告弹窗的方法
-  Widget _handleNoticeDialog(BuildContext context) {
-    if (controller.notype.value > 0 && controller.notice.value.isNotEmpty) {
+  Widget _handleNoticeDialog(context) {
+    if (controller.notype.value > 0 &&
+        controller.notice.value.isNotEmpty &&
+        controller.pushnotic.value == 1) {
       // 延迟一帧执行，避免在构建阶段直接弹窗导致异常
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showRichTextDialog(

@@ -6,6 +6,7 @@ import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/event/event_socket.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_request.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
 
 class RequestMessage {
   static String get _prefix => '/msg';
@@ -43,11 +44,13 @@ class RequestMessage {
 
   // 发送好友信息
   static Future<AjaxData> _sendFriendMsg(
-    String userId,
-    MsgType msgType,
-    Map<String, dynamic> content,
-  ) async {
+      String userId, MsgType msgType, Map<String, dynamic> content,
+      {bool un = false}) async {
     // 执行
+    if (un) {
+      content = ToolsEncrypt.encryptobj(AppConfig.secret, content)
+          as Map<String, dynamic>;
+    }
     return await ToolsRequest().post(
       '$_prefix/sendFriendMsg',
       data: {

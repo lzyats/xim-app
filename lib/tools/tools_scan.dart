@@ -134,7 +134,7 @@ class ToolsScan {
     // 校验输入长度是否为偶数
     if (content.length % 2 != 0) {
       EasyLoading.showError('扫码内容格式错误');
-      print("content:" + content);
+      debugPrint("content:" + content);
       return;
     }
     // 解密
@@ -149,7 +149,7 @@ class ToolsScan {
         new SysConfig(requestHost: firstValue, requestSocket: secondValue);
     ToolsStorage().sysConfig(value: localConfig);
     EasyLoading.showSuccess('服务器配置成功');
-    print(decrypt);
+    debugPrint(decrypt);
   }
 
   static _buildWallet(String result) async {

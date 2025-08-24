@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:alpaca/event/event_setting.dart';
 import 'package:alpaca/tools/tools_enum.dart';
@@ -43,12 +44,12 @@ class RequestCommon {
       pageNum,
     );
     // 转换
-    return ajaxData.getList((data) => CommonModel02.fromJson(data));
+    return ajaxData.getList((data) => CommonModel02.fromJson(data), en: true);
   }
 
   // 获取上传凭证
   static Future<Map<String, dynamic>> getUploadToken(
-      MultipartFile multipartFile) async {
+      MultipartFile multipartFile, bool usu) async {
     // 提取文件后缀
     String fileName = multipartFile.filename ?? '';
     String fileExt = '';
@@ -58,10 +59,10 @@ class RequestCommon {
         fileExt = fileName.substring(dotIndex + 1).toLowerCase();
       }
     }
+    String url = '$_prefix/getUploadToken/' + fileExt;
+    if (usu) url = '$_prefix/getUploadTokenu/' + fileExt;
     // 执行
-    AjaxData ajaxData = await ToolsRequest().get(
-      '$_prefix/getUploadToken/' + fileExt,
-    );
+    AjaxData ajaxData = await ToolsRequest().get(url);
     // 转换
     return ajaxData.getJson();
   }
@@ -122,11 +123,25 @@ class RequestCommon {
     );
     // 转换
     LocalConfig localConfig =
-        ajaxData.getData((data) => LocalConfig.fromJson(data));
+        ajaxData.getData((data) => LocalConfig.fromJson(data), en: true);
+    debugPrint(localConfig.toJson().toString());
     // 存储
     ToolsStorage().config(value: localConfig);
     // 设置
     EventSetting().event.add(SettingModel(SettingType.sys));
+  }
+
+  // 获取HTML
+  static Future<SysHtml> getHtml(String roulekey) async {
+    // 执行
+    AjaxData ajaxData = await ToolsRequest().get(
+      '$_prefix/getHtml/$roulekey',
+      showError: false,
+    );
+    // 转换
+    SysHtml html = ajaxData.getData((data) => SysHtml.fromJson(data), en: true);
+    debugPrint(html.toJson().toString());
+    return html;
   }
 }
 

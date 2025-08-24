@@ -252,7 +252,7 @@ class LoginIndexPage extends GetView<LoginIndexController> {
             const SizedBox(
               width: 10,
             ),
-            const Text('已阅读并同意'),
+            const Text('阅读并同意'),
             TDLink(
               label: '《服务协议》',
               style: TDLinkStyle.primary,

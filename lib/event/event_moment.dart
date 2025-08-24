@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 // 监听朋友圈消息
@@ -17,7 +18,7 @@ class EventMoment {
 
   // 处理接收到的朋友圈消息
   Future<void> handle(bool pushAudio, Map<String, dynamic> pushData) async {
-    print("收到新动态 => ");
+    debugPrint("收到新动态 => ");
     // 组装动态对象
     Moment? moment = _initMoment(pushData);
     if (moment == null) {
@@ -26,10 +27,10 @@ class EventMoment {
     // 避免消息重复处理
     bool donext = await handleMomentMsgId(moment.msgId);
     if (!donext) {
-      print("该消息不重复处理");
+      debugPrint("该消息不重复处理");
       return;
     }
-    print("处理新动态:" + pushData.toString());
+    debugPrint("处理新动态:" + pushData.toString());
     // 插入数据库
     await ToolsSqlite().moment.add(moment); // 假设数据库有对应的moment表操作
     // 广播动态消息
@@ -138,7 +139,7 @@ class EventMoment {
         likes: pushData['likes'] != null ? jsonEncode(pushData['likes']) : '[]',
       );
     } catch (e) {
-      print("组装动态失败: $e");
+      debugPrint("组装动态失败: $e");
       return null;
     }
   }

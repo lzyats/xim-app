@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:alpaca/request/request_common.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:alpaca/event/event_message.dart';
@@ -20,6 +21,7 @@ class MsgIndexController extends BaseController {
   String userId = ToolsStorage().local().userId;
   RxString notice = ''.obs;
   RxInt notype = 0.obs;
+  RxInt pushnotic = ToolsStorage().pushnotic().obs;
   final Map<String, ChatMsg> _dataMap = {};
 
   // 不显示
@@ -171,6 +173,10 @@ class MsgIndexController extends BaseController {
     // 监听通知
     subscription2 = EventSetting().event.stream.listen((model) {
       if (SettingType.sys == model.setting) {
+        if (model.label == "notice") {
+          ToolsStorage().pushnotic(value: 1);
+          pushnotic.value = 1;
+        }
         // 获取通知
         _notice();
       } else if (SettingType.message == model.setting) {
@@ -184,6 +190,7 @@ class MsgIndexController extends BaseController {
   _notice() {
     notice.value = ToolsStorage().config().notice;
     notype.value = ToolsStorage().config().notype;
+    pushnotic.value = ToolsStorage().pushnotic();
   }
 
   // 监听消息（当有新消息，显示到消息顶部）
@@ -211,7 +218,7 @@ class MsgIndexController extends BaseController {
   void onRefresh() {
     // 获取配置
     RequestCommon.getConfig();
-    print('onRefresh method called');
+    debugPrint('onRefresh method called');
     // 获取消息
     superRefresh(
       RequestMessage.pullMsg(),

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:alpaca/tools/tools_storage.dart';
@@ -76,12 +77,12 @@ class MineSigninController extends GetxController {
   Future<void> _fetchSignInfo() async {
     try {
       final Map<String, dynamic>? signInfo = await RequestMine.getSignInfo();
-      print(signInfo.toString());
+      debugPrint(signInfo.toString());
       if (signInfo != null) {
         _handleSignData(signInfo);
       }
     } catch (e) {
-      print('获取签到信息失败: $e');
+      debugPrint('获取签到信息失败: $e');
     }
   }
 
@@ -101,16 +102,16 @@ class MineSigninController extends GetxController {
       if (rawSignDates is List) {
         signedDates = rawSignDates;
       } else {
-        print('signDates类型异常，预期List，实际为：${rawSignDates.runtimeType}');
+        debugPrint('signDates类型异常，预期List，实际为：${rawSignDates.runtimeType}');
       }
 
       if (signedDates.isNotEmpty) {
         _updateSignInStatus(signedDates);
       } else {
-        print('signDates为空列表或类型异常，不更新签到状态');
+        debugPrint('signDates为空列表或类型异常，不更新签到状态');
       }
     } else {
-      print('接口返回不包含signDates字段');
+      debugPrint('接口返回不包含signDates字段');
     }
   }
 
@@ -152,7 +153,7 @@ class MineSigninController extends GetxController {
         DateFormat('yyyy-MM-dd').format(east8Now));
 
     if (todayIndex == -1) {
-      print('今日不在当月日期列表中');
+      debugPrint('今日不在当月日期列表中');
       return;
     }
 

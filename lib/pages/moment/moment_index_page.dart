@@ -495,7 +495,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
 
             if (media == null) return const SizedBox.shrink();
             if (media.type == null) {
-              print("警告：媒体资源 type 为 null，跳过处理");
+              debugPrint("警告：媒体资源 type 为 null，跳过处理");
               return const SizedBox.shrink();
             }
 

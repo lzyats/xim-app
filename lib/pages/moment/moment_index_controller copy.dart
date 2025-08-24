@@ -1,6 +1,7 @@
 // lib/pages/moment/moment_index_controller.dart
 import 'package:alpaca/pages/base/base_controller.dart';
 import 'package:alpaca/tools/tools_comment.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 //添加通用网络请求
 import 'package:alpaca/request/request_moment.dart';
@@ -73,7 +74,7 @@ class MomentIndexController extends BaseController {
         loadedPages.add(page);
       }
     } catch (e) {
-      print('Error loading moments: $e');
+      debugPrint('Error loading moments: $e');
       if (!isRefresh) {
         currentPage--;
       }
@@ -91,7 +92,7 @@ class MomentIndexController extends BaseController {
    * 发起点赞
    */
   Future<bool> likeMoment(int momentId) async {
-    print('点赞开始');
+    debugPrint('点赞开始');
     // 假设 API 调用成功后返回 true
     await RequestMoment.likeMoment(momentId);
     return true;
@@ -99,7 +100,7 @@ class MomentIndexController extends BaseController {
 
   //发起评论
   Future<bool> addComment(int momentId, int replyTo, String content) async {
-    print('评论开始');
+    debugPrint('评论开始');
     // 假设 API 调用成功后返回 true
     await RequestMoment.addComment(momentId, replyTo, content);
     return true;
@@ -109,7 +110,7 @@ class MomentIndexController extends BaseController {
    * 模拟API请求（确保参数正确）
    */
   Future<List<MomentModel>> getMoments(int page, int pageSize) async {
-    print('当前请求页：' + page.toString());
+    debugPrint('当前请求页：' + page.toString());
     dynamic responseDataa = await RequestMoment.getMomentList(page, pageSize);
     // 处理分页信息
     List<dynamic> responseData = responseDataa['list'];
@@ -119,7 +120,7 @@ class MomentIndexController extends BaseController {
       //判断是否存在下一页
       if (responseDataa['hasNextPage']) {
         currentPage++;
-        print('下个请求页：' + currentPage.toString());
+        debugPrint('下个请求页：' + currentPage.toString());
         isLoadingMore.value = false;
       } else {
         isLoadingMore.value = true;

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:alpaca/pages/login/login_index_page%20copy.dart';
 import 'package:alpaca/pages/login/login_register_controller.dart';
+import 'package:alpaca/pages/view/html_page.dart';
 import 'package:alpaca/pages/view/view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -475,17 +476,10 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     },
                     activeColor: Colors.blue,
                   ),
-                  const Text('已阅读并同意'),
+                  const Text('阅读并同意'),
                   GestureDetector(
                     onTap: () {
-                      Get.toNamed(
-                        ViewPage.routeName,
-                        arguments: ViewData(
-                          title: '服务协议',
-                          AppConfig.serviceHost,
-                          warn: false,
-                        ),
-                      );
+                      Get.toNamed(HtmlPage.routeName, arguments: "sys-service");
                     },
                     child: const Text(
                       '《用户协议》',
@@ -495,14 +489,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   const Text('和'),
                   GestureDetector(
                     onTap: () {
-                      Get.toNamed(
-                        ViewPage.routeName,
-                        arguments: ViewData(
-                          title: '隐私协议',
-                          AppConfig.privacyHost,
-                          warn: false,
-                        ),
-                      );
+                      Get.toNamed(HtmlPage.routeName, arguments: "sys-privacy");
                     },
                     child: const Text(
                       '《隐私政策》',

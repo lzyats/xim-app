@@ -5,6 +5,7 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:flutter/material.dart';
 
 class RequestRobot {
   static String get _prefix => '/robot';
@@ -18,11 +19,12 @@ class RequestRobot {
     );
     // 转换
     List<ChatRobot> dataList = ajaxData.getList((data) {
+      debugPrint("===>" + data.toString());
       ChatRobot robot = ChatRobot.fromJson(data);
       ToolsStorage().top(robot.robotId, value: robot.top);
       ToolsStorage().disturb(robot.robotId, value: robot.disturb);
       return robot;
-    });
+    }, en: true);
     // 存储
     await ToolsSqlite().robot.addBatch(dataList);
     // 通知

@@ -46,7 +46,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
                 enablePullDown: true,
                 controller: controller.refreshController,
                 onRefresh: () {
-                  print('onRefresh method called');
+                  debugPrint('onRefresh method called');
                   controller.onRefresh();
                 },
                 // 更新后的 WaterDropHeader 参数配置

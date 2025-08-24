@@ -1,3 +1,4 @@
+import 'package:alpaca/pages/view/html_page.dart';
 import 'package:alpaca/tools/tools_encrypt.dart';
 import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/tools/tools_scan.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
-import 'package:alpaca/pages/common/common_about_page.dart';
 import 'package:alpaca/pages/mine/mine_safety_page.dart';
 import 'package:alpaca/pages/mine/mine_setting_page.dart';
 import 'package:alpaca/pages/common/common_index_controller.dart';
@@ -28,7 +28,7 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
     String str = "http://110.42.56.25:8080|wss://110.42.56.25:8888";
     String secret = AppConfig.secret;
     secret = ToolsEncrypt.encrypt(secret, str);
-    print("加密：" + secret);
+    debugPrint("加密：" + secret);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -76,7 +76,9 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                 "关于我们",
                 onTap: () {
                   Get.toNamed(
-                    CommonAboutPage.routeName,
+                    //CommonAboutPage.routeName,
+                    HtmlPage.routeName,
+                    arguments: "sys-aboutus", // 传入roulekey参数
                   );
                 },
               ),
@@ -161,27 +163,13 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
               WidgetLineRow(
                 "服务协议",
                 onTap: () {
-                  Get.toNamed(
-                    ViewPage.routeName,
-                    arguments: ViewData(
-                      title: '服务协议',
-                      AppConfig.serviceHost,
-                      warn: false,
-                    ),
-                  );
+                  Get.toNamed(HtmlPage.routeName, arguments: "sys-service");
                 },
               ),
               WidgetLineRow(
                 "隐私协议",
                 onTap: () {
-                  Get.toNamed(
-                    ViewPage.routeName,
-                    arguments: ViewData(
-                      title: '隐私协议',
-                      AppConfig.privacyHost,
-                      warn: false,
-                    ),
-                  );
+                  Get.toNamed(HtmlPage.routeName, arguments: "sys-privacy");
                 },
               ),
               /* WidgetLineRow(

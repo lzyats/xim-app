@@ -34,7 +34,7 @@ class RequestFriend {
       ToolsStorage().disturb(friend.userId, value: friend.disturb);
       ToolsStorage().remark(friend.userId, value: friend.remark);
       return friend;
-    });
+    }, en: true);
     // 存储
     await ToolsSqlite().friend.addBatch(dataList);
     // 通知

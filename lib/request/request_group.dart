@@ -45,7 +45,7 @@ class RequestGroup {
       ToolsStorage().top(group.groupId, value: group.memberTop);
       ToolsStorage().disturb(group.groupId, value: group.memberDisturb);
       return group;
-    });
+    }, en: true);
     // 存储
     await ToolsSqlite().group.addBatch(dataList);
     // 通知

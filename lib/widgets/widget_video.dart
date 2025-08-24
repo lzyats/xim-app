@@ -69,7 +69,7 @@ class _WidgetVideoState extends State<WidgetVideo> {
     }).catchError((error) {
       // 增加错误处理，避免加载失败时一直显示加载框
       ToolsSubmit.dismiss();
-      print("视频初始化失败: $error");
+      debugPrint("视频初始化失败: $error");
       Get.snackbar('错误', '视频加载失败，请重试');
     });
   }

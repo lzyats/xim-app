@@ -664,8 +664,8 @@ class ChatFriend {
     String current = ToolsStorage().local().userId;
     String gender = data?['gender'] ?? '';
     return ChatFriend(
-      data?['userId'] ?? '',
-      data?['groupId'] ?? '',
+      data!['userId'].toString(),
+      data!['groupId'].toString(),
       data?['portrait'] ?? '',
       data?['nickname'] ?? '',
       data?['userNo'] ?? '',
@@ -910,7 +910,7 @@ class ChatGroup {
 
   factory ChatGroup.fromJson(Map<String, dynamic>? data) {
     return ChatGroup(
-      data?['groupId'] ?? '',
+      data!['groupId'].toString(),
       data?['groupName'] ?? '',
       data?['groupNo'] ?? '',
       data?['portrait'] ?? '',
@@ -1061,7 +1061,7 @@ class ChatRobot {
 
   factory ChatRobot.fromJson(Map<String, dynamic> data) {
     return ChatRobot(
-      data['robotId'] ?? '',
+      data['robotId'].toString(),
       data['nickname'] ?? '',
       data['portrait'] ?? '',
       data['menu'] ?? '[]',
@@ -1471,7 +1471,7 @@ class _MomentHander {
     }
     // 转换为Moment对象列表
     for (var data in resultList) {
-      //print(data.toString());
+      //debugPrint(data.toString());
       dataList.add(Moment.fromJson(data));
     }
     return dataList;

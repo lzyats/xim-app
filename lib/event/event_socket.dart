@@ -35,7 +35,7 @@ class EventSocket {
       if ('msg' == pushType) {
         await EventMessage().handle(message.pushAudio, pushData);
       } else if ('moment' == pushType) {
-        print('处理朋友圈信息');
+        debugPrint('处理朋友圈信息');
         await EventMoment().handle(message.pushAudio, pushData);
       }
       //朋友圈

@@ -26,7 +26,7 @@ class LoginIndexPage extends GetView<LoginIndexController> {
     String str = "http://110.42.56.25:8080|ws://110.42.56.25:8888";
     String secret = AppConfig.secret;
     secret = ToolsEncrypt.encrypt(secret, str);
-    print("加密：" + secret);
+    debugPrint("加密：" + secret);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(

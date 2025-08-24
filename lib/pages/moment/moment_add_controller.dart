@@ -65,7 +65,7 @@ class MomentAddController extends GetxController {
   void updateSelectedFriends(String permission, List<String>? friends) {
     _selectedFriends = friends;
     // 根据需要处理选中的好友列表
-    print(_selectedFriends);
+    debugPrint(_selectedFriends.toString());
   }
 
   // 发表朋友圈
@@ -81,7 +81,7 @@ class MomentAddController extends GetxController {
     );
 
     LocalUser localUser = ToolsStorage().local();
-    print('发布到这里了');
+    debugPrint('发布到这里了');
     // 创建朋友圈模型
     try {
       // 创建朋友圈模型
@@ -95,9 +95,9 @@ class MomentAddController extends GetxController {
           createTime: DateTime.now(),
           updateTime: DateTime.now(),
           isDeleted: 0);
-      print('发布到这里了');
+      debugPrint('发布到这里了');
 
-      print(moment.toJson());
+      debugPrint(moment.toJson().toString());
       // 构建附件库模型
       //final List<FriendMediaResourceModel> media = [];
       // 从 ImagePickerController 中获取 selectedImages
@@ -140,7 +140,7 @@ class MomentAddController extends GetxController {
           duration: Duration(seconds: 2),
         ),
       );
-      print('发表失败: $e');
+      debugPrint('发表失败: $e');
       return false;
     }
     return false; // 返回失败状态

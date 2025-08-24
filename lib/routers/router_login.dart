@@ -1,4 +1,5 @@
 import 'package:alpaca/pages/login/login_register_page.dart';
+import 'package:alpaca/pages/view/html_page.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/pages/login/login_banned_page.dart';
 import 'package:alpaca/pages/login/login_scan_page.dart';

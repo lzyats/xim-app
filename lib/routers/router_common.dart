@@ -4,6 +4,7 @@ import 'package:alpaca/pages/common/common_feedback_page.dart';
 import 'package:alpaca/pages/common/common_help_page.dart';
 import 'package:alpaca/pages/common/common_index_page.dart';
 import 'package:alpaca/pages/common/common_notices_page.dart';
+import 'package:alpaca/pages/view/html_page.dart';
 import 'package:alpaca/routers/router_base.dart';
 
 // 公共路由
@@ -32,5 +33,5 @@ List<GetPage> getCommonPages = [
   getPage(
     name: CommonSoftwarePage.routeName,
     page: () => const CommonSoftwarePage(),
-  ),
+  )
 ];

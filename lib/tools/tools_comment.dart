@@ -1,4 +1,6 @@
 // package:alpaca/tools/tools_comment.dart
+import 'package:flutter/material.dart';
+
 /// 朋友圈动态模型
 class FriendMomentModel {
   final int? momentId; // 动态ID
@@ -543,16 +545,16 @@ class MomentModel {
             // 调用FriendMediaResourceModel的fromJson方法
             return Media.fromJson(item);
           } catch (e) {
-            print('媒体资源解析失败: $e');
+            debugPrint('媒体资源解析失败: $e');
             // 解析失败时返回默认媒体资源（URL为空）
             return Media(url: '');
           }
         }
-        print('无效的媒体资源数据: $item');
+        debugPrint('无效的媒体资源数据: $item');
         return Media(url: '');
       }).toList();
     }
-    print('无效的媒体资源列表类型: $value');
+    debugPrint('无效的媒体资源列表类型: $value');
     return [];
   }
 
@@ -565,15 +567,15 @@ class MomentModel {
           try {
             return FriendCommentModel.fromJson(item);
           } catch (e) {
-            print('评论解析失败: $e');
+            debugPrint('评论解析失败: $e');
             return FriendCommentModel(content: '解析失败的评论');
           }
         }
-        print('无效的评论数据: $item');
+        debugPrint('无效的评论数据: $item');
         return FriendCommentModel(content: '无效的评论数据');
       }).toList();
     }
-    print('无效的评论列表类型: $value');
+    debugPrint('无效的评论列表类型: $value');
     return [];
   }
 
@@ -585,11 +587,11 @@ class MomentModel {
       try {
         return int.parse(value);
       } catch (e) {
-        print('解析int失败: $value');
+        debugPrint('解析int失败: $value');
         return null;
       }
     }
-    print('无效的int类型: $value');
+    debugPrint('无效的int类型: $value');
     return null;
   }
 
@@ -617,7 +619,7 @@ class MomentModel {
     try {
       return DateTime.parse(dateString);
     } catch (e) {
-      print('日期解析失败: 输入值=$value, 错误=$e'); // 调试用日志
+      debugPrint('日期解析失败: 输入值=$value, 错误=$e'); // 调试用日志
       return null; // 格式错误返回null
     }
   }
@@ -628,7 +630,7 @@ class MomentModel {
     if (value is List) {
       return value.map((item) => _parseString(item) ?? '').toList();
     }
-    print('无效的列表类型: $value');
+    debugPrint('无效的列表类型: $value');
     return [];
   }
 }

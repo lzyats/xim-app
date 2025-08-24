@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -9,6 +11,8 @@ import 'package:alpaca/tools/tools_encrypt.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
+import 'package:alpaca/config/app_config.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
 
 // 接口请求
 class ToolsRequest {
@@ -46,7 +50,7 @@ class ToolsRequest {
       baseUrl: baseUrl,
       connectTimeout: AppConfig.timeout,
     );
-    print("初始地址：" + baseUrl);
+    debugPrint("初始地址：" + baseUrl);
     _dio = Dio(options);
     _dio.interceptors.add(_AuthInterCeptor());
     // 初始化完成后，将标志位设为true
@@ -134,6 +138,7 @@ class ToolsRequest {
       await _ensureDioInitialized(); // 确保Dio已初始化
       debugPrint('请求地址：$baseUrl$url'); // 打印完整地址（验证baseUrl是否正确）
       debugPrint('请求方式：$method');
+      debugPrint('请求方式：$method');
       // 发起请求
       Response response;
       if (method == _post) {
@@ -143,7 +148,7 @@ class ToolsRequest {
       }
       return AjaxData(response.data);
     } catch (ex) {
-      print(ex);
+      debugPrint(ex.toString());
       if (showError) {
         ToolsSubmit.cancel();
         EasyLoading.showToast('网络开小差了，请稍后重试', dismissOnTap: false);
@@ -246,24 +251,50 @@ class AjaxData<T> {
     return result['data'] ?? {};
   }
 
-  T getData(T Function(dynamic data) function) {
+  T getData(T Function(dynamic data) function, {bool en = false}) {
+    if (en) {
+      // 1. 先获取原始数据并解密
+      dynamic encryptedData = result['data']; // 获取原始加密数据
+      String decryptedStr =
+          ToolsEncrypt.decrypt(AppConfig.secret, encryptedData); // 解密为字符串
+      Map<String, dynamic> decryptedData = jsonDecode(decryptedStr);
+      return function(decryptedData);
+    }
     return function(result['data']);
   }
 
-  List<T> getList<T>(T Function(dynamic data) function) {
+  List<T> getList<T>(T Function(dynamic data) function, {bool en = false}) {
     if (result.containsKey('data')) {
-      return _getList(function, 'data');
+      return _getList(function, 'data', en: en);
     } else if (result.containsKey('rows')) {
-      return _getList<T>(function, 'rows');
+      return _getList<T>(function, 'rows', en: en);
     }
     return [];
   }
 
-  List<T> _getList<T>(T Function(dynamic data) function, String param) {
-    List<dynamic>? dataList = List<dynamic>.from(result[param]?.map((x) => x));
-    if (dataList.isEmpty) {
+  List<T> _getList<T>(T Function(dynamic data) function, String param,
+      {bool en = false}) {
+    // 处理加密逻辑：当en=true时先解密整个列表数据
+    dynamic rawData = result[param];
+    List<dynamic>? dataList;
+
+    if (en) {
+      // 1. 获取原始加密数据并解密
+      String decryptedStr = ToolsEncrypt.decrypt(AppConfig.secret, rawData);
+      // 2. 解密后的数据应为列表，直接解析为List<dynamic>
+      dataList = jsonDecode(decryptedStr) as List<dynamic>?;
+    } else {
+      // 非加密情况直接转换为列表
+      dataList =
+          rawData != null ? List<dynamic>.from(rawData.map((x) => x)) : null;
+    }
+
+    // 处理空列表情况
+    if (dataList == null || dataList.isEmpty) {
       return [];
     }
+
+    // 映射为目标类型列表
     return dataList.map((data) => function(data)).toList();
   }
 }

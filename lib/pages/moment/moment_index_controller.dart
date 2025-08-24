@@ -4,6 +4,7 @@ import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/request/request_moment.dart';
 import 'package:alpaca/tools/tools_comment.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:alpaca/event/event_setting.dart';
@@ -33,7 +34,7 @@ class MomentIndexController extends BaseController {
    * 发起点赞
    */
   Future<bool> likeMoment(int momentId) async {
-    print('点赞开始');
+    debugPrint('点赞开始');
     // 假设 API 调用成功后返回 true
     await RequestMoment.likeMoment(momentId);
     return true;
@@ -41,7 +42,7 @@ class MomentIndexController extends BaseController {
 
   //发起评论
   Future<bool> addComment(int momentId, int replyTo, String content) async {
-    print('评论开始');
+    debugPrint('评论开始');
     // 假设 API 调用成功后返回 true
     await RequestMoment.addComment(momentId, replyTo, content);
     return true;
@@ -51,7 +52,7 @@ class MomentIndexController extends BaseController {
  * 删除指定momentId的朋友圈信息
  */
   Future<bool> deleteMoment(int momentId, int msgId) async {
-    print('开始删除朋友圈: $momentId');
+    debugPrint('开始删除朋友圈: $momentId');
     try {
       // 调用删除接口
       bool deleteSuccess = await RequestMoment.deleteMoment(momentId, msgId);
@@ -68,24 +69,24 @@ class MomentIndexController extends BaseController {
         updateMomentBadger(momentbadger);
         // 通知UI更新
         update();
-        print('删除朋友圈成功: $momentId');
+        debugPrint('删除朋友圈成功: $momentId');
         return true;
       }
     } catch (e) {
-      print('删除朋友圈失败: $e');
+      debugPrint('删除朋友圈失败: $e');
     }
     return false;
   }
 
   // 消息刷新
   Future onRefresh() async {
-    //print("开始获取数据");
+    //debugPrint("开始获取数据");
     // 更新
     refreshList = await ToolsSqlite().moment.getList();
     momentList.clear();
     int momentbadger = 0;
     for (Moment data in refreshList) {
-      //print("媒体文件：" + data.images);
+      //debugPrint("媒体文件：" + data.images);
       MomentModel momentModel = addMomentToModelList(data);
       // 添加到列表
       _dataMap[data.momentId] = momentModel;
@@ -150,7 +151,7 @@ class MomentIndexController extends BaseController {
     // 定时任务
     _listenTimer();
     Future.delayed(Duration(seconds: 4), () {
-      print("延时消息刷新");
+      debugPrint("延时消息刷新");
       onRefresh1(); // 延时消息刷新
     });
   }
@@ -175,7 +176,7 @@ class MomentIndexController extends BaseController {
       MomentModel momentModel = addMomentToModelList(moment);
       String isdel = moment.isDeleted;
       if (exists) {
-        print("已有数据:" + moment.momentId);
+        debugPrint("已有数据:" + moment.momentId);
         // 如果存在，说明是更新操作，先移除旧数据
         refreshList.remove(_dataMap[moment.momentId]);
         // 获取要移除数据的索引
@@ -185,8 +186,8 @@ class MomentIndexController extends BaseController {
           await ToolsSqlite().moment.update(moment.momentId, moment.toJson());
           bool removed = momentList.remove(_dataMap[moment.momentId]);
           if (removed) {
-            print("被移除元素的序列号（索引）是：$index");
-            print("删除该记录：$isdel");
+            debugPrint("被移除元素的序列号（索引）是：$index");
+            debugPrint("删除该记录：$isdel");
             if (isdel == "0")
               momentList.insert(index, momentModel); // 最新数据显示在最前面
           }
@@ -195,7 +196,7 @@ class MomentIndexController extends BaseController {
         // 如果不存在，说明是新增操作（可选：添加新增逻辑）
         momentList.insert(0, momentModel); // 最新数据显示在最前面
         refreshList.add(moment);
-        print("新增数据: ${moment.momentId}");
+        debugPrint("新增数据: ${moment.momentId}");
         int momentbadger = ToolsStorage().momentbadger(update: 1);
         updateMomentBadger(momentbadger);
       }
@@ -220,7 +221,7 @@ class MomentIndexController extends BaseController {
   Future onRefresh1() async {
     // 获取配置
     RequestCommon.getConfig();
-    //print('onRefresh method called');
+    debugPrint('onRefresh method called');
     // 获取消息
     superRefresh(
       RequestMoment.pullMsg(),

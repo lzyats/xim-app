@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/event/event_setting.dart';
@@ -20,7 +21,9 @@ class RequestMine {
       showError: false,
     );
     // 转换
-    LocalUser localUser = ajaxData.getData((data) => LocalUser.fromJson(data));
+    LocalUser localUser =
+        ajaxData.getData((data) => LocalUser.fromJson(data), en: true);
+    debugPrint(localUser.toJson().toString());
     // 存储数据
     ToolsStorage().local(value: localUser);
     // 通知

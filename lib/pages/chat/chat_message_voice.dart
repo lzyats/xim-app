@@ -174,7 +174,7 @@ class _ChatMessageVoiceState extends State<ChatMessageVoice> {
   // 开始播放
   Future<void> _startPlayer(String data, int second) async {
     try {
-      print(data);
+      debugPrint(data);
       // 停止当前播放
       await _stopPlayer();
 

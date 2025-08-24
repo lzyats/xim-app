@@ -4,6 +4,7 @@ import 'package:alpaca/event/event_socket.dart';
 import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_comment.dart'; // 假设数据模型文件路径
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // 朋友圈接口
@@ -100,7 +101,7 @@ class RequestMoment {
     );
     List<Map<String, dynamic>> messageList = [];
     for (var data in dataList) {
-      //print(data.pushData.toString());
+      //debugPrint(data.pushData.toString());
       messageList.add(data.pushData);
     }
 
@@ -140,7 +141,8 @@ class RequestMoment {
     // 判断是否发贴人回复
     int source = 1;
     if (replyTo == int.parse(userId)) source = 0;
-    print(userId + ' => ' + replyTo.toString() + " => " + source.toString());
+    debugPrint(
+        userId + ' => ' + replyTo.toString() + " => " + source.toString());
     // 执行
     AjaxData ajaxData = await ToolsRequest().post(
       '$_prefix/comment',

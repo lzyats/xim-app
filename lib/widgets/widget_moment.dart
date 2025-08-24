@@ -30,7 +30,7 @@ class WidgetMoment {
         longitude = double.parse(parts[1]);
         latitude = double.parse(parts[2]);
       } catch (e) {
-        print('经纬度解析失败: $e');
+        debugPrint('经纬度解析失败: $e');
       }
     }
 
@@ -673,7 +673,7 @@ class WidgetMoment {
   // 视频播放器核心组件（使用chewie包装video_player）
   static Future<Widget> buildVideoPlayer(Media media) async {
     String videoUrl = Uri.encodeFull(media.url);
-    print(media.toJson());
+    debugPrint(media.toJson().toString());
     int width = media.width ?? 1;
     int height = media.height ?? 1;
     late VideoPlayerController videoPlayerController;

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_comment.dart';
 import 'package:alpaca/request/request_moment.dart';
@@ -43,7 +44,7 @@ class MomentInfoController extends BaseController {
           postDateTime = post.createTime!;
         } catch (e) {
           postDateTime = DateTime.now();
-          print('解析时间失败: ${post.createTime}, 错误: $e');
+          debugPrint('解析时间失败: ${post.createTime}, 错误: $e');
         }
       } else {
         postDateTime = DateTime.now();
@@ -122,7 +123,7 @@ class MomentInfoController extends BaseController {
         loadedPages.add(page);
       }
     } catch (e) {
-      print('加载动态失败: $e');
+      debugPrint('加载动态失败: $e');
       if (!isRefresh) {
         currentPage--;
       }
@@ -138,7 +139,7 @@ class MomentInfoController extends BaseController {
 
   Future<List<MomentModel>> getMomentListbyid(
       int page, int pageSize, String userId) async {
-    print('当前请求页：$page，用户ID：$userId');
+    debugPrint('当前请求页：$page，用户ID：$userId');
     dynamic responseDataa =
         await RequestMoment.getMomentListbyid(userId, page, pageSize);
     List<dynamic> responseData = responseDataa['list'] ?? [];
@@ -147,7 +148,7 @@ class MomentInfoController extends BaseController {
           responseData.map((item) => MomentModel.fromJson(item)).toList();
       if (responseDataa['hasNextPage'] == true) {
         currentPage++;
-        print('下一页请求页：$currentPage');
+        debugPrint('下一页请求页：$currentPage');
         isLoadingMore.value = false;
       } else {
         isLoadingMore.value = true;

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:path_provider/path_provider.dart';
@@ -37,7 +38,7 @@ class ToolsUni {
         receive(event);
       }
     }, onError: (err) {
-      print('Error occurred: $err');
+      debugPrint('Error occurred: $err');
     });
   }
 
@@ -50,7 +51,7 @@ class ToolsUni {
   /// 获取UniMP版本
   Future<int> _version({required String appId}) async {
     final result = await _channel.invokeMethod('versionMP', {'appId': appId});
-    print(result);
+    debugPrint(result);
     return result['code'];
   }
 

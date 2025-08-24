@@ -37,6 +37,15 @@ class ToolsEncrypt {
     return _aes(secret).encrypt(data, iv: encrypt_.IV.fromUtf8(secret)).base16;
   }
 
+  // 原AES加密（保持不变）
+  static String encryptobj(String secret, Object data) {
+    // 将Object类型数据序列化为JSON字符串
+    String jsonData = convert.jsonEncode(data);
+    return _aes(secret)
+        .encrypt(jsonData, iv: encrypt_.IV.fromUtf8(secret))
+        .base16;
+  }
+
   // 原AES解密（保持不变）
   static String decrypt(String secret, String data) {
     return _aes(secret).decrypt16(data, iv: encrypt_.IV.fromUtf8(secret));
