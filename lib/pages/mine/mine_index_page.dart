@@ -1,5 +1,6 @@
 import 'package:alpaca/config/app_resource.dart';
 import 'package:alpaca/pages/mine/mine_singin_page.dart';
+import 'package:alpaca/pages/view/html_page%20copy.dart';
 import 'package:alpaca/pages/wallet/wallet_cash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -449,7 +450,9 @@ class MineIndexPage extends GetView<MineIndexController> {
                       onTap: () {
                         // 关于我们点击事件
                         Get.toNamed(
-                          CommonAboutPage.routeName,
+                          //CommonAboutPage.routeName,
+                          HtmlPage.routeName,
+                          arguments: "sys-aboutus", // 传入roulekey参数
                         );
                       },
                     ),
