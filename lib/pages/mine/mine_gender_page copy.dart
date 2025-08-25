@@ -10,8 +10,6 @@ class MineGenderPage extends GetView<MineGenderController> {
   static const String routeName = '/mine_gender';
   const MineGenderPage({super.key});
 
-  // 定义顶部导航栏的渐变颜色
-
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MineGenderController());

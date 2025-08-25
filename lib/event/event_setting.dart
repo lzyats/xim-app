@@ -10,6 +10,7 @@ import 'package:alpaca/tools/tools_badger.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:flutter/material.dart';
 
 // 监听Setting消息
 class EventSetting {
@@ -40,7 +41,14 @@ class EventSetting {
         // 通知
         case 'notice':
           // 写入存储
-          localConfig.notice = value;
+          if (!value.isEmpty) {
+            // 反序列化
+            Map<String, dynamic> jsonMap = jsonDecode(value);
+            localConfig.notype = jsonMap['notype'];
+            localConfig.notice = jsonMap['content'];
+          } else {
+            localConfig.notice = value;
+          }
           // 存储数据
           ToolsStorage().config(value: localConfig);
           break;

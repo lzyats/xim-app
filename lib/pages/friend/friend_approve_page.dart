@@ -13,8 +13,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 class FriendApprovePage extends GetView<FriendApproveController> {
   const FriendApprovePage({super.key});
   static const String routeName = '/friend_approve';
-  // 定义顶部导航栏的渐变颜色
-  // 修改为上下方向的渐变
 
   @override
   Widget build(BuildContext context) {
