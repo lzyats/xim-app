@@ -16,6 +16,10 @@ class WidgetImage extends StatelessWidget {
   final Color? color;
   final BoxFit? fit;
   final bool gallery;
+  // 新增缓存相关参数（按需调整）
+  final int? cacheWidth;
+  final int? cacheHeight;
+
   const WidgetImage(
     this.path,
     this.imageType, {
@@ -25,6 +29,8 @@ class WidgetImage extends StatelessWidget {
     this.color,
     this.fit,
     this.gallery = false,
+    this.cacheWidth,
+    this.cacheHeight,
   });
 
   @override
@@ -33,12 +39,10 @@ class WidgetImage extends StatelessWidget {
       return GestureDetector(
         child: _build(),
         onTap: () {
-          if (gallery) {
-            Get.to(
-              ShowImage(path, imageType: imageType),
-              transition: Transition.topLevel,
-            );
-          }
+          Get.to(
+            ShowImage(path, imageType: imageType),
+            transition: Transition.topLevel,
+          );
         },
       );
     }
@@ -47,17 +51,27 @@ class WidgetImage extends StatelessWidget {
 
   _build() {
     if (ImageType.network == imageType) {
+      // 使用CachedNetworkImage替代Image.network，支持缓存和错误处理
       return CachedNetworkImage(
         imageUrl: path,
         width: width,
         height: height,
         color: color,
         fit: fit,
-        cacheKey: path,
-        errorListener: (value) {},
-        errorWidget: (context, error, stackTrace) {
-          return _error();
-        },
+        // 加载中占位符（可选）
+        placeholder: (context, url) => Container(
+          width: width,
+          height: height,
+          color: Colors.grey[200],
+          child: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+            ),
+          ),
+        ),
+        // 错误处理（替换原errorBuilder）
+        errorWidget: (context, url, error) => _error(),
       );
     }
     if (ImageType.file == imageType) {
@@ -67,9 +81,7 @@ class WidgetImage extends StatelessWidget {
         height: height,
         color: color,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) {
-          return _error();
-        },
+        errorBuilder: (context, error, stackTrace) => _error(),
       );
     }
     if (ImageType.asset == imageType) {
@@ -79,14 +91,10 @@ class WidgetImage extends StatelessWidget {
         height: height,
         color: color,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) {
-          return _error();
-        },
+        errorBuilder: (context, error, stackTrace) => _error(),
       );
     }
-    return Container(
-      width: 50,
-    );
+    return Container(width: 50);
   }
 
   _error() {
@@ -99,27 +107,23 @@ class WidgetImage extends StatelessWidget {
     );
   }
 
+  // 优化图片提供者：使用CachedNetworkImage的缓存机制
   static ImageProvider provider(String path) {
     if (!AppConfig.network) {
-      return Image.asset(AppImage.error).image;
+      return AssetImage(AppImage.error);
     }
-    Image image = Image.network(
+    // 使用CachedNetworkImage的缓存管理器获取图片提供者
+    return CachedNetworkImageProvider(
       path,
-      errorBuilder: (context, error, stackTrace) {
-        return Image.asset(AppImage.error);
-      },
+      errorListener: (error) => debugPrint('图片加载错误: $error'),
     );
-    return image.image;
   }
 }
 
 // 图片类型
 enum ImageType {
-  // 网络
   network('network'),
-  // 文件
   file('file'),
-  // 资源
   asset('asset'),
   ;
 
@@ -127,7 +131,7 @@ enum ImageType {
   final String value;
 }
 
-// 图片组件
+// 图片预览组件（保持不变）
 class ShowImage extends StatelessWidget {
   final String path;
   final ImageType imageType;
@@ -137,23 +141,18 @@ class ShowImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: InkWell(
-        onTap: () {
-          Get.back();
-        },
+        onTap: () => Get.back(),
         child: PhotoViewGallery.builder(
           itemCount: 1,
           builder: (context, index) {
             return PhotoViewGalleryPageOptions(
               imageProvider: _provider(),
-              errorBuilder: (context, error, stackTrace) {
-                return Image.asset(AppImage.error);
-              },
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.asset(AppImage.error),
             );
           },
           scrollPhysics: const BouncingScrollPhysics(),
-          backgroundDecoration: const BoxDecoration(
-            color: Colors.white,
-          ),
+          backgroundDecoration: const BoxDecoration(color: Colors.white),
           pageController: PageController(),
         ),
       ),
@@ -163,7 +162,7 @@ class ShowImage extends StatelessWidget {
   ImageProvider _provider() {
     switch (imageType) {
       case ImageType.network:
-        return WidgetImage.provider(path);
+        return WidgetImage.provider(path); // 复用优化后的provider
       case ImageType.file:
         return FileImage(File(path));
       case ImageType.asset:

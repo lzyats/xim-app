@@ -251,6 +251,18 @@ class AjaxData<T> {
     return result['data'] ?? {};
   }
 
+  List<dynamic> getJsonlist({bool en = false}) {
+    if (en) {
+      // 1. 先获取原始数据并解密
+      dynamic encryptedData = result['data']; // 获取原始加密数据
+      String decryptedStr =
+          ToolsEncrypt.decrypt(AppConfig.secret, encryptedData); // 解密为字符串
+      List<dynamic> decryptedData = jsonDecode(decryptedStr);
+      return decryptedData;
+    }
+    return result['data'] ?? {};
+  }
+
   T getData(T Function(dynamic data) function, {bool en = false}) {
     if (en) {
       // 1. 先获取原始数据并解密

@@ -31,6 +31,33 @@ class RequestMine {
     return localUser;
   }
 
+  // 获取头像列表
+  static Future<List<String>> getAva() async {
+    // 执行请求
+    AjaxData ajaxData = await ToolsRequest().get(
+      '$_prefix/getAva',
+      showError: false,
+    );
+    // 关键修改：先获取原始数据，判断类型后再转换
+    dynamic rawData = ajaxData.getJsonlist(en: true); // 先用dynamic接收，避免类型冲突
+    debugPrint("getAva接口返回数据: ${rawData.toString()}");
+    // 情况1：如果接口返回的是纯数组（如 ["url1", "url2"]）
+    if (rawData is List<dynamic>) {
+      return rawData.map((item) => item.toString()).toList();
+    }
+    // 情况2：如果接口返回的是包裹数组的对象（如 {"data": ["url1", "url2"]}）
+    else if (rawData is Map<String, dynamic>) {
+      // 根据实际接口字段调整key（例如接口用"list"或"data"包裹数组）
+      List<dynamic> listData = rawData['list'] as List<dynamic>? ?? [];
+      return listData.map((item) => item.toString()).toList();
+    }
+    // 异常情况：返回空列表避免崩溃
+    else {
+      debugPrint("getAva接口返回数据格式异常: ${rawData.toString()}");
+      return [];
+    }
+  }
+
   // 设置密码
   static Future<void> setPass(
     String pass,

@@ -126,6 +126,7 @@ class MomentInfoPage extends StatelessWidget {
                         children: [
                           ...posts
                               .map((post) => WidgetMoment.momentsItem(
+                                    context,
                                     post: post,
                                     onImageTap: (mediaList, index) =>
                                         WidgetMoment.showImageViewer(

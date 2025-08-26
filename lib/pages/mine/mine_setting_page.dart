@@ -67,6 +67,8 @@ class MineSettingPage extends GetView<MineSettingController> {
                     onTap: () {
                       WidgetUpload.image(
                         context,
+                        avr: true,
+                        avrurl: localUser.portrait,
                         onTap: (value) {
                           if (ToolsSubmit.call()) {
                             // 提交

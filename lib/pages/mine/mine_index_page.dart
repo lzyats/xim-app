@@ -138,7 +138,10 @@ class MineIndexPage extends GetView<MineIndexController> {
                       // 右侧：二维码图标和箭头（已移到最右边）
                       Row(
                         children: <Widget>[
-                          Icon(Icons.qr_code),
+                          Icon(
+                            Icons.qr_code,
+                            color: Colors.red,
+                          ),
                           SizedBox(width: 8.0), // 增加图标间距
                           WidgetCommon.arrow(),
                         ],

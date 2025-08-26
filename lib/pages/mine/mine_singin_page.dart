@@ -17,7 +17,7 @@ class MineSigninPage extends GetView<MineSigninController> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeader(controller.localUser.value.portrait),
+            _buildHeader(controller.localUser.value!.portrait),
             _buildSignPrompt(sign),
             _buildSignGrid(sign),
             _buildRules(),
@@ -210,6 +210,9 @@ class MineSigninPage extends GetView<MineSigninController> {
                       date.month == east8Now.month &&
                       date.day == east8Now.day;
 
+                  // 新增：判断当前日期是否为未来日期（大于今天）
+                  final isFuture = date.isAfter(east8Now);
+
                   return Container(
                     margin: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
@@ -228,8 +231,8 @@ class MineSigninPage extends GetView<MineSigninController> {
                       children: [
                         // 奖励金额框
                         Container(
-                          width: 24,
-                          height: 24,
+                          width: 26,
+                          height: 26,
                           decoration: BoxDecoration(
                             color: isSigned
                                 ? const Color(0xFFFF7D3F)
@@ -238,10 +241,21 @@ class MineSigninPage extends GetView<MineSigninController> {
                           ),
                           child: Center(
                             child: Text(
-                              '+${sign.round()}',
+                              controller.dailyRewards[index] > 0
+                                  ? controller.dailyRewards[index].toString()
+                                  : isToday
+                                      ? (sign + controller.reward.value)
+                                          .toStringAsFixed(2)
+                                      : isFuture
+                                          ? "?"
+                                          : sign.toString(),
                               style: TextStyle(
-                                color: isSigned ? Colors.white : Colors.grey,
-                                fontSize: 12,
+                                color: isSigned
+                                    ? Colors.white
+                                    : isFuture
+                                        ? Colors.blue
+                                        : Colors.grey,
+                                fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -250,7 +264,7 @@ class MineSigninPage extends GetView<MineSigninController> {
                         const SizedBox(height: 4),
                         // 日期显示
                         Text(
-                          '${date.day}',
+                          isToday ? '今日' : '${date.day}',
                           style: TextStyle(
                             color: isSigned
                                 ? Colors.orange
@@ -305,11 +319,9 @@ class MineSigninPage extends GetView<MineSigninController> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildRuleItem('每日签到可获得对应金额奖励'),
-              _buildRuleItem('签到获取的奖励符合系统提现要求即可提现'),
+              _buildRuleItem('请不要在每日23点30分以后签到，漏签不可以进行补签'),
               _buildRuleItem(
-                  '连续签到30天额外奖励 10 ${controller.localConfig.cashname}'),
-              _buildRuleItem('漏签不可以进行补签，签到中断后签到从0开始计算'),
+                  '第1天 0.1元,第2天 0.15元,第3天 0.2元,第4天 0.25元,第5天 0.3元,第6天 0.35元元,第7天及以上 0.45元,中断后签到从第1天开始重新计算'),
             ],
           ),
         ],

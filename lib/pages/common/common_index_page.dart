@@ -9,7 +9,6 @@ import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/pages/mine/mine_safety_page.dart';
 import 'package:alpaca/pages/mine/mine_setting_page.dart';
 import 'package:alpaca/pages/common/common_index_controller.dart';
-import 'package:alpaca/pages/view/view_page.dart';
 import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 

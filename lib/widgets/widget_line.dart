@@ -130,7 +130,7 @@ class WidgetLineRow extends StatelessWidget {
                   : null,
               trailing: Container(
                 constraints: const BoxConstraints(
-                  maxWidth: 150,
+                  maxWidth: 110,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,

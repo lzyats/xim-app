@@ -8,6 +8,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper_null_safety_flutter3/flutter_swiper_null_safety_flutter3.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_perms.dart';
+import 'package:path/path.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 
@@ -126,7 +127,8 @@ class WidgetMoment {
   }
 
   // 帖子项组件
-  static momentsItem({
+  static momentsItem(
+    BuildContext context, {
     required MomentModel post,
     required Function(List<Media>, int) onImageTap,
     required Function(List<Media>, int) onVideoTap,
@@ -160,6 +162,46 @@ class WidgetMoment {
       );
     }
 
+    /// 统一的图片加载组件（带缓存）
+    Widget _buildCachedImage({
+      required String imageUrl,
+      double? width,
+      double? height,
+      BoxFit fit = BoxFit.cover,
+    }) {
+      return Container(
+        width: width,
+        height: height,
+        child: Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: width,
+              height: height,
+              fit: fit,
+              // 加载中占位符
+              placeholder: (context, url) => Container(
+                color: Colors.grey[100],
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                  ),
+                ),
+              ),
+              // 错误占位符
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[100],
+                child:
+                    const Icon(Icons.image_not_supported, color: Colors.grey),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // 统一的九宫格媒体布局方法
     // 统一的九宫格媒体布局方法
     Widget buildMediaGrid({
       required List<Media> mediaList,
@@ -176,36 +218,40 @@ class WidgetMoment {
           color: Colors.grey.shade100,
         );
       } else if (mediaCount == 1) {
+        //print("宽：" + mediaWidth.toString() + " 高：" + mediaHeight.toString());
         return GestureDetector(
-          onTap: () => onTap(mediaList, 0),
-          child: Image.network(
-            mediaList.first.url,
-            width: mediaWidth,
-            height: mediaHeight,
-            fit: BoxFit.cover,
-          ),
-        );
+            onTap: () => onTap(mediaList, 0),
+            child: _buildCachedImage(
+              imageUrl: mediaList.first.url,
+              width: mediaWidth,
+              height: mediaHeight,
+              fit: BoxFit.fill,
+            ));
       } else if (mediaCount == 2) {
         return Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () => onTap(mediaList, 0),
-                child: Image.network(
-                  mediaList[0].url,
-                  height: mediaHeight,
-                  fit: BoxFit.cover,
-                ),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 0.5), // 右侧间隔0.5
+                child: GestureDetector(
+                    onTap: () => onTap(mediaList, 0),
+                    child: _buildCachedImage(
+                      imageUrl: mediaList[0].url,
+                      height: mediaHeight,
+                      width: mediaWidth / 2,
+                    )),
               ),
             ),
             Expanded(
-              child: GestureDetector(
-                onTap: () => onTap(mediaList, 1),
-                child: Image.network(
-                  mediaList[1].url,
-                  height: mediaHeight,
-                  fit: BoxFit.cover,
-                ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 0.5), // 左侧间隔0.5
+                child: GestureDetector(
+                    onTap: () => onTap(mediaList, 1),
+                    child: _buildCachedImage(
+                      imageUrl: mediaList[1].url,
+                      height: mediaHeight,
+                      width: mediaWidth / 2,
+                    )),
               ),
             ),
           ],
@@ -215,34 +261,37 @@ class WidgetMoment {
           children: [
             Column(
               children: [
-                GestureDetector(
-                  onTap: () => onTap(mediaList, 0),
-                  child: Image.network(
-                    mediaList[0].url,
-                    width: mediaWidth / 2,
-                    height: mediaHeight / 2,
-                    fit: BoxFit.cover,
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 0.5, bottom: 0.5),
+                  child: GestureDetector(
+                      onTap: () => onTap(mediaList, 0),
+                      child: _buildCachedImage(
+                        imageUrl: mediaList[0].url,
+                        width: mediaWidth / 2 - 1.8, // 减去间隔
+                        height: mediaHeight / 2 - 0.5,
+                      )),
                 ),
-                GestureDetector(
-                  onTap: () => onTap(mediaList, 1),
-                  child: Image.network(
-                    mediaList[1].url,
-                    width: mediaWidth / 2,
-                    height: mediaHeight / 2,
-                    fit: BoxFit.cover,
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 0.5, top: 0.5),
+                  child: GestureDetector(
+                      onTap: () => onTap(mediaList, 1),
+                      child: _buildCachedImage(
+                        imageUrl: mediaList[1].url,
+                        width: mediaWidth / 2 - 1.8,
+                        height: mediaHeight / 2 - 0.5,
+                      )),
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () => onTap(mediaList, 2),
-              child: Image.network(
-                mediaList[2].url,
-                width: mediaWidth / 2,
-                height: mediaHeight,
-                fit: BoxFit.cover,
-              ),
+            Padding(
+              padding: const EdgeInsets.only(left: 0.5),
+              child: GestureDetector(
+                  onTap: () => onTap(mediaList, 2),
+                  child: _buildCachedImage(
+                    imageUrl: mediaList[2].url, // 修复原代码中误用mediaList[1]的bug
+                    width: mediaWidth / 2 - 2.5,
+                    height: mediaHeight - 1,
+                  )),
             ),
           ],
         );
@@ -251,16 +300,19 @@ class WidgetMoment {
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 1, // 列之间间隔1
+          mainAxisSpacing: 1, // 行之间间隔1
+          childAspectRatio: 1, // 正方形比例
           children: mediaList.asMap().entries.map((entry) {
             int index = entry.key;
             Media media = entry.value;
             return GestureDetector(
-              onTap: () => onTap(mediaList, index),
-              child: Image.network(
-                media.url,
-                fit: BoxFit.cover,
-              ),
-            );
+                onTap: () => onTap(mediaList, index),
+                child: _buildCachedImage(
+                  imageUrl: media.url,
+                  width: mediaWidth / 2,
+                  height: mediaHeight / 2,
+                ));
           }).toList(),
         );
       } else if (mediaCount == 5) {
@@ -269,23 +321,27 @@ class WidgetMoment {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 0),
-                    child: Image.network(
-                      mediaList[0].url,
-                      height: mediaHeight / 2,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 0.5, bottom: 1),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 0),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[0].url,
+                          height: mediaHeight / 2 - 0.5,
+                          width: mediaWidth / 2 - 0.5,
+                        )),
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 1),
-                    child: Image.network(
-                      mediaList[1].url,
-                      height: mediaHeight / 2,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 0.5, bottom: 1),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 1),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[1].url,
+                          height: mediaHeight / 2 - 0.5,
+                          width: mediaWidth / 2 - 0.5,
+                        )),
                   ),
                 ),
               ],
@@ -293,33 +349,39 @@ class WidgetMoment {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 2),
-                    child: Image.network(
-                      mediaList[2].url,
-                      height: mediaHeight / 2,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 0.5),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 2),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[2].url,
+                          height: mediaHeight / 2 - 0.5,
+                          width: mediaWidth / 3 - 0.3,
+                        )),
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 3),
-                    child: Image.network(
-                      mediaList[3].url,
-                      height: mediaHeight / 2,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0.5),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 3),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[3].url,
+                          height: mediaHeight / 2 - 0.5,
+                          width: mediaWidth / 3 - 0.3,
+                        )),
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 4),
-                    child: Image.network(
-                      mediaList[4].url,
-                      height: mediaHeight / 2,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 0.5),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 4),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[4].url,
+                          height: mediaHeight / 2 - 0.5,
+                          width: mediaWidth / 3 - 0.3,
+                        )),
                   ),
                 ),
               ],
@@ -327,50 +389,56 @@ class WidgetMoment {
           ],
         );
       } else if (mediaCount == 6) {
-        return GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: mediaList.asMap().entries.map((entry) {
-            int index = entry.key;
-            Media media = entry.value;
-            return GestureDetector(
-              onTap: () => onTap(mediaList, index),
-              child: Image.network(
-                media.url,
-                width: mediaWidth / 3,
-                height: mediaHeight,
-                fit: BoxFit.cover,
-              ),
-            );
-          }).toList(),
+        return Container(
+          height: mediaHeight, // 强制容器高度
+          child: GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 1, // 列间隔
+            mainAxisSpacing: 1, // 行间隔
+            children: mediaList.asMap().entries.map((entry) {
+              int index = entry.key;
+              Media media = entry.value;
+              return GestureDetector(
+                  onTap: () => onTap(mediaList, index),
+                  child: _buildCachedImage(
+                    imageUrl: media.url,
+                    height: mediaHeight / 2,
+                    width: mediaWidth / 3 - 0.3,
+                  ));
+            }).toList(),
+            childAspectRatio: (mediaWidth / 3) / (mediaHeight / 2), // 精确控制宽高比
+          ),
         );
       } else if (mediaCount == 7) {
         return Column(
           children: [
-            GestureDetector(
-              onTap: () => onTap(mediaList, 0),
-              child: Image.network(
-                mediaList[0].url,
-                width: mediaWidth,
-                height: mediaHeight / 3,
-                fit: BoxFit.cover,
-              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 1),
+              child: GestureDetector(
+                  onTap: () => onTap(mediaList, 0),
+                  child: _buildCachedImage(
+                    imageUrl: mediaList[0].url,
+                    width: mediaWidth,
+                    height: mediaHeight / 3 - 0.3,
+                  )),
             ),
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 1,
+              mainAxisSpacing: 1,
               children: mediaList.sublist(1).asMap().entries.map((entry) {
                 int index = entry.key + 1;
                 Media media = entry.value;
                 return GestureDetector(
                   onTap: () => onTap(mediaList, index),
-                  child: Image.network(
-                    media.url,
-                    width: mediaWidth / 3,
-                    height: mediaHeight / 3,
-                    fit: BoxFit.cover,
+                  child: _buildCachedImage(
+                    imageUrl: media.url,
+                    width: mediaWidth / 3 - 0.3,
+                    height: mediaHeight / 3 - 0.3,
                   ),
                 );
               }).toList(),
@@ -383,23 +451,27 @@ class WidgetMoment {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 0),
-                    child: Image.network(
-                      mediaList[0].url,
-                      height: mediaHeight / 3,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 0.5, bottom: 1),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 0),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[0].url,
+                          height: mediaHeight / 3 - 0.3,
+                          width: mediaWidth / 2 - 0.5,
+                        )),
                   ),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => onTap(mediaList, 1),
-                    child: Image.network(
-                      mediaList[1].url,
-                      height: mediaHeight / 3,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 0.5, bottom: 1),
+                    child: GestureDetector(
+                        onTap: () => onTap(mediaList, 1),
+                        child: _buildCachedImage(
+                          imageUrl: mediaList[1].url,
+                          height: mediaHeight / 3 - 0.5,
+                          width: mediaWidth / 2 - 0.5,
+                        )),
                   ),
                 ),
               ],
@@ -408,16 +480,18 @@ class WidgetMoment {
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              crossAxisSpacing: 1,
+              mainAxisSpacing: 1,
               children: mediaList.sublist(2).asMap().entries.map((entry) {
                 int index = entry.key + 2;
                 Media media = entry.value;
                 return GestureDetector(
-                  onTap: () => onTap(mediaList, index),
-                  child: Image.network(
-                    media.url,
-                    fit: BoxFit.cover,
-                  ),
-                );
+                    onTap: () => onTap(mediaList, index),
+                    child: _buildCachedImage(
+                      imageUrl: media.url,
+                      width: mediaWidth / 3 - 0.3,
+                      height: mediaHeight / 3 - 0.3,
+                    ));
               }).toList(),
             ),
           ],
@@ -427,16 +501,18 @@ class WidgetMoment {
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 1, // 列之间间隔1
+          mainAxisSpacing: 1, // 行之间间隔1
           children: mediaList.take(9).toList().asMap().entries.map((entry) {
             int index = entry.key;
             Media media = entry.value;
             return GestureDetector(
-              onTap: () => onTap(mediaList, index),
-              child: Image.network(
-                media.url,
-                fit: BoxFit.cover,
-              ),
-            );
+                onTap: () => onTap(mediaList, index),
+                child: _buildCachedImage(
+                  imageUrl: media.url,
+                  width: mediaWidth / 3 - 0.3,
+                  height: mediaHeight / 3 - 0.3,
+                ));
           }).toList(),
         );
       }
@@ -444,7 +520,7 @@ class WidgetMoment {
     }
 
     // 媒体区域构建函数
-    Widget _buildMediaSection() {
+    Widget _buildMediaSection(context) {
       List<Media> mediaList = post.images ?? [];
 
       if (mediaList.isNotEmpty && mediaList.first.type == 1) {
@@ -459,13 +535,16 @@ class WidgetMoment {
           ),
         );
       } else {
+        // 图片 - 计算 mediaWidth 为屏幕宽度的38%
+        final screenWidth = MediaQuery.of(context).size.width; // 获取屏幕宽度
+        final mediaWidth = screenWidth * 0.38; // 38%屏幕宽度
         // 图片 - 调用统一的九宫格布局方法
         return buildMediaGrid(
           mediaList: mediaList,
           onTap: onImageTap,
           // 可自定义宽高，这里使用默认值150
-          // mediaWidth: 200,
-          // mediaHeight: 200,
+          mediaWidth: mediaWidth,
+          mediaHeight: mediaWidth,
         );
       }
     }
@@ -484,7 +563,7 @@ class WidgetMoment {
                   flex: 1,
                   child: Container(
                     child: post.images?.isNotEmpty == true
-                        ? _buildMediaSection()
+                        ? _buildMediaSection(context)
                         : Container(
                             width: 150,
                             height: 150,

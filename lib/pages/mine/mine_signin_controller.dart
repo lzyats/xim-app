@@ -5,14 +5,18 @@ import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/request/request_mine.dart';
 
 class MineSigninController extends GetxController {
-  LocalUser localUsery = ToolsStorage().local();
+  LocalUser? localUsery = ToolsStorage().local();
   LocalConfig localConfig = ToolsStorage().config();
   double sign = 0;
-  late final Rx<LocalUser> localUser;
+  late final Rx<LocalUser?> localUser;
   final usdtBalance = 0.0.obs;
   final isTodaySigned = false.obs;
   // 动态存储当月天数的签到状态
   late final RxList<bool> signInStatus;
+  // 存储每日签到奖励金额
+  late final RxList<double> dailyRewards;
+  // 当日签到奖励
+  late final RxDouble reward = 0.0.obs;
   // 存储当月所有日期（东8区）
   late List<DateTime> east8MonthDates;
   // 当前月份信息（用于展示）
@@ -55,14 +59,12 @@ class MineSigninController extends GetxController {
       return DateTime(currentYear, currentMonthNum, i + 1);
     });
 
-    // 初始化签到状态列表（与当月天数一致）
+    // 初始化签到状态列表和奖励列表（与当月天数一致）
     signInStatus = List<bool>.filled(daysInMonth, false).obs;
+    dailyRewards = List<double>.filled(daysInMonth, 0.0).obs;
 
     // 加载签到信息
     await _fetchSignInfo();
-
-    // 加载本地签到状态
-    //await _loadSignInStatus();
 
     // 更新今日签到状态
     final todayIndex = east8MonthDates.indexWhere((date) =>
@@ -74,72 +76,67 @@ class MineSigninController extends GetxController {
   }
 
   // 获取签到信息接口调用
+  // 获取签到信息接口调用
   Future<void> _fetchSignInfo() async {
     try {
-      final Map<String, dynamic>? signInfo = await RequestMine.getSignInfo();
-      debugPrint(signInfo.toString());
-      if (signInfo != null) {
-        _handleSignData(signInfo);
+      // 接口实际返回 Map<String, dynamic> 类型，正确接收
+      final Map<String, dynamic>? signInfoMap = await RequestMine.getSignInfo();
+      debugPrint(signInfoMap.toString());
+
+      if (signInfoMap != null) {
+        // 从地图中提取签到列表（假设列表对应 key 为 'signList'，根据实际接口字段修改）
+        final List<dynamic> signDataList =
+            signInfoMap['signDates'] as List<dynamic>? ?? [];
+        reward.value = signInfoMap['reward'];
+        _handleSignData(signDataList);
       }
     } catch (e) {
       debugPrint('获取签到信息失败: $e');
     }
   }
 
-  // 统一处理签到数据
-  void _handleSignData(Map<String, dynamic> signData) {
-    // 更新USDT余额
-    if (signData.containsKey('totalReward')) {
-      usdtBalance.value =
-          double.tryParse(signData['totalReward'].toString()) ?? 0.0;
+  // 统一处理签到数据（新格式：列表）
+  void _handleSignData(List<dynamic> signDataList) {
+    // 计算总奖励金额
+    double totalReward = 0.0;
+
+    // 遍历所有签到记录
+    for (var item in signDataList) {
+      if (item is Map<String, dynamic>) {
+        final signDate = item['signDate']?.toString() ?? '';
+        final rewardAmount =
+            double.tryParse(item['rewardAmount']?.toString() ?? '0') ?? 0.0;
+
+        // 累加总奖励
+        totalReward += rewardAmount;
+
+        // 更新对应日期的签到状态和奖励金额
+        _updateSingleDateStatus(signDate, rewardAmount);
+      }
     }
 
-    // 解析signDates并更新签到状态列表
-    if (signData.containsKey('signDates')) {
-      dynamic rawSignDates = signData['signDates'];
-      List<dynamic> signedDates = [];
-
-      if (rawSignDates is List) {
-        signedDates = rawSignDates;
-      } else {
-        debugPrint('signDates类型异常，预期List，实际为：${rawSignDates.runtimeType}');
-      }
-
-      if (signedDates.isNotEmpty) {
-        _updateSignInStatus(signedDates);
-      } else {
-        debugPrint('signDates为空列表或类型异常，不更新签到状态');
-      }
-    } else {
-      debugPrint('接口返回不包含signDates字段');
-    }
+    // 更新总USDT余额
+    usdtBalance.value = totalReward;
   }
 
-  // 根据已签到日期列表更新signInStatus
-  void _updateSignInStatus(List<dynamic> signedDates) {
+  // 更新单个日期的签到状态和奖励金额
+  void _updateSingleDateStatus(String signDate, double rewardAmount) {
     for (int i = 0; i < east8MonthDates.length; i++) {
-      DateTime date = east8MonthDates[i];
-      String dateStr = DateFormat('yyyy-MM-dd').format(date);
-      signInStatus[i] = signedDates.contains(dateStr);
+      final dateStr = DateFormat('yyyy-MM-dd').format(east8MonthDates[i]);
+      if (dateStr == signDate) {
+        signInStatus[i] = true;
+        dailyRewards[i] = rewardAmount;
+        break;
+      }
     }
-    // 更新今天是否已签到状态（找到今天在列表中的索引）
+
+    // 更新今天是否已签到状态
+    final east8Now = DateTime.now().toUtc().add(const Duration(hours: 8));
     final todayIndex = east8MonthDates.indexWhere((date) =>
         DateFormat('yyyy-MM-dd').format(date) ==
-        DateFormat('yyyy-MM-dd')
-            .format(DateTime.now().toUtc().add(const Duration(hours: 8))));
+        DateFormat('yyyy-MM-dd').format(east8Now));
     if (todayIndex != -1) {
       isTodaySigned.value = signInStatus[todayIndex];
-    }
-  }
-
-  // 加载当月签到状态（从本地存储读取）
-  Future<void> _loadSignInStatus() async {
-    for (int i = 0; i < east8MonthDates.length; i++) {
-      final date = east8MonthDates[i];
-      final dateKey = DateFormat('yyyy-MM-dd').format(date);
-      final isSigned =
-          await ToolsStorage().signInStatus(dateKey: dateKey) ?? false;
-      signInStatus[i] = isSigned;
     }
   }
 
@@ -157,24 +154,30 @@ class MineSigninController extends GetxController {
       return;
     }
 
-    // 更新今日签到状态
-    signInStatus[todayIndex] = true;
-    isTodaySigned.value = true;
-
     // 调用签到接口
-    Map<String, dynamic>? signInfo = await RequestMine.sign();
-    if (signInfo != null) {
-      _handleSignData(signInfo);
+    Map<String, dynamic>? signResult = await RequestMine.sign();
+    if (signResult != null) {
+      // 假设签到接口返回当前签到记录：{signDate: "2025-08-07", rewardAmount: 3.0}
+      final signDate = signResult['signDate']?.toString() ?? '';
+      final rewardAmount =
+          double.tryParse(signResult['rewardAmount']?.toString() ?? '0') ?? 0.0;
+
+      // 更新今日签到状态和奖励
+      signInStatus[todayIndex] = true;
+      dailyRewards[todayIndex] = rewardAmount;
+      isTodaySigned.value = true;
+
+      // 重新计算总奖励
+      usdtBalance.value += rewardAmount;
+
+      // 保存今日签到状态到本地
+      final todayKey = DateFormat('yyyy-MM-dd').format(east8Now);
+      await ToolsStorage().signInStatus(dateKey: todayKey, value: true);
+
+      Get.showSnackbar(GetSnackBar(
+        message: '今日签到成功，获得$rewardAmount USDT',
+        duration: const Duration(seconds: 2),
+      ));
     }
-
-    // 保存今日签到状态到本地
-    final todayKey = DateFormat('yyyy-MM-dd').format(east8Now);
-    await ToolsStorage().signInStatus(dateKey: todayKey, value: true);
-
-    String signstr = sign.toString();
-    Get.showSnackbar(GetSnackBar(
-      message: '今日签到成功，获得$signstr USDT',
-      duration: Duration(seconds: 2),
-    ));
   }
 }

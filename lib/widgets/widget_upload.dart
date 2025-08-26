@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:alpaca/tools/tools_submit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_perms.dart';
@@ -9,6 +10,7 @@ import 'package:alpaca/widgets/widget_bottom.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:alpaca/pages/mine/mine_avatar_page.dart';
 
 // 上传组件
 class WidgetUpload {
@@ -17,8 +19,23 @@ class WidgetUpload {
     BuildContext context, {
     bool upload = true,
     required Function(String value) onTap,
+    bool avr = false,
+    String avrurl = "",
   }) async {
     WidgetBottom([
+      if (avr)
+        BottomModel(
+          '系统',
+          onTap: () async {
+            // 导航到头像选择页并等待返回结果
+            final result = await Get.toNamed(MineAvatarPage.routeName);
+            if (avrurl != result)
+              // 修改
+              onTap.call(result);
+            // 关闭
+            Get.back();
+          },
+        ),
       BottomModel(
         '图片',
         onTap: () async {

@@ -71,7 +71,15 @@ class CommonNoticesPage extends GetView<CommonNoticesController> {
           model.title,
           subtitle: model.createTime,
           onTap: () {
-            Get.to(const CommonNoticesItemPage(), arguments: model);
+            Get.bottomSheet(
+              CommonNoticesItemPage(model: model), // 传递 model 而非通过 arguments
+              isScrollControlled: true, // 允许抽屉占满指定高度（关键配置）
+              backgroundColor: Colors.transparent, // 透明背景，避免默认白色遮挡遮罩
+              elevation: 0,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+            );
           },
         );
       },
@@ -80,99 +88,116 @@ class CommonNoticesPage extends GetView<CommonNoticesController> {
 }
 
 // 通知公告
+// 通知公告详情页（抽屉样式）
 class CommonNoticesItemPage extends StatelessWidget {
-  const CommonNoticesItemPage({super.key});
+  final CommonModel02 model;
+  const CommonNoticesItemPage({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    final CommonModel02 model = Get.arguments;
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0.0, 1.0],
-            ),
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: const Text(
-              '公告详情',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
-      ),
-      body: SafeArea(
-        // 避免内容被系统状态栏/导航栏遮挡
-        child: Padding(
-          // 水平+垂直内边距，让卡片不贴边
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Card(
-            elevation: 2, // 卡片阴影深度
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12), // 卡片圆角
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16), // 卡片内边距
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // 公告标题
-                  Text(
-                    model.title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8), // 标题与时间的间距
-                  // 公告时间
-                  Text(
-                    model.createTime,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey, // 浅灰色弱化时间视觉层级
-                    ),
-                  ),
-                  const Divider(
-                    // 分隔线（时间与内容区）
-                    height: 16,
-                    thickness: 1,
-                    color: Colors.grey,
-                  ),
-                  // 公告内容（长文本支持滚动）
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Html(
-                        data: model.content,
-                        style: {
-                          // 配置对齐相关样式
-                          '.ql-align-left': Style(
-                            textAlign: TextAlign.left,
-                          ),
-                          '.ql-align-center': Style(
-                            textAlign: TextAlign.center,
-                          ),
-                          '.ql-align-right': Style(
-                            textAlign: TextAlign.right,
-                          ),
-                          '.ql-align-justify': Style(
-                            textAlign: TextAlign.justify,
-                          ),
-                          // 可以在这里添加其他全局样式
-                        },
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return GestureDetector(
+      // 点击遮罩层（抽屉外部区域）关闭页面
+      onTap: () => Get.back(),
+      child: Container(
+        color: Colors.black54, // 半透明遮罩层，占满整个屏幕
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          // 抽屉内容区域（占屏幕75%高度）
+          child: GestureDetector(
+            // 关键：阻止抽屉内容区域的事件透传到外层遮罩
+            onTap: () {},
+            child: Container(
+              height: screenHeight * 0.75,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  children: [
+                    // 抽屉顶部指示器
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                  ),
-                ],
+
+                    // 标题栏
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(width: 24),
+                          Text(
+                            model.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 1,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Get.back(),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(
+                                width: 24, height: 24),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Divider(height: 1),
+
+                    // 公告内容区域
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              model.createTime,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Html(
+                                  data: model.content,
+                                  style: {
+                                    '.ql-align-left':
+                                        Style(textAlign: TextAlign.left),
+                                    '.ql-align-center':
+                                        Style(textAlign: TextAlign.center),
+                                    '.ql-align-right':
+                                        Style(textAlign: TextAlign.right),
+                                    '.ql-align-justify':
+                                        Style(textAlign: TextAlign.justify),
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
