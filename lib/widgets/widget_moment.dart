@@ -11,6 +11,7 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:path/path.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:alpaca/widgets/widget_ioscache.dart';
 
 class WidgetMoment {
   /// 构建位置显示组件
@@ -755,16 +756,23 @@ class WidgetMoment {
     debugPrint(media.toJson().toString());
     int width = media.width ?? 1;
     int height = media.height ?? 1;
+    double whb = width / height;
     late VideoPlayerController videoPlayerController;
 
-    if (Platform.isAndroid) {
-      // 安卓平台：使用缓存文件播放
-      File file = await DefaultCacheManager().getSingleFile(videoUrl);
-      videoPlayerController = VideoPlayerController.file(file);
-    } else if (Platform.isIOS) {
+    if (Platform.isIOS) {
       // iOS平台：直接播放网络视频
-      videoPlayerController =
-          VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      //videoPlayerController =   VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      // 1. 获取缓存文件的路径（String类型）
+      File file = await WidgetIoscache().getSingleFile(videoUrl);
+      // 2. 通过路径创建 File 实例（关键修复）
+      // 3. 检查文件是否存在（增加容错处理）
+      if (await file.exists()) {
+        videoPlayerController = VideoPlayerController.file(file);
+      } else {
+        // 文件不存在时，降级使用网络播放
+        videoPlayerController =
+            VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      }
     } else {
       // 安卓平台：使用缓存文件播放
       File file = await DefaultCacheManager().getSingleFile(videoUrl);
@@ -778,7 +786,7 @@ class WidgetMoment {
       looping: false,
       allowFullScreen: false, // 此处已全屏，禁用内部全屏按钮
       fullScreenByDefault: false,
-      aspectRatio: height / width, // 自适应比例
+      aspectRatio: whb, // 自适应比例
       errorBuilder: (context, errorMessage) {
         return Center(
           child: Text(

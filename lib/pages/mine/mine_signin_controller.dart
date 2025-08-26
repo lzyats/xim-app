@@ -87,7 +87,9 @@ class MineSigninController extends GetxController {
         // 从地图中提取签到列表（假设列表对应 key 为 'signList'，根据实际接口字段修改）
         final List<dynamic> signDataList =
             signInfoMap['signDates'] as List<dynamic>? ?? [];
-        reward.value = signInfoMap['reward'];
+        // 修复 reward.value 的赋值
+        reward.value =
+            double.tryParse(signInfoMap['reward']?.toString() ?? '0') ?? 0.0;
         _handleSignData(signDataList);
       }
     } catch (e) {

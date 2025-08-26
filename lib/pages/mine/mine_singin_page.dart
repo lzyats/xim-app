@@ -211,8 +211,17 @@ class MineSigninPage extends GetView<MineSigninController> {
                       date.day == east8Now.day;
 
                   // 新增：判断当前日期是否为未来日期（大于今天）
-                  final isFuture = date.isAfter(east8Now);
+                  //debugPrint(east8Now.toString());
+                  //debugPrint(date.toString());
 
+                  // 先将date转换为东八区时间（因为date是本地时区的日期）
+                  final dateInEast8 = DateTime.utc(
+                    date.year,
+                    date.month,
+                    date.day,
+                  ).add(const Duration(hours: 8)); // 转换为东八区0点
+                  final isFuture = dateInEast8.isAfter(east8Now);
+                  //debugPrint(isFuture.toString());
                   return Container(
                     margin: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
