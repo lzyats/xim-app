@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/event/event_moment.dart';
 import 'package:alpaca/event/event_socket.dart';
+import 'package:alpaca/tools/tools_encrypt.dart';
 import 'package:alpaca/tools/tools_request.dart';
 import 'package:alpaca/tools/tools_comment.dart'; // 假设数据模型文件路径
 import 'package:alpaca/tools/tools_storage.dart';
@@ -40,7 +43,11 @@ class RequestMoment {
       },
     );
     // 转换
-    return ajaxData.result['data'];
+    dynamic encryptedData = ajaxData.result['data']; // 获取原始加密数据
+    String decryptedStr =
+        ToolsEncrypt.decrypt(AppConfig.secret, encryptedData); // 解密为字符串
+    Map<String, dynamic> decryptedData = jsonDecode(decryptedStr);
+    return decryptedData;
   }
 
 // 删除朋友圈
@@ -96,9 +103,8 @@ class RequestMoment {
       showError: false,
     );
     // 转换
-    List<SocketModel> dataList = ajaxData.getList(
-      (data) => SocketModel.fromJson(data),
-    );
+    List<SocketModel> dataList =
+        ajaxData.getList((data) => SocketModel.fromJson(data), en: true);
     List<Map<String, dynamic>> messageList = [];
     for (var data in dataList) {
       //debugPrint(data.pushData.toString());

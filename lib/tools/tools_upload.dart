@@ -86,8 +86,8 @@ class ToolsUpload {
       case 'oss':
         return await _oss(multipartFile, uploadToken);
       // 阿里上传
-      //case 'minio':
-      //  return await _minio(multipartFile, uploadToken);
+      case 'minio':
+        return await _minio(multipartFile, uploadToken);
       // 本地上传
       default:
         return await _local(multipartFile);
@@ -220,89 +220,40 @@ class ToolsUpload {
     MultipartFile multipartFile,
     Map<String, dynamic> uploadToken,
   ) async {
-    debugPrint('使用 MINIO 上传');
-
-    // 1. 从服务端返回的 uploadToken 中提取所有必要参数（关键：直接使用服务端生成的参数，不手动计算）
-    final String signature = uploadToken['signature'] ?? '';
-    final String policy = uploadToken['policy'] ?? '';
-    final String accessKey = uploadToken['accessKey'] ?? '';
-    // 1. 从服务端返回的 uploadToken 中提取所有必要参数
-
-// 新增：打印获取到的 Access Key，验证是否正确
-    debugPrint('从 uploadToken 中获取的 Access Key：$accessKey');
-    final String fileKey = uploadToken['fileKey'] ?? '';
+    final String uploadUrl = uploadToken['serverUrl'] ?? '';
     final String filePath = uploadToken['filePath'] ?? '';
-    final String serverUrl = uploadToken['serverUrl'] ?? '';
-    // 服务端返回的核心签名参数（必须原封不动传递）
-    final String xAmzAlgorithm = uploadToken['x-amz-algorithm'] ?? '';
-    final String xAmzDate = uploadToken['x-amz-date'] ?? '';
-    final String xAmzCredential = uploadToken['x-amz-credential'] ?? '';
 
-    // 2. 校验必要参数（补充服务端返回的核心签名参数校验）
-    if ([
-      signature,
-      policy,
-      accessKey,
-      fileKey,
-      serverUrl,
-      xAmzAlgorithm,
-      xAmzDate,
-      xAmzCredential
-    ].any((e) => e.isEmpty)) {
-      EasyLoading.showToast('上传参数不完整（缺失签名关键参数）');
+    if (uploadUrl.isEmpty) {
+      EasyLoading.showToast('上传URL为空');
       return '';
     }
 
-    // 3. 构造表单参数（严格匹配服务端 policy 中定义的条件）
-    final FormData formData = FormData.fromMap({
-      'key': fileKey,
-      'policy': policy,
-      'accessKey': accessKey,
-      'x-amz-algorithm': xAmzAlgorithm, // 使用服务端返回的算法（AWS4-HMAC-SHA256）
-      'x-amz-credential': xAmzCredential, // 使用服务端生成的凭证
-      'x-amz-date': xAmzDate, // 使用服务端生成的时间戳
-      'signature': signature,
-      'success_action_status': '200', // 与服务端 policy 中条件匹配
-      'file': multipartFile,
-    });
-
-    // 4. 配置 Dio（移除手动 Content-Type，由 FormData 自动处理为 multipart/form-data）
-    final Dio dio = Dio(BaseOptions(
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      // 移除手动设置的 Content-Type，避免覆盖表单正确类型
-      headers: {
-        'Content-Length': multipartFile.length, // 保留长度信息（可选，FormData 可能自动处理）
-      },
-    ));
-
     try {
-      final Response response = await dio.post(
-        serverUrl,
-        data: formData,
+      // 直接向预签名URL发送PUT请求，文件内容作为请求体
+      final Response response = await Dio().put(
+        uploadUrl,
+        data: multipartFile.finalize(),
+        options: Options(
+          headers: {
+            'Content-Type': multipartFile.contentType?.toString() ??
+                'application/octet-stream',
+            // 添加Content-Length头，解决411错误
+            'Content-Length': multipartFile.length.toString(),
+          },
+        ),
         onSendProgress: (int sent, int total) {
           final double progress = sent / total;
           debugPrint('上传进度：${(progress * 100).toStringAsFixed(1)}%');
         },
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // MinIO PUT成功可能返回204
         return filePath;
       } else {
         EasyLoading.showToast('上传失败，状态码：${response.statusCode}');
         return '';
       }
-    } on DioException catch (e) {
-      String errorMsg = '上传失败，请稍后重试';
-      if (e.response != null) {
-        errorMsg += '\n状态码：${e.response?.statusCode}';
-        errorMsg += '\n响应：${e.response?.data}'; // 打印原始响应，便于排查服务端具体错误
-      } else {
-        errorMsg += '\n原因：${e.message}';
-      }
-      debugPrint(errorMsg);
-      EasyLoading.showToast(errorMsg);
-      return '';
     } catch (e) {
       debugPrint('上传异常：$e');
       EasyLoading.showToast('上传异常，请稍后重试');

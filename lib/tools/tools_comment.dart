@@ -336,6 +336,7 @@ class FriendLikeModel {
 /// 媒体资源简化模型
 /// 仅包含类型、URL、宽高字段
 class Media {
+  final String? mediaId;
   final int? type; // 媒体类型：0-图片，1-视频，2-音频
   final String url; // 媒体资源URL
   final int? width; // 媒体宽度（可选）
@@ -349,6 +350,7 @@ class Media {
   /// - height: 可选的高度，默认null
   /// - thumbnail: 可选的缩略图URL，默认null
   Media({
+    this.mediaId,
     this.type,
     required this.url,
     this.width,
@@ -359,6 +361,7 @@ class Media {
   /// 从JSON创建实例
   factory Media.fromJson(Map<String, dynamic> json) {
     return Media(
+      mediaId: json['mediaId'].toString(),
       type: json['type'],
       url: json['url'] ?? '',
       width: json['width'],
@@ -370,6 +373,7 @@ class Media {
   /// 转换为JSON格式
   Map<String, dynamic> toJson() {
     return {
+      if (mediaId != null) 'mediaId': mediaId,
       if (type != null) 'type': type,
       'url': url,
       if (width != null) 'width': width,
@@ -458,6 +462,7 @@ class MomentModel {
 
   // 从JSON创建实例，添加全面的空值判断
   factory MomentModel.fromJson(Map<String, dynamic> json) {
+    //debugPrint(json.toString());
     return MomentModel(
       momentId: _parseInt(json['momentId']),
       msgId: _parseInt(json['msgId']),
@@ -601,11 +606,27 @@ class MomentModel {
     return value.toString().trim().isNotEmpty ? value.toString() : null;
   }
 
-  // 辅助方法：解析DateTime类型，处理空值和格式错误
+  /// 辅助方法：解析DateTime类型，支持ISO字符串和时间戳（毫秒/秒）
   static DateTime? _parseDateTime(dynamic value) {
     if (value == null) return null; // 空值直接返回null
 
-    // 尝试将输入转换为字符串
+    // 1. 先尝试判断是否为数字类型（时间戳）
+    if (value is int || value is double) {
+      // 转换为整数（处理可能的double类型时间戳，如1756286754000.0）
+      final timestamp = value is double ? value.toInt() : value as int;
+
+      // 区分毫秒级（13位）和秒级（10位）时间戳
+      if (timestamp.toString().length == 13) {
+        return DateTime.fromMillisecondsSinceEpoch(timestamp);
+      } else if (timestamp.toString().length == 10) {
+        return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000); // 秒转毫秒
+      } else {
+        debugPrint('无效的时间戳长度: $timestamp（需10位秒级或13位毫秒级）');
+        return null;
+      }
+    }
+
+    // 2. 非数字类型，尝试转换为字符串（处理ISO格式）
     String? dateString;
     if (value is String) {
       dateString = value.trim();
@@ -615,12 +636,12 @@ class MomentModel {
 
     if (dateString.isEmpty) return null; // 空字符串返回null
 
-    // 尝试解析日期，捕获格式错误
+    // 3. 尝试解析ISO格式字符串
     try {
       return DateTime.parse(dateString);
     } catch (e) {
-      debugPrint('日期解析失败: 输入值=$value, 错误=$e'); // 调试用日志
-      return null; // 格式错误返回null
+      debugPrint('日期解析失败: 输入值=$value, 错误=$e');
+      return null;
     }
   }
 

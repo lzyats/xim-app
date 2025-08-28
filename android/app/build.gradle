@@ -68,8 +68,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled true
+            signingConfig signingConfigs.release    // 启用正式签名
+            minifyEnabled true                      // 启用混淆
+            shrinkResources true                    // 移除无用资源
             // 混淆
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro", "proguard.cfg"
             // 平台

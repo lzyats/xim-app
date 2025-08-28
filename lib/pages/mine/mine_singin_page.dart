@@ -65,7 +65,7 @@ class MineSigninPage extends GetView<MineSigninController> {
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     Text(
-                      controller.usdtBalance.toStringAsFixed(0) +
+                      controller.usdtBalance.toStringAsFixed(2) +
                           " ${controller.localConfig.cashname}",
                       style: const TextStyle(
                         color: Colors.white,

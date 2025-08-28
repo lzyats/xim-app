@@ -8,16 +8,17 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_swiper_null_safety_flutter3/flutter_swiper_null_safety_flutter3.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_perms.dart';
-import 'package:path/path.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
 import 'package:alpaca/widgets/widget_ioscache.dart';
+
+import 'package:alpaca/tools/tools_videocheck.dart';
 
 class WidgetMoment {
   /// 构建位置显示组件
   /// [strlen]：位置文本的最大长度限制，默认值为22
   static Widget buildLocationWidget(String? location, {int strlen = 20}) {
-    // 新增strlen参数，默认值22
     if (location == null || location.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -36,11 +37,9 @@ class WidgetMoment {
       }
     }
 
-    // 使用strlen参数替代固定值22，同时增加边界判断（避免传入负数导致异常）
-    if (strlen <= 0) strlen = strlen; // 若传入非正数，强制使用默认值22
+    if (strlen <= 0) strlen = 22;
     if (locationText.length > strlen) {
-      locationText =
-          '${locationText.substring(0, strlen - 2)}...'; // 预留2个字符给省略号
+      locationText = '${locationText.substring(0, strlen - 2)}...';
     }
 
     return GestureDetector(
@@ -134,7 +133,14 @@ class WidgetMoment {
     required Function(List<Media>, int) onImageTap,
     required Function(List<Media>, int) onVideoTap,
   }) {
-    // 1. 先声明 _buildVideoPlayerPlaceholder
+    // 获取显示用的图片URL（优先使用包含http的thumbnail）
+    String _getDisplayImageUrl(Media media) {
+      if (media.thumbnail != null && media.thumbnail!.contains('http')) {
+        return media.thumbnail!;
+      }
+      return media.url;
+    }
+
     Widget _buildVideoPlayerPlaceholder(
         String videoUrl, String thumbnailUrl, double width, double height) {
       return Container(
@@ -165,45 +171,46 @@ class WidgetMoment {
 
     /// 统一的图片加载组件（带缓存）
     Widget _buildCachedImage({
-      required String imageUrl,
+      required String displayUrl, // 显示用URL（可能是thumbnail）
+      required String originalUrl, // 原始URL（用于点击查看）
+      required String id, //用于标识唯一图片
       double? width,
       double? height,
       BoxFit fit = BoxFit.cover,
     }) {
-      return Container(
-        width: width,
-        height: height,
-        child: Stack(
-          children: [
-            CachedNetworkImage(
-              imageUrl: imageUrl,
-              width: width,
-              height: height,
-              fit: fit,
-              // 加载中占位符
-              placeholder: (context, url) => Container(
-                color: Colors.grey[100],
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
-                  ),
-                ),
-              ),
-              // 错误占位符
-              errorWidget: (context, url, error) => Container(
-                color: Colors.grey[100],
-                child:
-                    const Icon(Icons.image_not_supported, color: Colors.grey),
+      return VisibilityDetector(
+        key: Key('lazy_image_$id'),
+        onVisibilityChanged: (visibilityInfo) {
+          if (visibilityInfo.visibleFraction > 0.5) {
+            // 预加载显示用的图片到缓存
+            DefaultCacheManager().getSingleFile(displayUrl);
+          }
+        },
+        child: CachedNetworkImage(
+          imageUrl: displayUrl, // 排版时使用displayUrl
+          width: width,
+          height: height,
+          fit: fit,
+          placeholder: (context, url) => Container(
+            color: Colors.grey[100],
+            child: const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
               ),
             ),
-          ],
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: Colors.grey[100],
+            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+          ),
+          memCacheWidth: width?.toInt(),
+          memCacheHeight: height?.toInt(),
         ),
       );
     }
 
-    // 统一的九宫格媒体布局方法
-    // 统一的九宫格媒体布局方法
+    /// 统一的九宫格媒体布局方法
     Widget buildMediaGrid({
       required List<Media> mediaList,
       required Function(List<Media>, int) onTap,
@@ -219,11 +226,13 @@ class WidgetMoment {
           color: Colors.grey.shade100,
         );
       } else if (mediaCount == 1) {
-        //print("宽：" + mediaWidth.toString() + " 高：" + mediaHeight.toString());
+        final media = mediaList.first;
         return GestureDetector(
             onTap: () => onTap(mediaList, 0),
             child: _buildCachedImage(
-              imageUrl: mediaList.first.url,
+              displayUrl: _getDisplayImageUrl(media),
+              originalUrl: media.url,
+              id: media.mediaId ?? media.url,
               width: mediaWidth,
               height: mediaHeight,
               fit: BoxFit.fill,
@@ -233,23 +242,28 @@ class WidgetMoment {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(right: 0.5), // 右侧间隔0.5
+                padding: const EdgeInsets.only(right: 0.5),
                 child: GestureDetector(
                     onTap: () => onTap(mediaList, 0),
                     child: _buildCachedImage(
-                      imageUrl: mediaList[0].url,
+                      displayUrl: _getDisplayImageUrl(mediaList[0]),
+                      originalUrl: mediaList[0].url,
+                      id: mediaList[0].mediaId ?? mediaList[0].url,
                       height: mediaHeight,
                       width: mediaWidth / 2,
+                      fit: BoxFit.cover,
                     )),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(left: 0.5), // 左侧间隔0.5
+                padding: const EdgeInsets.only(left: 0.5),
                 child: GestureDetector(
                     onTap: () => onTap(mediaList, 1),
                     child: _buildCachedImage(
-                      imageUrl: mediaList[1].url,
+                      displayUrl: _getDisplayImageUrl(mediaList[1]),
+                      originalUrl: mediaList[1].url,
+                      id: mediaList[1].mediaId ?? mediaList[1].url,
                       height: mediaHeight,
                       width: mediaWidth / 2,
                     )),
@@ -267,8 +281,10 @@ class WidgetMoment {
                   child: GestureDetector(
                       onTap: () => onTap(mediaList, 0),
                       child: _buildCachedImage(
-                        imageUrl: mediaList[0].url,
-                        width: mediaWidth / 2 - 1.8, // 减去间隔
+                        displayUrl: _getDisplayImageUrl(mediaList[0]),
+                        originalUrl: mediaList[0].url,
+                        id: mediaList[0].mediaId ?? mediaList[0].url,
+                        width: mediaWidth / 2 - 1.8,
                         height: mediaHeight / 2 - 0.5,
                       )),
                 ),
@@ -277,7 +293,9 @@ class WidgetMoment {
                   child: GestureDetector(
                       onTap: () => onTap(mediaList, 1),
                       child: _buildCachedImage(
-                        imageUrl: mediaList[1].url,
+                        displayUrl: _getDisplayImageUrl(mediaList[1]),
+                        originalUrl: mediaList[1].url,
+                        id: mediaList[1].mediaId ?? mediaList[1].url,
                         width: mediaWidth / 2 - 1.8,
                         height: mediaHeight / 2 - 0.5,
                       )),
@@ -289,7 +307,9 @@ class WidgetMoment {
               child: GestureDetector(
                   onTap: () => onTap(mediaList, 2),
                   child: _buildCachedImage(
-                    imageUrl: mediaList[2].url, // 修复原代码中误用mediaList[1]的bug
+                    displayUrl: _getDisplayImageUrl(mediaList[2]),
+                    originalUrl: mediaList[2].url,
+                    id: mediaList[2].mediaId ?? mediaList[2].url,
                     width: mediaWidth / 2 - 2.5,
                     height: mediaHeight - 1,
                   )),
@@ -301,16 +321,18 @@ class WidgetMoment {
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 1, // 列之间间隔1
-          mainAxisSpacing: 1, // 行之间间隔1
-          childAspectRatio: 1, // 正方形比例
+          crossAxisSpacing: 1,
+          mainAxisSpacing: 1,
+          childAspectRatio: 1,
           children: mediaList.asMap().entries.map((entry) {
             int index = entry.key;
             Media media = entry.value;
             return GestureDetector(
                 onTap: () => onTap(mediaList, index),
                 child: _buildCachedImage(
-                  imageUrl: media.url,
+                  displayUrl: _getDisplayImageUrl(media),
+                  originalUrl: media.url,
+                  id: media.mediaId ?? media.url,
                   width: mediaWidth / 2,
                   height: mediaHeight / 2,
                 ));
@@ -327,7 +349,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 0),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[0].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[0]),
+                          originalUrl: mediaList[0].url,
+                          id: mediaList[0].mediaId ?? mediaList[0].url,
                           height: mediaHeight / 2 - 0.5,
                           width: mediaWidth / 2 - 0.5,
                         )),
@@ -339,7 +363,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 1),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[1].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[1]),
+                          originalUrl: mediaList[1].url,
+                          id: mediaList[1].mediaId ?? mediaList[1].url,
                           height: mediaHeight / 2 - 0.5,
                           width: mediaWidth / 2 - 0.5,
                         )),
@@ -355,7 +381,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 2),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[2].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[2]),
+                          originalUrl: mediaList[2].url,
+                          id: mediaList[2].mediaId ?? mediaList[2].url,
                           height: mediaHeight / 2 - 0.5,
                           width: mediaWidth / 3 - 0.3,
                         )),
@@ -367,7 +395,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 3),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[3].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[3]),
+                          originalUrl: mediaList[3].url,
+                          id: mediaList[3].mediaId ?? mediaList[3].url,
                           height: mediaHeight / 2 - 0.5,
                           width: mediaWidth / 3 - 0.3,
                         )),
@@ -379,7 +409,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 4),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[4].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[4]),
+                          originalUrl: mediaList[4].url,
+                          id: mediaList[4].mediaId ?? mediaList[4].url,
                           height: mediaHeight / 2 - 0.5,
                           width: mediaWidth / 3 - 0.3,
                         )),
@@ -391,25 +423,27 @@ class WidgetMoment {
         );
       } else if (mediaCount == 6) {
         return Container(
-          height: mediaHeight, // 强制容器高度
+          height: mediaHeight,
           child: GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 1, // 列间隔
-            mainAxisSpacing: 1, // 行间隔
+            crossAxisSpacing: 1,
+            mainAxisSpacing: 1,
             children: mediaList.asMap().entries.map((entry) {
               int index = entry.key;
               Media media = entry.value;
               return GestureDetector(
                   onTap: () => onTap(mediaList, index),
                   child: _buildCachedImage(
-                    imageUrl: media.url,
+                    displayUrl: _getDisplayImageUrl(media),
+                    originalUrl: media.url,
+                    id: media.mediaId ?? media.url,
                     height: mediaHeight / 2,
                     width: mediaWidth / 3 - 0.3,
                   ));
             }).toList(),
-            childAspectRatio: (mediaWidth / 3) / (mediaHeight / 2), // 精确控制宽高比
+            childAspectRatio: (mediaWidth / 3) / (mediaHeight / 2),
           ),
         );
       } else if (mediaCount == 7) {
@@ -420,7 +454,9 @@ class WidgetMoment {
               child: GestureDetector(
                   onTap: () => onTap(mediaList, 0),
                   child: _buildCachedImage(
-                    imageUrl: mediaList[0].url,
+                    displayUrl: _getDisplayImageUrl(mediaList[0]),
+                    originalUrl: mediaList[0].url,
+                    id: mediaList[0].mediaId ?? mediaList[0].url,
                     width: mediaWidth,
                     height: mediaHeight / 3 - 0.3,
                   )),
@@ -437,7 +473,9 @@ class WidgetMoment {
                 return GestureDetector(
                   onTap: () => onTap(mediaList, index),
                   child: _buildCachedImage(
-                    imageUrl: media.url,
+                    displayUrl: _getDisplayImageUrl(media),
+                    originalUrl: media.url,
+                    id: media.mediaId ?? media.url,
                     width: mediaWidth / 3 - 0.3,
                     height: mediaHeight / 3 - 0.3,
                   ),
@@ -457,7 +495,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 0),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[0].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[0]),
+                          originalUrl: mediaList[0].url,
+                          id: mediaList[0].mediaId ?? mediaList[0].url,
                           height: mediaHeight / 3 - 0.3,
                           width: mediaWidth / 2 - 0.5,
                         )),
@@ -469,7 +509,9 @@ class WidgetMoment {
                     child: GestureDetector(
                         onTap: () => onTap(mediaList, 1),
                         child: _buildCachedImage(
-                          imageUrl: mediaList[1].url,
+                          displayUrl: _getDisplayImageUrl(mediaList[1]),
+                          originalUrl: mediaList[1].url,
+                          id: mediaList[1].mediaId ?? mediaList[1].url,
                           height: mediaHeight / 3 - 0.5,
                           width: mediaWidth / 2 - 0.5,
                         )),
@@ -489,7 +531,9 @@ class WidgetMoment {
                 return GestureDetector(
                     onTap: () => onTap(mediaList, index),
                     child: _buildCachedImage(
-                      imageUrl: media.url,
+                      displayUrl: _getDisplayImageUrl(media),
+                      originalUrl: media.url,
+                      id: media.mediaId ?? media.url,
                       width: mediaWidth / 3 - 0.3,
                       height: mediaHeight / 3 - 0.3,
                     ));
@@ -502,15 +546,17 @@ class WidgetMoment {
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 1, // 列之间间隔1
-          mainAxisSpacing: 1, // 行之间间隔1
+          crossAxisSpacing: 1,
+          mainAxisSpacing: 1,
           children: mediaList.take(9).toList().asMap().entries.map((entry) {
             int index = entry.key;
             Media media = entry.value;
             return GestureDetector(
                 onTap: () => onTap(mediaList, index),
                 child: _buildCachedImage(
-                  imageUrl: media.url,
+                  displayUrl: _getDisplayImageUrl(media),
+                  originalUrl: media.url,
+                  id: media.mediaId ?? media.url,
                   width: mediaWidth / 3 - 0.3,
                   height: mediaHeight / 3 - 0.3,
                 ));
@@ -523,27 +569,24 @@ class WidgetMoment {
     // 媒体区域构建函数
     Widget _buildMediaSection(context) {
       List<Media> mediaList = post.images ?? [];
-
+      final screenWidth = MediaQuery.of(context).size.width;
+      final mediaWidth = screenWidth * 0.38;
       if (mediaList.isNotEmpty && mediaList.first.type == 1) {
-        // 视频
+        // 视频处理保持不变
         return GestureDetector(
           onTap: () => onVideoTap(mediaList, 0),
           child: _buildVideoPlayerPlaceholder(
             mediaList.first.url,
             mediaList.first.thumbnail ?? '',
-            150,
-            150,
+            mediaWidth,
+            mediaWidth,
           ),
         );
       } else {
-        // 图片 - 计算 mediaWidth 为屏幕宽度的38%
-        final screenWidth = MediaQuery.of(context).size.width; // 获取屏幕宽度
-        final mediaWidth = screenWidth * 0.38; // 38%屏幕宽度
         // 图片 - 调用统一的九宫格布局方法
         return buildMediaGrid(
           mediaList: mediaList,
           onTap: onImageTap,
-          // 可自定义宽高，这里使用默认值150
           mediaWidth: mediaWidth,
           mediaHeight: mediaWidth,
         );
@@ -597,8 +640,7 @@ class WidgetMoment {
     );
   }
 
-  // 图片浏览及缩放（优化：支持媒体资源元数据）
-  /// 显示图片预览
+  // 图片浏览及缩放（保持使用原始url）
   static void showImageViewer(
     BuildContext context,
     List<Media> picList,
@@ -633,13 +675,11 @@ class WidgetMoment {
                 backgroundColor: Colors.black,
                 body: Stack(
                   children: [
-                    // 每次打开时创建新的 PhotoViewContainer 实例
                     PhotoViewContainer(
-                      mediaList: imageList, // 使用过滤后的图片列表
-                      initialIndex: adjustedInitialIndex, // 使用调整后的初始索引
+                      mediaList: imageList,
+                      initialIndex: adjustedInitialIndex,
                       currentIndex: currentIndex,
                     ),
-                    // 关闭按钮（提升层级至顶部）
                     Positioned(
                       top: 16,
                       right: 16,
@@ -650,7 +690,6 @@ class WidgetMoment {
                         },
                       ),
                     ),
-                    // 底部指示器（提升层级至顶部）
                     Positioned(
                       bottom: 24,
                       left: 0,
@@ -700,27 +739,20 @@ class WidgetMoment {
                 child: FutureBuilder<Widget>(
                   future: buildVideoPlayer(media),
                   builder: (context, snapshot) {
-                    // 加载状态处理
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       );
-                    }
-                    // 错误状态处理
-                    else if (snapshot.hasError) {
+                    } else if (snapshot.hasError) {
                       return Center(
                         child: Text(
                           '视频加载失败: ${snapshot.error}',
                           style: const TextStyle(color: Colors.white),
                         ),
                       );
-                    }
-                    // 成功状态处理
-                    else if (snapshot.hasData) {
+                    } else if (snapshot.hasData) {
                       return snapshot.data!;
-                    }
-                    // 默认 fallback
-                    else {
+                    } else {
                       return const Center(
                         child: Text(
                           '无法加载视频',
@@ -750,43 +782,65 @@ class WidgetMoment {
     );
   }
 
-  // 视频播放器核心组件（使用chewie包装video_player）
+  // 视频播放器核心组件
+  // 修改buildVideoPlayer方法中的iOS部分逻辑
   static Future<Widget> buildVideoPlayer(Media media) async {
     String videoUrl = Uri.encodeFull(media.url);
     debugPrint(media.toJson().toString());
+    // 修复视频比例计算逻辑
     int width = media.width ?? 1;
     int height = media.height ?? 1;
-    double whb = width / height;
-    late VideoPlayerController videoPlayerController;
 
-    if (Platform.isIOS) {
-      // iOS平台：直接播放网络视频
-      //videoPlayerController =   VideoPlayerController.networkUrl(Uri.parse(videoUrl));
-      // 1. 获取缓存文件的路径（String类型）
-      File file = await WidgetIoscache().getSingleFile(videoUrl);
-      // 2. 通过路径创建 File 实例（关键修复）
-      // 3. 检查文件是否存在（增加容错处理）
-      if (await file.exists()) {
-        videoPlayerController = VideoPlayerController.file(file);
+    // 确保宽高都为正数
+    width = width <= 0 ? 1 : width;
+    height = height <= 0 ? 1 : height;
+
+    double whb = width / height;
+
+    // 确保比例为合理正值
+    if (whb <= 0 || whb.isInfinite || whb.isNaN) {
+      whb = 9 / 16; // 使用默认宽高比
+    }
+    late VideoPlayerController videoPlayerController;
+    bool isInitialized = false; // 跟踪初始化状态
+
+    try {
+      // 获取缓存文件
+      File file = await WidgetIoscache().getCustomSingleFile(videoUrl);
+      debugPrint("缓存文件路径: ${file.path}");
+
+      // 1. 判断文件是否存在
+      bool fileExists = await file.exists();
+      if (!fileExists) {
+        debugPrint("缓存文件不存在，准备切换到网络播放");
       } else {
-        // 文件不存在时，降级使用网络播放
-        videoPlayerController =
-            VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+        debugPrint("缓存文件存在，准备判断文件是否具有可读权限");
       }
-    } else {
-      // 安卓平台：使用缓存文件播放
-      File file = await DefaultCacheManager().getSingleFile(videoUrl);
+
+      // 使用重命名后的文件初始化播放器
       videoPlayerController = VideoPlayerController.file(file);
+      await videoPlayerController.initialize();
+      isInitialized = true;
+      debugPrint("视频初始化成功，格式正确");
+    } catch (e) {
+      debugPrint("文件播放失败，准备切换到网络播放: $e");
+    }
+
+    // 如果缓存文件初始化失败，使用网络URL
+    if (!isInitialized) {
+      videoPlayerController =
+          VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      await videoPlayerController.initialize();
     }
     final chewieController = ChewieController(
       videoPlayerController: videoPlayerController,
-      autoInitialize: true,
-      autoPlay: true, // 自动播放
+      autoInitialize: false, // 已手动初始化，这里设为false
+      autoPlay: true,
       showControlsOnInitialize: true,
       looping: false,
-      allowFullScreen: false, // 此处已全屏，禁用内部全屏按钮
+      allowFullScreen: false,
       fullScreenByDefault: false,
-      aspectRatio: whb, // 自适应比例
+      aspectRatio: whb,
       errorBuilder: (context, errorMessage) {
         return Center(
           child: Text(
@@ -797,11 +851,8 @@ class WidgetMoment {
       },
     );
 
-    // 页面销毁时释放资源
-    // 使用 PopScope 替代 WillPopScope（Flutter 3.12+ 推荐）
     return PopScope(
       onPopInvoked: (didPop) {
-        // 关键修复：移除 await，因为 dispose() 返回 void
         videoPlayerController.dispose();
         chewieController.dispose();
       },
@@ -810,7 +861,7 @@ class WidgetMoment {
   }
 }
 
-// 图片预览容器组件
+// 图片预览容器组件（使用原始url）
 class PhotoViewContainer extends StatelessWidget {
   final List<Media> mediaList;
   final int initialIndex;
@@ -834,6 +885,7 @@ class PhotoViewContainer extends StatelessWidget {
         },
         itemBuilder: (context, index) {
           final media = mediaList[index];
+          // 图片浏览器中始终使用原始url
           return PhotoView(
             imageProvider: CachedNetworkImageProvider(media.url),
             minScale: PhotoViewComputedScale.contained * 0.8,

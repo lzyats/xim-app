@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>语聊</string>
+	<string>田言觅语</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -95,5 +95,8 @@
 	<!-- 二维码 -->
 	<key>io.flutter.embedded_views_preview</key>
 	<string>YES</string>
+	<!-- 缓存播放 -->
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>需要访问本地缓存文件以播放视频</string>
 </dict>
 </plist>

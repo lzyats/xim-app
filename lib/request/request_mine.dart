@@ -314,9 +314,10 @@ class RequestMine {
         'type': type,
       },
     );
-    EasyLoading.showToast(ajaxData.getData((data) => data['msg']));
+    EasyLoading.showToast(ajaxData.getData((data) => data['msg'], en: true));
     // 转换
-    return ajaxData.getData((data) => MineModel02.fromJson(data).code);
+    return ajaxData.getData((data) => MineModel02.fromJson(data).code,
+        en: true);
   }
 
   // 忘记密码

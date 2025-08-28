@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:alipay_kit/alipay_kit_platform_interface.dart' as alipay;
-import 'package:fluwx/fluwx.dart' as wechat;
 import 'package:get/get.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/pages/base/base_controller.dart';
@@ -42,10 +40,10 @@ class WalletRechargeController extends BaseController {
     rechargeType = await RequestWallet.getRechargeType();
     // 移除微信
     try {
-      wechat.Fluwx fluwx = wechat.Fluwx();
-      if (!await fluwx.isWeChatInstalled) {
-        rechargeType.remove(PayType.wechat);
-      }
+      //wechat.Fluwx fluwx = wechat.Fluwx();
+      //if (!await fluwx.isWeChatInstalled) {
+      //  rechargeType.remove(PayType.wechat);
+      //}
     } catch (e) {}
     // 默认第一条
     if (rechargeType.isNotEmpty) {
@@ -78,7 +76,7 @@ class WalletRechargeController extends BaseController {
     String decrypt = ToolsEncrypt.decrypt(secret, encrypt);
     // 切换
     switch (payType) {
-      case PayType.alipay:
+      /* case PayType.alipay:
         await alipay.AlipayKitPlatform.instance.pay(
           orderInfo: decrypt,
         );
@@ -102,7 +100,7 @@ class WalletRechargeController extends BaseController {
             sign: result['sign'].toString(),
           ),
         );
-        break;
+        break; */
       default:
         break;
     }

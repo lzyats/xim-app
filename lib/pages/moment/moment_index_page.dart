@@ -476,20 +476,101 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     );
   }
 
+  // 抽取占位符和错误widget为单独方法（复用）
+  Widget _buildPlaceholder(double size) {
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.grey[200],
+      child: const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor:
+              AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 92, 104, 141)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget(double size) {
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.grey[200],
+      child: const Icon(
+        Icons.image_not_supported,
+        color: Colors.grey,
+        size: 30,
+      ),
+    );
+  }
+
   // 关键修改：参数类型改为List<FriendMediaResourceModel>
   Widget _buildImageList(List<Media> picList) {
     if (picList.isEmpty) return const SizedBox.shrink();
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double width = (constraints.maxWidth - 20) / 3;
+        // 单张媒体处理（区分图片/视频，并添加交互逻辑）
+        if (picList.length == 1) {
+          final Media media = picList.first;
+          if (media == null || media.type == null) {
+            return const SizedBox.shrink();
+          }
 
-        // 将 map 生成的 List<Widget> 放入 Wrap 中
+          // 单张视频处理（添加播放交互）
+          if (media.type == 1) {
+            return GestureDetector(
+              // 新增：视频点击播放
+              onTap: () => WidgetMoment.playVideoFullscreen(context, media),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                constraints: const BoxConstraints(
+                  maxWidth: 300,
+                ),
+                child: _buildVideoPlayerPlaceholder(
+                  media.url,
+                  media.thumbnail ?? '',
+                  constraints.maxWidth / 2,
+                  200, // 当宽高无效时，使用默认高度200
+                ),
+              ),
+            );
+          }
+
+          // 单张图片处理（添加预览交互）
+          return GestureDetector(
+            // 新增：图片点击预览
+            onTap: () =>
+                WidgetMoment.showImageViewer(context, picList, 0), // 索引固定为0（单张）
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: CachedNetworkImage(
+                  // 缩略图判断逻辑（包含http则使用缩略图）
+                  imageUrl: media.thumbnail?.contains('http') == true
+                      ? media.thumbnail!
+                      : media.url,
+                  width: constraints.maxWidth / 2,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) =>
+                      _buildPlaceholder(constraints.maxWidth / 2),
+                  errorWidget: (context, url, error) =>
+                      _buildErrorWidget(constraints.maxWidth / 2),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // 多张媒体处理（3列网格，保持原有交互）
+        final double width = (constraints.maxWidth - 20) / 3;
         return Wrap(
           spacing: 10,
           runSpacing: 10,
           children: picList.asMap().entries.map((entry) {
-            // 这里返回 List<Widget> 作为 Wrap 的 children
             final int index = entry.key;
             final Media media = entry.value;
 
@@ -499,51 +580,31 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
               return const SizedBox.shrink();
             }
 
+            // 图片处理（点击预览）
             if (media.type == 0) {
-              // 图片逻辑
               return GestureDetector(
-                onTap: () {
-                  WidgetMoment.showImageViewer(context, picList, index);
-                },
+                onTap: () =>
+                    WidgetMoment.showImageViewer(context, picList, index),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: CachedNetworkImage(
-                    imageUrl: media.url,
+                    imageUrl: media.thumbnail?.contains('http') == true
+                        ? media.thumbnail!
+                        : media.url,
                     width: width,
                     height: width,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      width: width,
-                      height: width,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color.fromARGB(255, 92, 104, 141),
-                          ),
-                        ),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      width: width,
-                      height: width,
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey,
-                        size: 30,
-                      ),
-                    ),
+                    placeholder: (context, url) => _buildPlaceholder(width),
+                    errorWidget: (context, url, error) =>
+                        _buildErrorWidget(width),
                   ),
                 ),
               );
-            } else if (media.type == 1) {
-              // 视频逻辑
+            }
+            // 视频处理（点击播放）
+            else if (media.type == 1) {
               return GestureDetector(
-                onTap: () {
-                  WidgetMoment.playVideoFullscreen(context, media);
-                },
+                onTap: () => WidgetMoment.playVideoFullscreen(context, media),
                 child: _buildVideoPlayerPlaceholder(
                   media.url,
                   media.thumbnail ?? '',
@@ -553,7 +614,7 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
               );
             }
             return const SizedBox.shrink();
-          }).toList(), // 将 Iterable 转换为 List<Widget>
+          }).toList(),
         );
       },
     );
@@ -598,7 +659,12 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
     timeago.setLocaleMessages('en', ToolsFormat());
     // 获取当前登录用户ID（假设从控制器中获取）
     final currentUserId = controller.userId; // 需确保控制器中有此属性
-
+    bool hasdel = false;
+    int strlen = 20;
+    if (moment.userId != null &&
+        currentUserId != null &&
+        moment.userId.toString() == currentUserId) hasdel = true;
+    if (hasdel) strlen = 18;
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -614,18 +680,16 @@ class _MomentIndexPageState extends State<MomentIndexPage> {
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
               // 只有当前用户发布的朋友圈才显示删除图标
-              if (moment.userId != null &&
-                  currentUserId != null &&
-                  moment.userId.toString() == currentUserId)
+              if (hasdel)
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.black, size: 16),
+                  icon: const Icon(Icons.delete, color: Colors.black, size: 15),
                   onPressed: () => _showDeleteConfirmation(moment),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
             ],
           ),
-          WidgetMoment.buildLocationWidget(moment.location, strlen: 20),
+          WidgetMoment.buildLocationWidget(moment.location, strlen: strlen),
           // 更多操作按钮（保持不变）
           GestureDetector(
             onTapDown: (TapDownDetails details) async {

@@ -132,15 +132,16 @@ dependencies:
   # 数据分组
   grouped_list: ^6.0.0
   # 微信支付
-  fluwx: ^4.5.5
+  #fluwx: ^4.5.5
   # 支付宝支付
-  alipay_kit: ^6.0.0
-  alipay_kit_ios: ^6.0.1
+  #alipay_kit: ^6.0.0
+  #alipay_kit_ios: ^6.0.1
   # 视频压缩
   video_compress: ^3.1.3
   # 声网
   agora_rtc_engine: ^6.1.0
-
+  # 滚动显示
+  visibility_detector: ^0.4.0+2  # 添加这一行
   #日期格式化
 
 alipay_kit:

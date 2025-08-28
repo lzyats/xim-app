@@ -15,7 +15,6 @@ class HtmlPage extends GetView<HtmlController> {
   Widget build(BuildContext context) {
     Get.lazyPut(() => HtmlController());
     String beian = ToolsStorage().config().beian;
-    late WebViewController _controller;
 
     return PopScope(
         canPop: false,

@@ -131,7 +131,7 @@ class MsgIndexPage extends GetView<MsgIndexController> {
             // 替换原来的 maxWidth 和 maxHeight 为 constraints
             constraints: BoxConstraints(
               maxWidth: 400,
-              maxHeight: MediaQuery.of(context).size.height * 0.55,
+              maxHeight: MediaQuery.of(context).size.height * 0.6,
             ), // 最大高度限制
             margin: const EdgeInsets.symmetric(horizontal: 26),
             padding: const EdgeInsets.all(16),

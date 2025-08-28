@@ -177,7 +177,7 @@ class MineSigninController extends GetxController {
       await ToolsStorage().signInStatus(dateKey: todayKey, value: true);
 
       Get.showSnackbar(GetSnackBar(
-        message: '今日签到成功，获得$rewardAmount USDT',
+        message: '今日签到成功',
         duration: const Duration(seconds: 2),
       ));
     }

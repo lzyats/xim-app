@@ -10,12 +10,15 @@ import 'package:alpaca/event/event_message.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/widgets/widget_common.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scan/scan.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:alpaca/tools/tools_upload.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart'; // 新增相机选择器依赖
 import 'package:alpaca/tools/tools_comment.dart';
+import 'dart:io';
+import 'package:image/image.dart' as img;
 
 import 'dart:ui' as ui; // 引入dart:ui库
 
@@ -284,26 +287,23 @@ class ImagePickerWidget extends StatelessWidget {
         String thumbnailUrl = await ToolsUpload.uploadFileu(thumbFile.path);
         content['thumbnail'] = thumbnailUrl;
       } else {
+        //原图缩略
+        File thumbFile = await generateThumbnail(file);
+        // 上传视频缩略图
+        String thumbnailUrl = await ToolsUpload.uploadFileu(thumbFile.path);
+        content['thumbnail'] = thumbnailUrl;
+        //压缩图片
+        file = await compressImage(file, quality: 70);
+        path = file.path;
+
         // 图片类型处理
         Map<String, dynamic> imgInfo = await WidgetCommon.calculateImage(path);
         debugPrint('图片信息：' + imgInfo.toString());
         content.addAll(imgInfo);
         content['type'] = 0;
 
-        // 新增：获取图片宽高
-        // 正确获取图片宽高：通过回调函数获取解析后的图片
-        final Uint8List imageBytes = await File(path).readAsBytes();
-
-        // 创建 Completer 用于将回调转为 Future
-        final Completer<ui.Image> completer = Completer();
-        ui.decodeImageFromList(imageBytes, (ui.Image image) {
-          completer.complete(image); // 回调触发时，完成 Future 并返回 image
-        });
-
-        // 等待 Future 完成，获取图片对象
-        final ui.Image image = await completer.future;
-        int width = image.width; // 图片宽度
-        int height = image.height; // 图片高度
+        int width = imgInfo['width']; // 图片宽度
+        int height = imgInfo['height']; // 图片高度
         content['width'] = width;
         content['height'] = height;
 
@@ -473,6 +473,79 @@ class ImagePickerWidget extends StatelessWidget {
         children: mediaWidgets,
       );
     });
+  }
+
+  /**
+   * 压缩图片
+   */
+  Future<File> compressImage(File imageFile, {int quality = 80}) async {
+    // 读取图片文件
+    final bytes = await imageFile.readAsBytes();
+    img.Image? image = img.decodeImage(bytes);
+
+    if (image == null) return imageFile;
+
+    // 压缩图片（调整质量，1-100，数值越低压缩率越高）
+    List<int> compressedBytes = img.encodeJpg(image, quality: quality);
+
+    // 保存压缩后的图片
+    final tempDir = await getTemporaryDirectory();
+    final compressedFile = File(
+        '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    await compressedFile.writeAsBytes(compressedBytes);
+
+    return compressedFile;
+  }
+
+  /// 使用 image 库生成图片缩略图
+  /// 使用 image 库生成图片缩略图（宽度优先）
+  Future<File> generateThumbnail(File originalFile,
+      {int maxWidth = 200}) async {
+    try {
+      // 1. 读取原图字节
+      final Uint8List imageBytes = await originalFile.readAsBytes();
+
+      // 2. 解码图片（支持 JPG、PNG 等格式）
+      img.Image? originalImage = img.decodeImage(imageBytes);
+      if (originalImage == null) {
+        throw Exception("无法解码图片");
+      }
+
+      // 3. 计算缩略图尺寸（宽度优先，按比例缩放）
+      int originalWidth = originalImage.width;
+      int originalHeight = originalImage.height;
+
+      // 仅当原图宽度超过 maxWidth 时才进行缩放
+      double scale = 1.0;
+      if (originalWidth > maxWidth) {
+        scale = maxWidth / originalWidth; // 基于宽度计算缩放比例
+      }
+
+      // 按比例计算目标尺寸（宽度优先，高度自适应）
+      int targetWidth = (originalWidth * scale).toInt();
+      int targetHeight = (originalHeight * scale).toInt();
+
+      // 4. 缩放图片生成缩略图
+      img.Image thumbnailImage = img.copyResize(
+        originalImage,
+        width: targetWidth,
+        height: targetHeight,
+      );
+
+      // 5. 保存缩略图到临时文件
+      final tempDir = await getTemporaryDirectory();
+      final thumbnailFile = File(
+        '${tempDir.path}/thumbnail_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
+      await thumbnailFile.writeAsBytes(
+        img.encodeJpg(thumbnailImage, quality: 80),
+      );
+
+      return thumbnailFile;
+    } catch (e) {
+      print("生成缩略图失败: $e");
+      rethrow;
+    }
   }
 }
 

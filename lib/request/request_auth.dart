@@ -19,9 +19,10 @@ class RequestAuth {
       '$_prefix/sendCode',
       data: {'phone': phone, 'email': email, 'type': type, 'safestr': safe},
     );
-    EasyLoading.showToast(ajaxData.getData((data) => data['msg']));
+    EasyLoading.showToast(ajaxData.getData((data) => data['msg'], en: true));
     // 转换
-    return ajaxData.getData((data) => AuthModel01.fromJson(data).code);
+    return ajaxData.getData((data) => AuthModel01.fromJson(data).code,
+        en: true);
   }
 
   // 密码登录
