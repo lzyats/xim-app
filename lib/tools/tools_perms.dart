@@ -125,7 +125,7 @@ class ToolsPerms {
       }
       // 未授权时直接引导至设置页
       //_showDialog(label);
-      const platform = MethodChannel('myeim.im/overlay');
+      const platform = MethodChannel('lansoft.com/overlay');
       try {
         await platform.invokeMethod('requestOverlayPermission');
       } on PlatformException catch (e) {

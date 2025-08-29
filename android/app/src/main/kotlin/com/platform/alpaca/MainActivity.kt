@@ -1,4 +1,4 @@
-package myeim.im
+package lansoft.com
 
 import android.content.Intent
 import android.net.Uri
@@ -35,8 +35,8 @@ import android.os.Looper
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
     private val TAG = "MainActivity"
-    private val OVERLAY_CHANNEL = "myeim.im/overlay"
-    private val WAKEUP_CHANNEL = "myeim.im/wakeup"
+    private val OVERLAY_CHANNEL = "lansoft.com/overlay"
+    private val WAKEUP_CHANNEL = "lansoft.com/wakeup"
     private val UNI_EVENT_CHANNEL = "flutter_uni_stream"
     private val UNI_METHOD_CHANNEL = "flutter_uni_channel"
 

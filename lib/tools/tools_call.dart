@@ -300,7 +300,7 @@ class _ToolsCallState extends State<ToolsCall> {
     ToolsStorage().callEvents(value: events);
   }
 
-  // 显示通话浮窗（适配原生层已有的showCallOverlay实现）
+  /* // 显示通话浮窗（适配原生层已有的showCallOverlay实现）
   Future<void> _showCallOverlay(String eventData) async {
     // 1. 检查浮窗权限
     bool hasOverlayPermission = await ToolsPerms.overlay();
@@ -312,7 +312,7 @@ class _ToolsCallState extends State<ToolsCall> {
     try {
       // 2. 直接使用原生层要求的参数名"eventData"传递数据
       // 通道名称需与原生层OVERLAY_CHANNEL保持一致（假设为"com.example/overlay"）
-      const platform = MethodChannel('myeim.im/overlay');
+      const platform = MethodChannel('lansoft.com/overlay');
       await platform.invokeMethod('showCallOverlay', {
         'eventData': eventData, // 与原生层call.argument<String>("eventData")对应
       });
@@ -322,7 +322,7 @@ class _ToolsCallState extends State<ToolsCall> {
     } catch (e) {
       debugPrint("显示通话浮窗异常: $e");
     }
-  }
+  } */
 }
 
 class ToolsCallVideo extends StatefulWidget {

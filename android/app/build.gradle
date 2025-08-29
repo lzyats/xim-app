@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "myeim.im"
+    namespace "lansoft.com"
     buildToolsVersion = '34.0.0'
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         // Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "myeim.im"
+        applicationId "lansoft.com"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21

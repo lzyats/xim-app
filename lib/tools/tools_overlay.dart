@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// 浮窗权限工具类（仅支持 Android）
 class ToolsOverlay {
   // 定义常量通道名（避免硬编码）
-  static const MethodChannel _channel = MethodChannel('myeim.im/overlay');
+  static const MethodChannel _channel = MethodChannel('lansoft.com/overlay');
 
   /// 检查是否拥有浮窗权限
   static Future<bool> checkPermission() async {

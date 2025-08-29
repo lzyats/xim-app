@@ -108,7 +108,7 @@ class MainController extends BaseController {
     }
 
     // 检查并请求浮窗权限
-    _checkOverlayPermission();
+    //_checkOverlayPermission();
     // 查询自己
     await RequestMine.getInfo();
     // 好友列表
@@ -134,7 +134,7 @@ class MainController extends BaseController {
     RequestMine.refresh();
   }
 
-  // 请求浮窗权限
+  /* // 请求浮窗权限
   Future<void> _requestOverlayPermission() async {
     // 添加浮窗权限请求
     if (!Platform.isAndroid) {
@@ -142,24 +142,24 @@ class MainController extends BaseController {
     }
     final status = await ToolsOverlay.checkPermission();
     if (!status) {
-      const platform = MethodChannel('myeim.im/overlay');
+      const platform = MethodChannel('lansoft.com/overlay');
       try {
         await platform.invokeMethod('requestOverlayPermission');
       } on PlatformException catch (e) {
         debugPrint("请求浮窗权限失败: ${e.message}");
       }
     }
-  }
+  } 
 
   // 唤醒应用
   Future<void> wakeUpApp() async {
-    const platform = MethodChannel('myeim.im/wakeup');
+    const platform = MethodChannel('lansoft.com/wakeup');
     try {
       await platform.invokeMethod('wakeUp');
     } on PlatformException catch (e) {
       debugPrint("唤醒应用失败: ${e.message}");
     }
-  }
+  }*/
 
   _listenSetting() {
     // 系统设置
@@ -278,7 +278,7 @@ class MainController extends BaseController {
     });
   }
 
-  // 检查并请求浮窗权限
+  /* // 检查并请求浮窗权限
   Future<void> _checkOverlayPermission() async {
     // 使用专用方法判断首次启动
     //bool isFirstLaunch = ToolsStorage().firstLaunch();
@@ -293,5 +293,5 @@ class MainController extends BaseController {
     // 标记为已启动过（更新存储）
     //ToolsStorage().firstLaunch(value: false);
     //}
-  }
+  } */
 }

@@ -127,7 +127,7 @@ class EventMessage {
 
   // 唤醒应用
   Future<void> wakeUpApp() async {
-    const platform = MethodChannel('myeim.im/wakeup');
+    const platform = MethodChannel('lansoft.com/wakeup');
     try {
       await platform.invokeMethod('wakeUp');
     } on PlatformException catch (e) {
