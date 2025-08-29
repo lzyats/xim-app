@@ -13,8 +13,8 @@ class AppSetting {
     // secret
     AppConfig.secret = 'YTY9FRenXiJNeE2x';
     // 接口请求地址
-    //AppConfig.requestHost = 'http://43.225.157.91:6666';
-    AppConfig.requestHost = 'http://192.168.109.131:8080';
+    AppConfig.requestHost = 'http://43.225.157.91:6666';
+    //AppConfig.requestHost = 'http://192.168.109.131:8080';
     // socket地址
     AppConfig.requestSocket = 'ws://43.225.157.91:7777';
     //AppConfig.requestSocket = 'ws://43.225.157.91:8888';
