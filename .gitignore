@@ -140,3 +140,4 @@ app.*.symbols
 .fvm/
 /.vscode
 /lib/config/app_setting.dart
+/lib/config/app_setting.dart
