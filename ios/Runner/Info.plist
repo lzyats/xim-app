@@ -84,14 +84,6 @@
 	</array>
 	<key>NSVoiceOverUsageDescription</key>
 	<string>需要使用麦克风进行通话</string>
-	<!-- 调用第三方 -->
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>tel</string>
-		<string>weixin</string>
-		<string>weixinULAPI</string>
-		<string>weixinURLParamsAPI</string>
-	</array>
 	<!-- 二维码 -->
 	<key>io.flutter.embedded_views_preview</key>
 	<string>YES</string>

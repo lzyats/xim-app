@@ -39,14 +39,6 @@ PODS:
   - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.2)
   - AgoraRtcEngine_iOS/VirtualBackground (4.3.2)
   - AgoraRtcEngine_iOS/VQA (4.3.2)
-  - alipay_kit_ios (6.0.1):
-    - alipay_kit_ios/utdid (= 6.0.1)
-    - alipay_kit_ios/vendor (= 6.0.1)
-    - Flutter
-  - alipay_kit_ios/utdid (6.0.1):
-    - Flutter
-  - alipay_kit_ios/vendor (6.0.1):
-    - Flutter
   - AMap3DMap-NO-IDFA (9.2.1):
     - AMapFoundation-NO-IDFA (~> 1.6.9)
   - amap_core_fluttify (0.0.1):
@@ -132,12 +124,6 @@ PODS:
     - Flutter
   - flutter_sound_record (0.0.1):
     - Flutter
-  - fluwx (0.0.1):
-    - Flutter
-    - fluwx/pay (= 0.0.1)
-  - fluwx/pay (0.0.1):
-    - Flutter
-    - WechatOpenSDK-XCFramework (~> 2.0.4)
   - foundation_fluttify (0.0.1):
     - Flutter
   - getuiflut (0.0.1):
@@ -206,7 +192,6 @@ PODS:
 
 DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
-  - alipay_kit_ios (from `.symlinks/plugins/alipay_kit_ios/ios`)
   - amap_core_fluttify (from `.symlinks/plugins/amap_core_fluttify/ios`)
   - amap_location_fluttify (from `.symlinks/plugins/amap_location_fluttify/ios`)
   - amap_map_fluttify (from `.symlinks/plugins/amap_map_fluttify/ios`)
@@ -224,7 +209,6 @@ DEPENDENCIES:
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_ringtone_player (from `.symlinks/plugins/flutter_ringtone_player/ios`)
   - flutter_sound_record (from `.symlinks/plugins/flutter_sound_record/ios`)
-  - fluwx (from `.symlinks/plugins/fluwx/ios`)
   - foundation_fluttify (from `.symlinks/plugins/foundation_fluttify/ios`)
   - getuiflut (from `.symlinks/plugins/getuiflut/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
@@ -272,8 +256,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   agora_rtc_engine:
     :path: ".symlinks/plugins/agora_rtc_engine/ios"
-  alipay_kit_ios:
-    :path: ".symlinks/plugins/alipay_kit_ios/ios"
   amap_core_fluttify:
     :path: ".symlinks/plugins/amap_core_fluttify/ios"
   amap_location_fluttify:
@@ -308,8 +290,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_ringtone_player/ios"
   flutter_sound_record:
     :path: ".symlinks/plugins/flutter_sound_record/ios"
-  fluwx:
-    :path: ".symlinks/plugins/fluwx/ios"
   foundation_fluttify:
     :path: ".symlinks/plugins/foundation_fluttify/ios"
   getuiflut:
@@ -359,7 +339,6 @@ SPEC CHECKSUMS:
   agora_rtc_engine: 14229f6b2fb40ab33cabba2b9f9c5b1c454ecb8e
   AgoraIrisRTC_iOS: 3cb15344a503a1a35ab6d60481732a8beeda98fe
   AgoraRtcEngine_iOS: eaa97751fcfe1b50d9b067e0df92752a6a5f899f
-  alipay_kit_ios: 1e4b1ca531943ca5356e10af689ffc7e5c633d21
   AMap3DMap-NO-IDFA: 6660036f9a8c28ed3e9037936210121599055a2e
   amap_core_fluttify: b84657ba39ee287a4b96bbcc0a6e67612cc3808f
   amap_location_fluttify: 7dc366b959d3ea9ce0b826e60c22a15cec54bbad
@@ -383,7 +362,6 @@ SPEC CHECKSUMS:
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_ringtone_player: 15eba85187230b87b2512f0e1b92225618bc03e7
   flutter_sound_record: fa9800029599bccfaa8be22cc372550a5fa505ac
-  fluwx: daa284756ce53442b3d0417ceeda66e981906811
   foundation_fluttify: 0c45145e3fad1fb99188e4979daed5b24cd9b278
   getuiflut: 8628ba2b64a738a847a07d2b67e0ac305778e2ee
   GTCommonSDK: 5f23150656349e33595ddc544e89312085234cb7
