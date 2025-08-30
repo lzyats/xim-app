@@ -6,8 +6,6 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
-import android.view.WindowManager
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.NonNull
@@ -32,10 +30,20 @@ import android.os.PowerManager
 import android.os.Handler
 import android.os.Looper
 
+// 1. 导入 Bundle 类（用于传递数据）
+import android.os.Bundle
+
+// 2. 导入通知相关类（NotificationChannel/NotificationManager 等）
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+
+// 3. 导入 AndroidX 通知兼容类（NotificationCompat，需确保依赖已添加）
+import androidx.core.app.NotificationCompat
+
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
     private val TAG = "MainActivity"
-    private val OVERLAY_CHANNEL = "lansoft.com/overlay"
     private val WAKEUP_CHANNEL = "lansoft.com/wakeup"
     private val UNI_EVENT_CHANNEL = "flutter_uni_stream"
     private val UNI_METHOD_CHANNEL = "flutter_uni_channel"
@@ -77,7 +85,6 @@ class MainActivity : FlutterFragmentActivity() {
     private fun registerChannels(flutterEngine: FlutterEngine) {
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
-        MethodChannel(messenger, OVERLAY_CHANNEL).setMethodCallHandler(this::handleOverlayMethods)
         MethodChannel(messenger, WAKEUP_CHANNEL).setMethodCallHandler(this::handleWakeupMethods)
         EventChannel(messenger, UNI_EVENT_CHANNEL).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
@@ -91,94 +98,69 @@ class MainActivity : FlutterFragmentActivity() {
             }
         })
         MethodChannel(messenger, UNI_METHOD_CHANNEL).setMethodCallHandler(this::handleUniMPMethods)
-    }
-
-    // ===================== 浮窗权限方法处理 =====================
-    private fun handleOverlayMethods(call: MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "requestOverlayPermission" -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                    pendingOverlayResult = result
-                    overlayPermissionLauncher.launch(intent)
-                } else {
-                    result.success(true)
+        // 在 MainActivity.kt 的 registerChannels 方法中添加
+        MethodChannel(messenger, "lansoft.com/launchParams").setMethodCallHandler { call, result ->
+            if (call.method == "getLaunchParams") {
+                val params = mutableMapOf<String, Any?>()
+                intent.extras?.let { extras ->
+                    params["callType"] = extras.getString("callType")
+                    params["channel"] = extras.getString("channel")
+                    params["chatId"] = extras.getString("chatId")
+                    params["isIncomingCall"] = extras.getBoolean("isIncomingCall", false)
                 }
-            }
-            "showCallOverlay" -> {
-                val eventData = call.argument<String>("eventData")
-                showCallOverlay(eventData)
-                result.success(true)
-            }
-            else -> result.notImplemented()
-        }
-    }
-
-    // 在showCallOverlay方法中添加定时移除逻辑
-    private fun showCallOverlay(eventData: String?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Log.w(TAG, "浮窗权限未授予，无法显示浮窗")
-            return
-        }
-
-        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        val overlayView = TextView(this).apply {
-            text = "通话浮窗: $eventData"
-            setTextColor(android.graphics.Color.WHITE)
-            setBackgroundColor(android.graphics.Color.argb(180, 0, 0, 0))
-            setPadding(16.dp(), 16.dp(), 16.dp(), 16.dp())
-            gravity = Gravity.CENTER
-        }
-
-        val params = WindowManager.LayoutParams().apply {
-            type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                result.success(params)
             } else {
-                @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT
+                result.notImplemented()
             }
-            flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-            width = WindowManager.LayoutParams.WRAP_CONTENT
-            height = WindowManager.LayoutParams.WRAP_CONTENT
-            gravity = Gravity.TOP or Gravity.START
-            x = 100
-            y = 200
-        }
-
-        try {
-            windowManager.addView(overlayView, params)
-            
-            // 添加定时移除浮窗的逻辑（例如5秒后移除）
-            Handler(Looper.getMainLooper()).postDelayed({
-                try {
-                    windowManager.removeView(overlayView)
-                    Log.d(TAG, "浮窗已定时移除")
-                } catch (e: Exception) {
-                    Log.e(TAG, "移除浮窗失败: ${e.message}", e)
-                }
-            }, 5000) // 5000毫秒 = 5秒，可根据需求调整时间
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "浮窗添加失败: ${e.message}", e)
         }
     }
+
 
     // ===================== 唤醒功能处理 =====================
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // 初始化通知渠道
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "call_channel",
+                "通话通知",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+    // 文件路径：xim-app/android/app/src/main/kotlin/com/platform/alpaca/MainActivity.kt
     private fun handleWakeupMethods(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "wakeUp") {
-            packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                
-                // 获取唤醒锁
-                val powerManager = getSystemService(POWER_SERVICE) as PowerManager
-                val wakeLock = powerManager.newWakeLock(
-                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                    "MyApp:WakeLockTag"
-                )
-                wakeLock.acquire(10*1000L) // 保持唤醒10秒（自动释放）
-                
-                // 启动Activity
-                startActivity(intent)
+            // 获取通话参数（从 Flutter 层传递）
+            val callData = call.arguments as? Map<String, String>
+            val callType = callData?.get("callType") ?: "voice"
+            val channel = callData?.get("channel") ?: ""
+            val chatId = callData?.get("chatId") ?: ""
+
+            // 唤醒屏幕
+            val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+            val wakeLock = powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "MyApp:WakeLockTag"
+            )
+            wakeLock.acquire(10*1000L)
+
+            // 构建启动 MainActivity 的 Intent，并传递通话参数
+            val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT 
+                        or Intent.FLAG_ACTIVITY_NEW_TASK 
+                        or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                // 传递参数给 Flutter 层（用于打开对应通话页面）
+                putExtra("callType", callType)
+                putExtra("channel", channel)
+                putExtra("chatId", chatId)
+                putExtra("isIncomingCall", true) // 标记为来电，用于 Flutter 层判断
+            }
+
+            intent?.let {
+                startActivity(it)
                 result.success(true)
             } ?: run {
                 result.error("LAUNCH_ERROR", "启动意图获取失败", null)

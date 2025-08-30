@@ -52,6 +52,15 @@ class _ToolsCallState extends State<ToolsCall> {
   @override
   void initState() {
     super.initState();
+    AppConfig.isInCall = true; // 进入通话时标记
+    // 隐藏状态栏和导航栏，设置全屏
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky, // 沉浸式粘性模式（滑动边缘才显示状态栏）
+      overlays: [], // 隐藏所有系统 overlay
+    );
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp, // 锁定竖屏（可选，根据需求）
+    ]);
     // 赋值
     token = widget.token;
     channel = widget.channel;
@@ -116,6 +125,13 @@ class _ToolsCallState extends State<ToolsCall> {
 
   @override
   void dispose() {
+    AppConfig.isInCall = false;
+    // 恢复系统 UI 显示（退出通话页面时）
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values, // 恢复状态栏和导航栏
+    );
+    SystemChrome.setPreferredOrientations([]); // 恢复旋转
     if (mounted) {
       audioPlayer.stop();
       _subscription.cancel();
@@ -362,12 +378,28 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   @override
   void initState() {
     super.initState();
+    AppConfig.isInCall = true; // 进入通话时标记
+    // 同样设置全屏
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [],
+    );
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     AppConfig.callKit = widget.chatId;
     initializeCalling();
   }
 
   @override
   void dispose() {
+    AppConfig.isInCall = false;
+    // 恢复系统 UI
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+    SystemChrome.setPreferredOrientations([]);
     _engine?.leaveChannel();
     AppConfig.callKit = '';
     super.dispose();

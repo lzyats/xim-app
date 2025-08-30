@@ -53,18 +53,23 @@ class EventMessage {
         // 新增判断：如果AppConfig.open为false，唤醒应用并触发全屏
         if (!AppConfig.open) {
           // 唤醒应用
-          await wakeUpApp();
+          // 调用处传递参数
+          await wakeUpApp(callData: {
+            'callType': chatHis.content['callType'],
+            'channel': chatHis.msgId,
+            'chatId': chatHis.chatId,
+          });
           // 触发全屏操作（假设通过SystemChrome设置全屏模式）
-          // 延迟设置全屏（确保应用已唤醒）
-          Future.delayed(const Duration(milliseconds: 500), () async {
-            await SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.immersiveSticky,
-              overlays: [], // 隐藏所有系统UI（状态栏、导航栏）
-            );
-            // 强制刷新UI
-            if (Get.context != null) {
-              WidgetsBinding.instance.ensureVisualUpdate();
-            }
+          // 直接导航到通话界面（替换原有的全屏设置逻辑）
+          Future.delayed(const Duration(milliseconds: 500), () {
+            Get.to(ToolsCall(
+              nickname: chatHis.source['nickname'],
+              portrait: chatHis.source['portrait'],
+              video: 'video' == chatHis.content['callType'],
+              channel: chatHis.msgId,
+              chatId: chatHis.chatId,
+              request: false, // 作为接收方
+            ));
           });
         }
         // 通话中
@@ -126,10 +131,11 @@ class EventMessage {
   }
 
   // 唤醒应用
-  Future<void> wakeUpApp() async {
+  // 修改wakeUpApp方法，允许传递参数
+  Future<void> wakeUpApp({Map<String, String>? callData}) async {
     const platform = MethodChannel('lansoft.com/wakeup');
     try {
-      await platform.invokeMethod('wakeUp');
+      await platform.invokeMethod('wakeUp', callData);
     } on PlatformException catch (e) {
       debugPrint("唤醒应用失败: ${e.message}");
     }

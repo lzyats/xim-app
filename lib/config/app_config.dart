@@ -25,6 +25,7 @@ class AppConfig {
   /// 开发模式=dev
   /// 生产模式=pro
   static const String active = 'dev';
+  static bool isInCall = false; // 通话状态标记（通话开始时设为true，结束时设为false）
   // debug模式
   static late bool debug;
   // 以下为配置文件读取出来

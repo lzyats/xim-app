@@ -22,25 +22,6 @@ import UIKit
         let event = FlutterEventChannel(name: "flutter_uni_stream", binaryMessenger: controller.binaryMessenger)
         event.setStreamHandler(self)
 
-        // 注册浮窗通道
-        let overlayChannel = FlutterMethodChannel(name: "myeim.im/overlay", binaryMessenger: controller.binaryMessenger)
-        overlayChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
-            switch call.method {
-            case "requestOverlayPermission":
-                // iOS需要请求相应权限
-                result(true)
-            case "showCallOverlay":
-                if let args = call.arguments as? [String: Any],
-                   let eventData = args["eventData"] as? String {
-                    self?.showCallOverlay(eventData: eventData)
-                    result(true)
-                } else {
-                    result(false)
-                }
-            default:
-                result(FlutterMethodNotImplemented)
-            }
-        }
         
         // 注册唤醒通道
         let wakeupChannel = FlutterMethodChannel(name: "myeim.im/wakeup", binaryMessenger: controller.binaryMessenger)
@@ -223,11 +204,6 @@ import UIKit
         return true // 隐藏状态栏，实现全屏
     }
     
-    // 显示通话浮窗
-    private func showCallOverlay(eventData: String) {
-        // 实现iOS浮窗逻辑
-    }
-  
     /// FlutterStreamHandler监听
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
