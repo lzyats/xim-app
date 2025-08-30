@@ -90,5 +90,16 @@
 	<!-- 缓存播放 -->
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>需要访问本地缓存文件以播放视频</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.yourcompany.yourapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>yourappscheme</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

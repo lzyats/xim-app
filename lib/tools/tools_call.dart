@@ -52,15 +52,6 @@ class _ToolsCallState extends State<ToolsCall> {
   @override
   void initState() {
     super.initState();
-    AppConfig.isInCall = true; // 进入通话时标记
-    // 隐藏状态栏和导航栏，设置全屏
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky, // 沉浸式粘性模式（滑动边缘才显示状态栏）
-      overlays: [], // 隐藏所有系统 overlay
-    );
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp, // 锁定竖屏（可选，根据需求）
-    ]);
     // 赋值
     token = widget.token;
     channel = widget.channel;
@@ -125,13 +116,6 @@ class _ToolsCallState extends State<ToolsCall> {
 
   @override
   void dispose() {
-    AppConfig.isInCall = false;
-    // 恢复系统 UI 显示（退出通话页面时）
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values, // 恢复状态栏和导航栏
-    );
-    SystemChrome.setPreferredOrientations([]); // 恢复旋转
     if (mounted) {
       audioPlayer.stop();
       _subscription.cancel();
@@ -315,30 +299,6 @@ class _ToolsCallState extends State<ToolsCall> {
     // 4. 保存更新后的列表
     ToolsStorage().callEvents(value: events);
   }
-
-  /* // 显示通话浮窗（适配原生层已有的showCallOverlay实现）
-  Future<void> _showCallOverlay(String eventData) async {
-    // 1. 检查浮窗权限
-    bool hasOverlayPermission = await ToolsPerms.overlay();
-    if (!hasOverlayPermission) {
-      debugPrint("没有浮窗权限，无法显示通话浮窗");
-      return;
-    }
-
-    try {
-      // 2. 直接使用原生层要求的参数名"eventData"传递数据
-      // 通道名称需与原生层OVERLAY_CHANNEL保持一致（假设为"com.example/overlay"）
-      const platform = MethodChannel('lansoft.com/overlay');
-      await platform.invokeMethod('showCallOverlay', {
-        'eventData': eventData, // 与原生层call.argument<String>("eventData")对应
-      });
-      debugPrint("通话浮窗显示指令已发送");
-    } on PlatformException catch (e) {
-      debugPrint("显示通话浮窗失败: ${e.message}");
-    } catch (e) {
-      debugPrint("显示通话浮窗异常: $e");
-    }
-  } */
 }
 
 class ToolsCallVideo extends StatefulWidget {
@@ -378,28 +338,12 @@ class _ToolsCallVideoState extends State<ToolsCallVideo> {
   @override
   void initState() {
     super.initState();
-    AppConfig.isInCall = true; // 进入通话时标记
-    // 同样设置全屏
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersiveSticky,
-      overlays: [],
-    );
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
     AppConfig.callKit = widget.chatId;
     initializeCalling();
   }
 
   @override
   void dispose() {
-    AppConfig.isInCall = false;
-    // 恢复系统 UI
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: SystemUiOverlay.values,
-    );
-    SystemChrome.setPreferredOrientations([]);
     _engine?.leaveChannel();
     AppConfig.callKit = '';
     super.dispose();

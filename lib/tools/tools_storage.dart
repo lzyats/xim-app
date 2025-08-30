@@ -140,6 +140,32 @@ class ToolsStorage {
     return LocalConfig.fromJson(data);
   }
 
+// 在 tools_storage.dart 中添加以下方法（建议在 remark 或 draft 方法附近）
+
+// 临时数据存储（独立类型，避免冲突）
+  String setTempData(String key, {String value = '', bool read = false}) {
+    // 使用独立的存储类型标识，与 remark 区分
+    String type = 'temp_data';
+    // 读取现有数据
+    Map<String, dynamic> dataList = _storage.read(type) ?? {};
+
+    // 读取操作
+    if (read) {
+      return dataList[key] ?? '';
+    }
+
+    // 写入/删除操作
+    if (value.isEmpty) {
+      dataList.remove(key); // 空值表示删除
+    } else {
+      dataList[key] = value; // 存储新值
+    }
+
+    // 保存到存储
+    _storage.write(type, dataList);
+    return value;
+  }
+
   // 首次启动标记存储
   bool firstLaunch({bool? value}) {
     // 存储键名

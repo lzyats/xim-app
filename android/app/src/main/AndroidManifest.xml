@@ -35,8 +35,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
     <!-- SD卡读取 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>-->
-    <!-- 安装包 -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!-- 安装包 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />-->
     <!-- 系统广播 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- 唤醒锁权限：保持屏幕唤醒 -->
@@ -44,6 +44,10 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <!-- 浮窗权限 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />-->
+    <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 若需后台显示来电通知，还需前台服务权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     
     <application
         android:label="田言觅语"

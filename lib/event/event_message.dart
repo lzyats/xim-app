@@ -145,6 +145,54 @@ class EventMessage {
   void _tips(bool pushAudio, ChatMsg chatMsg, String userId) async {
     // 语音
     if (MsgType.call == chatMsg.msgType) {
+      // 开启通知
+      if ('Y' == ToolsStorage().setting().notice) {
+        if (!AppConfig.open) {
+          // 应用在后台时发送通知
+          int badge =
+              await AwesomeNotifications().incrementGlobalBadgeCounter();
+          if (badge > 0) {
+            await AwesomeNotifications()
+                .cancelNotificationsByChannelKey('alerts');
+          }
+          // 发送高优先级通知
+          await AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: chatMsg.msgId.hashCode,
+              channelKey: 'call_channel', // 使用通话专用渠道
+              title: '${chatMsg.nickname} 正在来电',
+              body: '点击接听或挂断',
+              //importance: NotificationImportance.High,
+              //priority: NotificationPriority.Max,
+              fullScreenIntent: true, // 触发全屏 intent（锁屏时可能全屏显示）
+              wakeUpScreen: true, // 唤醒屏幕
+              payload: {
+                'chatId': chatMsg.chatId,
+                'callType': 'voice', // 或 'video'
+              },
+              // 自定义横幅样式（可选）
+              displayOnForeground: true,
+              displayOnBackground: true,
+            ),
+            actionButtons: [
+              // 接听按钮
+              NotificationActionButton(
+                key: 'accept_call',
+                label: '接听',
+                actionType: ActionType.SilentAction, // 点击后不关闭通知（可选）
+                isDangerousOption: false,
+              ),
+              // 挂断按钮
+              NotificationActionButton(
+                key: 'reject_call',
+                label: '挂断',
+                actionType: ActionType.SilentAction,
+                isDangerousOption: true, // 危险操作（视觉上可能标红）
+              ),
+            ],
+          );
+        }
+      }
       return;
     }
     // 静默

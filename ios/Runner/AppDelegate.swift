@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import AVFoundation
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, DCUniMPSDKEngineDelegate, FlutterStreamHandler {
@@ -24,14 +25,16 @@ import UIKit
 
         
         // 注册唤醒通道
-        let wakeupChannel = FlutterMethodChannel(name: "myeim.im/wakeup", binaryMessenger: controller.binaryMessenger)
+        // 注册通道
+        let wakeupChannel = FlutterMethodChannel(name: "lansoft.com/wakeup", binaryMessenger: controller.binaryMessenger)
+        // 实现wakeUp方法
         wakeupChannel.setMethodCallHandler { [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) in
-            if call.method == "wakeUp" {
-                self?.wakeUpApp()
-                result(true)
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
+        if call.method == "wakeUp" {
+            self?.wakeUpApp(call.arguments as? [String: String])
+            result(nil)
+        } else {
+            result(FlutterMethodNotImplemented)
+        }
         }
         
         // 设置主通道的方法处理器
@@ -188,15 +191,103 @@ import UIKit
     }
     
     // 唤醒应用
-    private func wakeUpApp() {
-        UIApplication.shared.applicationIconBadgeNumber = 0
-
-        if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
-            rootViewController.setNeedsStatusBarAppearanceUpdate()
+     // 唤醒应用的具体实现
+    private func wakeUpApp(_ callData: [String: String]?) {
+        // 1. 激活应用到前台（原逻辑保留，优化URL Scheme判断）
+        guard let url = URL(string: "yourappscheme://") else {
+            print("唤醒失败：URL Scheme 无效")
+            return
         }
+        
+        if #available(iOS 10.0, *) {
+            let center = UNUserNotificationCenter.current()
+            center.removeAllPendingNotificationRequests()
+            UIApplication.shared.open(url, options: [:]) { [weak self] success in
+                if success {
+                    print("应用唤醒成功")
+                    // 唤醒成功后，触发全屏配置
+                    self?.enableFullScreenForRootVC()
+                    // 唤醒后重新激活音频会话
+                    // 延迟重置音频会话，确保应用完全激活
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self?.resetAudioSession()
+                    }
+                }
+            }
+        } else {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.openURL(url)
+                // 唤醒成功后，触发全屏配置
+                enableFullScreenForRootVC()
+                // 唤醒后重新激活音频会话
+                self.resetAudioSession()
+            }
+        }
+        
+        // 2. 处理通话数据（原逻辑保留）
+        if let data = callData {
+            print("收到通话数据: \(data)")
+            // （可选）若需传递数据到Flutter，可通过MethodChannel发送
+        }
+    }
 
-        // 额外：如果需要强制将应用带到前台，可通过激活主窗口实现（适用于某些场景）
-        UIApplication.shared.keyWindow?.makeKeyAndVisible()
+    /// 让根视图控制器（FlutterViewController）实现全屏
+    private func enableFullScreenForRootVC() {
+        // 1. 获取当前根视图控制器（确保是FlutterViewController）
+        guard let rootVC = window?.rootViewController as? FlutterViewController else {
+            print("全屏配置失败：根视图控制器不是FlutterViewController")
+            return
+        }
+        
+        // 2. 隐藏状态栏（主动触发状态栏刷新）
+        rootVC.setNeedsStatusBarAppearanceUpdate() // 强制刷新状态栏配置
+        
+        // 3. 移除安全区边距（适配刘海屏，实现真正全屏）
+        // 给FlutterViewController添加全屏约束，忽略安全区
+        rootVC.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            rootVC.view.topAnchor.constraint(equalTo: window!.topAnchor),    // 顶部贴屏幕顶
+            rootVC.view.leadingAnchor.constraint(equalTo: window!.leadingAnchor), // 左侧贴屏幕左
+            rootVC.view.trailingAnchor.constraint(equalTo: window!.trailingAnchor), // 右侧贴屏幕右
+            rootVC.view.bottomAnchor.constraint(equalTo: window!.bottomAnchor)     // 底部贴屏幕底
+        ])
+
+        // 重置音频会话配置
+        resetAudioSession()
+        
+        // 4. （可选）强制Flutter视图刷新（避免Flutter侧未适配安全区）
+        // 通过MethodChannel通知Flutter侧进入全屏模式，让Flutter页面也适配
+        let channel = FlutterMethodChannel(name: "flutter_uni_channel", binaryMessenger: rootVC.binaryMessenger)
+        channel.invokeMethod("onFullScreenActivated", arguments: ["isFullScreen": true])
+    }
+
+    // 新增音频会话重置方法
+    private func resetAudioSession() {
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            // 先尝试停用当前会话
+            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+            
+            // 根据实际使用场景调整类别（如果主要是播放，可用.playback）
+            try audioSession.setCategory(
+                .playAndRecord,
+                mode: .default,
+                options: [.mixWithOthers, .allowBluetooth, .allowAirPlay]
+            )
+            
+            // 延迟激活，避免状态冲突
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                do {
+                    try audioSession.setActive(true)
+                    print("音频会话激活成功")
+                } catch {
+                    print("音频会话激活失败: \(error.localizedDescription)")
+                    print("错误代码: \(error._code)")
+                }
+            }
+        } catch {
+            print("音频会话配置失败: \(error.localizedDescription)")
+        }
     }
 
     // 配置视图控制器全屏（在 FlutterViewController 中）
@@ -262,4 +353,18 @@ import UIKit
     //   backdata["event"] = "close"
     //   eventSink?(backdata)
     // }
+    // 在文件末尾添加扩展，让FlutterViewController响应状态栏隐藏
+}
+// 修复扩展中的属性重写问题
+extension FlutterViewController {
+    // 1. 增加open访问控制符，与父类保持一致
+    override open var prefersStatusBarHidden: Bool {
+        return true
+    }
+        
+    // 2. 将public改为open，与父类UIViewController的viewWillAppear访问级别匹配
+    override open func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
 }

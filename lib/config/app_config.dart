@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:alpaca/tools/tools_push.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -152,6 +153,19 @@ class AppConfig {
           channelDescription: 'alerts',
           onlyAlertOnce: true,
           importance: NotificationImportance.High,
+        ),
+        // 通话通知渠道（支持全屏和最高优先级）
+        NotificationChannel(
+          channelKey: 'call_channel',
+          channelName: '通话通知',
+          channelDescription: '来电和通话相关通知',
+          importance: NotificationImportance.High, // 重要性：高（必须）
+          //priority: NotificationPriority.Max, // 优先级：最高（升级后支持）
+          // fullScreenIntent: true, // 全屏 intent（升级后支持，来电关键配置）
+          enableVibration: true,
+          vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]), // 来电震动节奏
+          enableLights: true,
+          ledColor: Colors.red,
         )
       ],
     );

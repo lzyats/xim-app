@@ -10,7 +10,7 @@ import 'package:flutter/services.dart'; // 新增：用于SystemChrome控制
 import 'package:alpaca/config/app_config.dart'; // 新增：用于访问AppConfig中的通话状态
 
 // 主页面
-class MainPage extends GetView<MainController> with WidgetsBindingObserver {
+class MainPage extends GetView<MainController> {
   // 路由地址
   static const String routeName = '/';
   const MainPage({super.key});
@@ -18,9 +18,6 @@ class MainPage extends GetView<MainController> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MainController());
-
-    // 初始化生命周期观察者
-    WidgetsBinding.instance.addObserver(this); // 新增
 
     return PopScope(
       canPop: false,
@@ -32,10 +29,6 @@ class MainPage extends GetView<MainController> with WidgetsBindingObserver {
       },
       child: GetBuilder<MainController>(
         builder: (builder) {
-          // 初始化时检查通话参数并设置全屏（新增）
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _checkCallAndSetFullScreen();
-          });
           return Scaffold(
             resizeToAvoidBottomInset: false,
             body: IndexedStack(
@@ -92,41 +85,6 @@ class MainPage extends GetView<MainController> with WidgetsBindingObserver {
         },
       ),
     );
-  }
-
-  // 新增：检查通话参数并设置全屏
-  Future<void> _checkCallAndSetFullScreen() async {
-    debugPrint('检查通话参数');
-    const platform = MethodChannel('lansoft.com/launchParams');
-    final Map<String, dynamic>? params =
-        await platform.invokeMethod('getLaunchParams');
-    if (params != null && params['isIncomingCall'] == true) {
-      // 若为来电唤醒，立即设置全屏
-      await SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.immersiveSticky,
-        overlays: [],
-      );
-    }
-    try {} catch (e) {
-      debugPrint('检查通话参数失败: $e');
-    }
-  }
-
-// 新增：监听应用生命周期变化（从后台返回前台时）
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    // 应用从后台回到前台
-    if (state == AppLifecycleState.resumed) {
-      // 若当前在通话中，重新设置全屏（假设AppConfig中有通话状态标记）
-      if (AppConfig.isInCall) {
-        // 需确保AppConfig中定义isInCall标记通话状态
-        SystemChrome.setEnabledSystemUIMode(
-          SystemUiMode.immersiveSticky,
-          overlays: [],
-        );
-      }
-    }
   }
 
   // 退出app

@@ -168,6 +168,57 @@ class ToolsPerms {
     return false;
   }
 
+  // 新增：检查后台启动权限（仅Android）
+  static Future<bool> checkBackgroundLaunchPermission() async {
+    if (!Platform.isAndroid) return true; // iOS无需此权限
+    const platform = MethodChannel('lansoft.com/background_launch');
+    try {
+      return await platform
+              .invokeMethod<bool>('checkBackgroundPopupPermission') ??
+          false;
+    } catch (e) {
+      debugPrint('检查后台启动权限失败: $e');
+      return false;
+    }
+  }
+
+// 新增：请求后台启动权限（引导用户到设置页）
+  static Future<bool> requestBackgroundLaunchPermission() async {
+    if (!Platform.isAndroid) return true;
+    bool hasPermission = await checkBackgroundLaunchPermission();
+    if (hasPermission) return true;
+
+    // 显示引导对话框
+    return await _showBackgroundLaunchDialog();
+  }
+
+// 引导用户开启后台启动权限的对话框
+  static Future<bool> _showBackgroundLaunchDialog() async {
+    final context = AppConfig.navigatorKey.currentState!.context;
+    final result = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('需要后台启动权限'),
+        content: const Text('为了确保您能收到来电通知并正常唤醒应用，请开启后台启动权限。'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('取消'),
+            onPressed: () => Get.back(result: false),
+          ),
+          CupertinoDialogAction(
+            child: const Text('去设置'),
+            onPressed: () async {
+              Get.back(result: true);
+              // 打开应用设置页面
+              await openAppSettings();
+            },
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   // 显示弹框
   static _showDialog(String label) {
     showCupertinoDialog(

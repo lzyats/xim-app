@@ -107,6 +107,8 @@ class MainController extends BaseController {
       items.add(initItem(i));
     }
 
+    //_checkAndRequestSpecialPermissions();
+
     // 检查并请求浮窗权限
     //_checkOverlayPermission();
     // 查询自己
@@ -134,7 +136,7 @@ class MainController extends BaseController {
     RequestMine.refresh();
   }
 
-  /* // 请求浮窗权限
+  // 请求浮窗权限
   Future<void> _requestOverlayPermission() async {
     // 添加浮窗权限请求
     if (!Platform.isAndroid) {
@@ -149,8 +151,8 @@ class MainController extends BaseController {
         debugPrint("请求浮窗权限失败: ${e.message}");
       }
     }
-  } 
-
+  }
+/*
   // 唤醒应用
   Future<void> wakeUpApp() async {
     const platform = MethodChannel('lansoft.com/wakeup');
@@ -193,6 +195,12 @@ class MainController extends BaseController {
         }
       }
     });
+  }
+
+  Future<void> _checkAndRequestSpecialPermissions() async {
+    // 检查并请求后台启动权限
+    await ToolsPerms.requestBackgroundLaunchPermission();
+    // 其他初始化逻辑...
   }
 
   // 系统设置
@@ -278,7 +286,7 @@ class MainController extends BaseController {
     });
   }
 
-  /* // 检查并请求浮窗权限
+  // 检查并请求浮窗权限
   Future<void> _checkOverlayPermission() async {
     // 使用专用方法判断首次启动
     //bool isFirstLaunch = ToolsStorage().firstLaunch();
@@ -293,5 +301,5 @@ class MainController extends BaseController {
     // 标记为已启动过（更新存储）
     //ToolsStorage().firstLaunch(value: false);
     //}
-  } */
+  }
 }
