@@ -87,6 +87,7 @@ dependencies:
   extended_text_field: ^15.0.0
   # 声音播放
   just_audio: ^0.9.38
+  audio_session: ^0.1.16  # 新增：用于配置iOS/Android音频会话的核心插件
   # 声音录音
   flutter_sound_record: ^3.3.2
   # 权限组件

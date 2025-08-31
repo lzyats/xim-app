@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:alpaca/tools/tools_background_task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+// 在文件顶部的导入部分添加此行
+import 'package:audio_session/audio_session.dart';
 import 'package:alpaca/config/app_config.dart';
 import 'package:alpaca/config/app_resource.dart';
 import 'package:alpaca/event/event_setting.dart';
@@ -16,6 +20,7 @@ import 'package:alpaca/tools/tools_perms.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 // 音视频
 class ToolsCall extends StatefulWidget {
@@ -47,18 +52,27 @@ class _ToolsCallState extends State<ToolsCall> {
   bool _trigger = false;
   bool _back = false;
   String value = '';
-  final AudioPlayer audioPlayer = AudioPlayer();
+  late AudioPlayer audioPlayer = AudioPlayer();
+  late String _cachedRingPath; // 新增：缓存铃声到本地文件，避免后台加载Asset
   late StreamSubscription _subscription;
   @override
   void initState() {
     super.initState();
+    // 1. 提前初始化播放器（在前台时预初始化，避免后台初始化）
+    audioPlayer = AudioPlayer();
+    // 2. 预缓存铃声到本地文件（关键：将Asset资源复制到缓存目录，后台读取本地文件更稳定）
+    // 2. 预缓存铃声到本地文件，完成后再初始化音频
+    _preCacheRingtone().then((_) {
+      // 3. 确保缓存完成后，再初始化音频
+      _initSetting();
+    });
     // 赋值
     token = widget.token;
     channel = widget.channel;
     _trigger = widget.request;
     AppConfig.callKit = widget.chatId;
     // 初始化
-    _initSetting();
+    //_initSetting();
     // 监听关闭
     _subscription = EventSetting().event.stream.listen((model) async {
       if (SettingType.sys != model.setting) {
@@ -101,28 +115,122 @@ class _ToolsCallState extends State<ToolsCall> {
     });
   }
 
+  // 新增：将Asset中的铃声预缓存到本地缓存目录
+  Future<void> _preCacheRingtone() async {
+    try {
+      // ① 获取Asset中的铃声文件（假设 AppAudio.call 是 Asset 路径，如 "assets/audios/call_ring.mp3"）
+      ByteData assetData = await rootBundle.load(AppAudio.call);
+      List<int> ringBytes = assetData.buffer.asUint8List();
+
+      // ② 获取iOS本地缓存目录（后台可读写）
+      Directory cacheDir = await getTemporaryDirectory();
+      _cachedRingPath = "${cacheDir.path}/call_ring.mp3"; // 缓存文件路径
+
+      // ③ 将Asset字节写入本地缓存文件
+      File ringFile = File(_cachedRingPath);
+      if (!await ringFile.exists()) {
+        await ringFile.writeAsBytes(ringBytes);
+      }
+    } catch (e) {
+      debugPrint("预缓存铃声失败：$e");
+      // 降级方案：若缓存失败，仍使用Asset路径（但后台可能仍报错）
+      _cachedRingPath = AppAudio.call;
+    }
+  }
+
   // 初始化
+  // 修改初始化设置方法，区分iOS和Android的后台保活处理
   _initSetting() async {
-    // 声音消息
-    AudioSource audioSource = AudioSource.asset(AppAudio.call);
-    await audioPlayer.setAudioSource(audioSource);
-    audioPlayer.setLoopMode(LoopMode.all);
-    audioPlayer.play();
+    // 增加判断，确保铃声路径已初始化
+    if (_cachedRingPath.isEmpty) {
+      debugPrint("铃声路径未初始化，等待缓存完成...");
+      await Future.delayed(const Duration(milliseconds: 200));
+      _initSetting();
+      return;
+    }
+
+    // ① 【新增】
+// 区分平台配置音频会话和后台任务
+    if (Platform.isIOS) {
+      // iOS配置音频会话并启动后台任务保活
+      await _configureAudioSession();
+      BackgroundTaskService.startBackgroundTask();
+    } else {
+      // Android不需要后台保活，直接配置基础音频
+      await audioPlayer.setVolume(0.82);
+    }
+// 声音消息
+    try {
+      AudioSource audioSource;
+      debugPrint(_cachedRingPath);
+
+      if (_cachedRingPath.startsWith('/')) {
+        audioSource = AudioSource.file(_cachedRingPath);
+      } else {
+        audioSource = AudioSource.asset(AppAudio.call);
+      }
+
+      await audioPlayer.setAudioSource(
+        audioSource,
+        preload: true,
+      );
+      await audioPlayer.setLoopMode(LoopMode.all);
+      await audioPlayer.play();
+    } catch (e) {
+      debugPrint("音频初始化失败：$e");
+      if (e is PlayerInterruptedException) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        _initSetting();
+      }
+    }
     _timer = Timer(
       const Duration(milliseconds: 60 * 1000),
       _endCall,
     );
   }
 
+// 修改dispose方法，只在iOS释放后台任务
   @override
   void dispose() {
+    // 只在iOS平台结束后台任务
+    if (Platform.isIOS) {
+      BackgroundTaskService.endBackgroundTask();
+    }
     if (mounted) {
       audioPlayer.stop();
+      audioPlayer.dispose();
       _subscription.cancel();
       _timer?.cancel();
     }
     AppConfig.callKit = '';
     super.dispose();
+  }
+
+// 在初始化音频播放器前配置音频会话
+  // 在初始化音频播放器前配置音频会话（修改后）
+  Future<void> _configureAudioSession() async {
+    try {
+      final session = await AudioSession.instance;
+      // 配置音频会话：适配iOS通话场景，强制扬声器输出
+      await session.configure(AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionCategoryOptions:
+            AVAudioSessionCategoryOptions.allowBluetooth |
+                AVAudioSessionCategoryOptions.defaultToSpeaker | // 强制默认扬声器
+                AVAudioSessionCategoryOptions
+                    .interruptSpokenAudioAndMixWithOthers, // 允许中断其他音频
+        avAudioSessionMode: AVAudioSessionMode.voiceChat, // 语音通话模式（优化降噪）
+        avAudioSessionRouteSharingPolicy:
+            AVAudioSessionRouteSharingPolicy.defaultPolicy,
+        avAudioSessionSetActiveOptions:
+            AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
+      ));
+      debugPrint("iOS音频会话配置成功");
+    } catch (e) {
+      debugPrint("iOS音频会话配置失败：$e");
+      // 降级处理：若会话配置失败，仍尝试强制扬声器
+      await audioPlayer.setVolume(1.0);
+    }
   }
 
   @override

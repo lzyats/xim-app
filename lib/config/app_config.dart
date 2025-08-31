@@ -20,6 +20,7 @@ import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter/foundation.dart'; // 新增这行，导入 kDebugMode 所在的包
 
 // 总配置
 class AppConfig {
@@ -162,12 +163,16 @@ class AppConfig {
           importance: NotificationImportance.High, // 重要性：高（必须）
           //priority: NotificationPriority.Max, // 优先级：最高（升级后支持）
           // fullScreenIntent: true, // 全屏 intent（升级后支持，来电关键配置）
-          enableVibration: true,
           vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]), // 来电震动节奏
-          enableLights: true,
           ledColor: Colors.red,
+          // 允许前台显示通知
+          playSound: true,
+          enableLights: true,
+          enableVibration: true,
         )
       ],
+      // 关键：允许前台显示通知
+      debug: kDebugMode,
     );
     await AwesomeNotifications().getInitialNotificationAction(
       removeFromActionEvents: false,

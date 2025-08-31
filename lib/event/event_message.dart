@@ -62,14 +62,15 @@ class EventMessage {
           // 触发全屏操作（假设通过SystemChrome设置全屏模式）
           // 直接导航到通话界面（替换原有的全屏设置逻辑）
           Future.delayed(const Duration(milliseconds: 500), () {
-            Get.to(ToolsCall(
-              nickname: chatHis.source['nickname'],
-              portrait: chatHis.source['portrait'],
-              video: 'video' == chatHis.content['callType'],
-              channel: chatHis.msgId,
-              chatId: chatHis.chatId,
-              request: false, // 作为接收方
-            ));
+            // 关键修改：将 Get.to(Widget) 改为 Get.to(() => Widget)
+            Get.to(() => ToolsCall(
+                  nickname: chatHis.source['nickname'],
+                  portrait: chatHis.source['portrait'],
+                  video: 'video' == chatHis.content['callType'],
+                  channel: chatHis.msgId,
+                  chatId: chatHis.chatId,
+                  request: false, // 作为接收方
+                ));
           });
         }
         // 通话中
@@ -86,17 +87,17 @@ class EventMessage {
         else if (!chatHis.self) {
           String userId = chatHis.source['userId'];
           String nickname = chatHis.source['nickname'];
-          Get.to(ToolsCall(
-            nickname: ToolsStorage().remark(
-              userId,
-              value: nickname,
-              read: true,
-            ),
-            portrait: chatHis.source['portrait'],
-            video: 'video' == chatHis.content['callType'],
-            channel: chatHis.msgId,
-            chatId: chatHis.chatId,
-          ));
+          Get.to(() => ToolsCall(
+                nickname: ToolsStorage().remark(
+                  userId,
+                  value: nickname,
+                  read: true,
+                ),
+                portrait: chatHis.source['portrait'],
+                video: 'video' == chatHis.content['callType'],
+                channel: chatHis.msgId,
+                chatId: chatHis.chatId,
+              ));
         }
         break;
       default:
@@ -174,7 +175,7 @@ class EventMessage {
               displayOnForeground: true,
               displayOnBackground: true,
             ),
-            actionButtons: [
+            /* actionButtons: [
               // 接听按钮
               NotificationActionButton(
                 key: 'accept_call',
@@ -189,7 +190,7 @@ class EventMessage {
                 actionType: ActionType.SilentAction,
                 isDangerousOption: true, // 危险操作（视觉上可能标红）
               ),
-            ],
+            ], */
           );
         }
       }
