@@ -448,7 +448,7 @@ class EventMessage {
           'data': path,
           'height': content['height'],
           'width': content['width'],
-          'scan': content['scan'],
+          'scan': content['scan'] ?? '',
         };
         // 赋值
         chatHis.content.addAll(content);
