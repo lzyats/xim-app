@@ -422,6 +422,7 @@ class _ChatMessageBubbleMenu extends StatelessWidget {
           if (MsgType.reply == msgType) {
             msgType = MsgType.text;
           }
+          //print(chatHis.toJson().toString());
           configReply.value = {
             'msgType': msgType.value,
             'content': jsonEncode(ToolsMessage.convert(msgType, content)),

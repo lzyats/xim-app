@@ -87,9 +87,9 @@ class ToolsStorage {
   }
 
   // 系统配置（新增）
-  SysConfig sysConfig({SysConfig? value}) {
+  SysConfig sysconfig({SysConfig? value}) {
     // 存储键名（与其他配置区分）
-    String type = 'sysConfig';
+    String type = 'sysconfig';
     // 写入操作
     if (value != null) {
       _storage.write(type, value.toJson());
@@ -98,6 +98,19 @@ class ToolsStorage {
     // 读取操作
     Map<String, dynamic> data = _storage.read(type) ?? {};
     return SysConfig.fromJson(data);
+  }
+
+  String sconfig({String value = ''}) {
+    // 存储键名（与其他配置区分）
+    // 类型
+    String type = 'scon';
+    // 读取
+    if (value.isEmpty) {
+      return _storage.read(type) ?? '';
+    }
+    // 写入
+    _storage.write(type, value);
+    return value;
   }
 
   // 朋友圈提醒

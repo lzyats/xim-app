@@ -142,6 +142,7 @@ class MsgChatController extends BaseController {
     }
     // 引用
     if (configReply.isNotEmpty) {
+      print("引用：" + configReply.toString());
       ToolsStorage().reply(localChat.chatId, value: configReply);
     } else {
       ToolsStorage().reply(localChat.chatId);

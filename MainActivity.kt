@@ -1,4 +1,4 @@
-package lansoft.com
+package com.lkim.xyz
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -37,6 +37,8 @@ import java.util.WeakHashMap
 
 import android.content.ComponentName
 import android.content.pm.PackageManager
+import android.content.Context
+import android.view.WindowInsets
 
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
@@ -44,6 +46,8 @@ class MainActivity : FlutterFragmentActivity() {
     private val WAKEUP_CHANNEL = "lansoft.com/wakeup"
     private val UNI_EVENT_CHANNEL = "flutter_uni_stream"
     private val UNI_METHOD_CHANNEL = "flutter_uni_channel"
+    private val NAVIGATION_TYPE_CHANNEL = "navigation_type" // 重命名为 NAVIGATION_TYPE_CHANNEL 以避免混淆
+    private val LAUNCH_PARAMS_CHANNEL = "lansoft.com/launchParams" // 提取为常量
 
     // ===================== 成员变量 =====================
     private val unimpMap = WeakHashMap<String, IUniMP>()
@@ -64,10 +68,12 @@ class MainActivity : FlutterFragmentActivity() {
 
     // ===================== 核心生命周期 =====================
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        // 移除旧的插件注册判断方式，直接使用新的注册方法
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
         super.configureFlutterEngine(flutterEngine)
-        registerChannels(flutterEngine)
+        // 1. 注册 Flutter 插件
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+
+        // 2. 注册所有自定义的 Method Channel 和 Event Channel
+        registerCustomChannels(flutterEngine)
     }
 
     override fun onDestroy() {
@@ -78,13 +84,17 @@ class MainActivity : FlutterFragmentActivity() {
         pendingOverlayResult = null
     }
 
-   
-
     // ===================== 通道注册与处理 =====================
-    private fun registerChannels(flutterEngine: FlutterEngine) {
+    /**
+     * 统一注册所有自定义 Channel
+     */
+    private fun registerCustomChannels(flutterEngine: FlutterEngine) {
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
+        // 唤醒功能通道
         MethodChannel(messenger, WAKEUP_CHANNEL).setMethodCallHandler(this::handleWakeupMethods)
+
+        // UniMP 事件流通道
         EventChannel(messenger, UNI_EVENT_CHANNEL).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 eventSink = events
@@ -96,9 +106,12 @@ class MainActivity : FlutterFragmentActivity() {
                 Log.w(TAG, "EventChannel disconnected")
             }
         })
+
+        // UniMP 方法调用通道
         MethodChannel(messenger, UNI_METHOD_CHANNEL).setMethodCallHandler(this::handleUniMPMethods)
-        
-        MethodChannel(messenger, "lansoft.com/launchParams").setMethodCallHandler { call, result ->
+
+        // 获取启动参数通道
+        MethodChannel(messenger, LAUNCH_PARAMS_CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "getLaunchParams") {
                 val params = mutableMapOf<String, Any?>()
                 intent.extras?.let { extras ->
@@ -112,14 +125,22 @@ class MainActivity : FlutterFragmentActivity() {
                 result.notImplemented()
             }
         }
-    
-        
+
+        // 获取导航类型通道
+        MethodChannel(messenger, NAVIGATION_TYPE_CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == "getNavigationType") {
+                val navigationType = getNavigationType()
+                result.success(navigationType)
+            } else {
+                result.notImplemented()
+            }
+        }
+
     }
 
     // ===================== 全屏设置方法 =====================
-    
+    // (你的代码中这部分是空的，如果有具体实现可以加在这里)
 
-    
     // ===================== 唤醒功能处理 =====================
     private fun handleWakeupMethods(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "wakeUp") {
@@ -143,15 +164,15 @@ class MainActivity : FlutterFragmentActivity() {
                 setTurnScreenOn(true)
             } else {
                 window.addFlags(
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED 
-                    or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                            or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 )
             }
 
             // 构建启动意图
             val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT 
-                        or Intent.FLAG_ACTIVITY_NEW_TASK 
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                        or Intent.FLAG_ACTIVITY_NEW_TASK
                         or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 putExtra("callType", callType)
                 putExtra("channel", channel)
@@ -292,6 +313,53 @@ class MainActivity : FlutterFragmentActivity() {
         val data = call.argument<Any>("data") ?: ""
         uniMpJsCallback?.invoke(data)
         result.success(true)
+    }
+
+    /**
+     * 判断导航类型（传统三键、手势导航等）
+     * 直接集成在 MainActivity 中
+     */
+    private fun getNavigationType(): String {
+        // 方法1: 使用 WindowInsets API (Android 10, API 29+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return try {
+                val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                val windowInsets = windowManager.currentWindowMetrics.windowInsets
+
+                // isVisible() 会返回当前导航栏是否可见
+                // 对于手势导航，这个Insets通常是不可见的或高度为0
+                val isGestureNavigation = !windowInsets.isVisible(WindowInsets.Type.navigationBars())
+
+                if (isGestureNavigation) "gesture" else "traditional"
+            } catch (e: Exception) {
+                // 如果API调用失败，回退到方法2
+                getNavigationTypeBySystemProperty()
+            }
+        }
+        // 方法2: 通过反射获取系统属性 (兼容 Android 10 以下版本)
+        else {
+            return getNavigationTypeBySystemProperty()
+        }
+    }
+
+    /**
+     * 通过反射获取系统属性来判断导航类型 (辅助方法)
+     */
+    private fun getNavigationTypeBySystemProperty(): String {
+        return try {
+            val systemPropertiesClass = Class.forName("android.os.SystemProperties")
+            val getMethod = systemPropertiesClass.getDeclaredMethod("get", String::class.java)
+
+            // "navigationbar.mode" 属性在很多设备上有效
+            // 0 或未设置 -> 传统导航
+            // 1 -> 手势导航
+            val navMode = getMethod.invoke(null, "navigationbar.mode") as String?
+
+            if (navMode == "1") "gesture" else "traditional"
+        } catch (e: Exception) {
+            // 如果所有方法都失败，默认返回传统导航
+            "gesture"
+        }
     }
 
     // ===================== 工具方法 =====================

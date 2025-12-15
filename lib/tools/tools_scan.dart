@@ -147,8 +147,11 @@ class ToolsScan {
     // 打印结果（可根据实际需求处理这两个值）
     SysConfig localConfig =
         new SysConfig(requestHost: firstValue, requestSocket: secondValue);
-    ToolsStorage().sysConfig(value: localConfig);
-    EasyLoading.showSuccess('服务器配置成功');
+    await ToolsStorage().sysconfig(value: localConfig);
+    EasyLoading.showSuccess('服务器配置成功，即将重启应用');
+                                    // 延迟2秒后重启
+                                    await Future.delayed(
+                                        const Duration(seconds: 2));
     debugPrint(decrypt);
   }
 

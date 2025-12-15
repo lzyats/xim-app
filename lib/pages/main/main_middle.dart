@@ -13,6 +13,7 @@ class MainMiddleWare extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     String token = ToolsStorage().token();
+    print("token:"+token);
     // 判断登录状态
     if (token.isEmpty) {
       return const RouteSettings(name: LoginIndexPage.routeName);

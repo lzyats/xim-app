@@ -92,8 +92,8 @@ class CommonSoftwarePage extends GetView<CommonSoftwareController> {
                 },
               ),
               WidgetLineRow(
-                "软件版本",
-                value: '当前版本 V${AppConfig.version}',
+                "软件版本(${AppConfig.version})",
+                value: '检查更新[长按]',
                 arrow: false,
                 onLongPress: () {
                   if (ToolsSubmit.call()) {

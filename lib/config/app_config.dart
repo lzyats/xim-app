@@ -51,6 +51,8 @@ class AppConfig {
   static late String requestHost;
   // socket地址
   static late String requestSocket;
+  // 线路选择库
+  static late List<Map<String, String>> requestHostgroup;
   // 请求隐私协议
   static late String privacyHost;
   // 请求服务协议

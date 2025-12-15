@@ -31,6 +31,7 @@ class EventMoment {
       return;
     }
     debugPrint("处理新动态:" + pushData.toString());
+    //处理不是自己的评论
     // 插入数据库
     await ToolsSqlite().moment.add(moment); // 假设数据库有对应的moment表操作
     // 广播动态消息

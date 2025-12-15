@@ -138,7 +138,7 @@ class ChatMessageReply extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
             child: Container(
               padding: const EdgeInsets.all(10),
-              color: chatHis.self ? const Color(0xFF9EEA6A) : Colors.yellow,
+              color: chatHis.self ? const Color(0xFF9EEA6A) : Color(0xFF0463F7),
               child: ToolsRegex.parsedText(data),
             ),
           ),

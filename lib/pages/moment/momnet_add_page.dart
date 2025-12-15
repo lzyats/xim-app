@@ -82,7 +82,7 @@ class MomentAddPage extends GetView<MomentAddController> {
               const SizedBox(height: 16.0),
               _buildImagePickerSection(),
               const SizedBox(height: 16.0),
-              _buildLocationPickerSection(),
+              //_buildLocationPickerSection(),
               const SizedBox(height: 16.0),
               _buildPermissionSelectorSection(),
               const SizedBox(height: 80.0),

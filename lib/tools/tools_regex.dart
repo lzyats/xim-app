@@ -101,7 +101,7 @@ class ToolsRegex {
           pattern: r'@[^>@]+༺\d{1,19}༻',
           renderWidget: ({required pattern, required text}) {
             text = text.replaceAll(RegExp(r'༺\d{1,19}༻'), ' ');
-            return Text(text, style: TextStyle(color: AppTheme.color));
+            return Text(text, style: TextStyle(color: Colors.white));
           },
           onTap: (value) {},
         ),

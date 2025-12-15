@@ -85,7 +85,10 @@ class ToolsUpload {
       // 阿里上传
       case 'oss':
         return await _oss(multipartFile, uploadToken);
-      // 阿里上传
+      // aws上传
+      case 'aws':
+        return await _aws(multipartFile, uploadToken);
+      // minio上传
       case 'minio':
         return await _minio(multipartFile, uploadToken);
       // 本地上传
@@ -216,6 +219,53 @@ class ToolsUpload {
     return filePath;
   }
 
+  // aws
+  static Future<String> _aws(
+    MultipartFile multipartFile,
+    Map<String, dynamic> uploadToken,
+  ) async {
+    final String uploadUrl = uploadToken['serverUrl'] ?? '';
+    final String filePath = uploadToken['filePath'] ?? '';
+    final String cloudFrontUrl = uploadToken['cloudFrontUrl'] ?? '';
+    if (uploadUrl.isEmpty) {
+      EasyLoading.showToast('上传URL为空');
+      return '';
+    }
+
+    try {
+      // 直接向预签名URL发送PUT请求，文件内容作为请求体
+      final Response response = await Dio().put(
+        uploadUrl,
+        data: multipartFile.finalize(),
+        options: Options(
+          headers: {
+            'Content-Type': multipartFile.contentType?.toString() ??
+                'application/octet-stream',
+            // 添加Content-Length头，解决411错误
+            'Content-Length': multipartFile.length.toString(),
+          },
+        ),
+        onSendProgress: (int sent, int total) {
+          final double progress = sent / total;
+          debugPrint('上传进度：${(progress * 100).toStringAsFixed(1)}%');
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        // MinIO PUT成功可能返回204
+        return cloudFrontUrl;
+      } else {
+        EasyLoading.showToast('上传失败，状态码：${response.statusCode}');
+        return '';
+      }
+    } catch (e) {
+      debugPrint('上传异常：$e');
+      EasyLoading.showToast('上传异常，请稍后重试');
+      return '';
+    }
+  }
+
+  // minio上传
   static Future<String> _minio(
     MultipartFile multipartFile,
     Map<String, dynamic> uploadToken,

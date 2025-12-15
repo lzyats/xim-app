@@ -24,7 +24,7 @@ class ChatMessageAt extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: chatHis.self ? const Color(0xFF9EEA6A) : Colors.yellow,
+          color: chatHis.self ? const Color(0xFF9EEA6A) : Color(0xFF0463F7),
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         ),
         child: ToolsRegex.parsedText(data),

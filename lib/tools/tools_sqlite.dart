@@ -451,12 +451,12 @@ class ChatHis {
     this.statusLabel = '成功',
   }) {
     // 群组
-    if (ChatTalk.group == chatTalk) {
+    /* if (ChatTalk.group == chatTalk) {
       String userId = source['userId'];
       String nickname = source['nickname'];
       nickname = ToolsStorage().remark(userId, value: nickname, read: true);
       source['nickname'] = nickname;
-    }
+    } */
   }
 
   factory ChatHis.fromJson(Map<String, dynamic> data) {

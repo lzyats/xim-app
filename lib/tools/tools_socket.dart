@@ -23,6 +23,7 @@ class ToolsSocket {
   // 连接
   Future<void> onConnect() async {
     String requestSocket = await getSocketHost();
+    print("Socket请求地址：$requestSocket");
 
     // 判断
     if (MiddleStatus.normal != ToolsStorage().status()) {
@@ -78,7 +79,7 @@ class ToolsSocket {
 
   // 从缓存获取WebSocket服务器配置（新增方法）
   static Future<String> getSocketHost() async {
-    SysConfig sysConfig = ToolsStorage().sysConfig();
+    SysConfig sysConfig = ToolsStorage().sysconfig();
     // 优先使用缓存中的WebSocket地址
     if (sysConfig.requestSocket != null && sysConfig.requestSocket.isNotEmpty) {
       return sysConfig.requestSocket;

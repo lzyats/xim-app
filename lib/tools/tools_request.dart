@@ -41,6 +41,12 @@ class ToolsRequest {
     return _singleton!;
   }
 
+  // 新增：重置单例和初始化状态的方法
+  static void reset() {
+    _singleton = null;
+    _isInitialized = false; // 重置初始化标志
+  }
+
   // 异步初始化Dio（核心：使用缓存的baseUrl）
   static Future<void> _initDio() async {
     // 1. 调用getapihost()获取缓存中的baseUrl
@@ -50,7 +56,7 @@ class ToolsRequest {
       baseUrl: baseUrl,
       connectTimeout: AppConfig.timeout,
     );
-    debugPrint("初始地址：" + baseUrl);
+    debugPrint("API初始地址：" + baseUrl);
     _dio = Dio(options);
     _dio.interceptors.add(_AuthInterCeptor());
     // 初始化完成后，将标志位设为true
@@ -59,7 +65,7 @@ class ToolsRequest {
 
   // 从缓存获取API服务器配置（你的原方法）
   static Future<String> getapihost() async {
-    SysConfig sysConfig = ToolsStorage().sysConfig();
+    SysConfig sysConfig = ToolsStorage().sysconfig();
     if (sysConfig.requestHost != null && sysConfig.requestHost.isNotEmpty) {
       return sysConfig.requestHost; // 返回缓存中的值
     }
