@@ -1,16 +1,14 @@
 import 'dart:async';
 
-import 'package:alpaca/pages/login/login_index_page%20copy.dart';
+import 'package:alpaca/pages/login/login_index_page.dart';
 import 'package:alpaca/pages/login/login_register_controller.dart';
 import 'package:alpaca/pages/view/html_page.dart';
-import 'package:alpaca/pages/view/view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:alpaca/tools/tools_regex.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/tools/tools_name.dart';
-import 'package:alpaca/config/app_config.dart';
 
 class LoginRegisterPage extends StatefulWidget {
   static const String routeName = '/login_register';

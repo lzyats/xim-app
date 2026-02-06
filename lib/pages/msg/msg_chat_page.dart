@@ -41,7 +41,7 @@ class MsgChatPage extends GetView<MsgChatController> {
         EventSetting().handle(SettingModel(SettingType.close));
       },
       child: Scaffold(
-        backgroundColor: Color(0xFFFFFFFF),
+        backgroundColor:const Color(0xFFFFFFFF),
         resizeToAvoidBottomInset: false,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),

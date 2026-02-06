@@ -1,8 +1,11 @@
+import 'package:alpaca/config/app_fonts.dart';
 import 'package:alpaca/pages/login/login_register_page.dart';
 import 'package:alpaca/tools/tools_encrypt.dart';
+import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_perms.dart';
-import 'package:alpaca/tools/tools_request.dart';
+import 'package:alpaca/tools/tools_route.dart';
 import 'package:alpaca/tools/tools_scan.dart';
+import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,8 +56,8 @@ class LoginIndexPage extends GetView<LoginIndexController> {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       // 使用原背景渐变色
-                      gradient: LinearGradient(
-                        colors: const [
+                      gradient: const LinearGradient(
+                        colors: [
                           Color(0xFFF4F9FE),
                           Color(0xFFECF4FF),
                         ],
@@ -73,8 +76,52 @@ class LoginIndexPage extends GetView<LoginIndexController> {
                       children: [
                         _buildAccountField(),
                         _buildPasswordField(),
+                        // 选择线路（添加点击事件功能）
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: TextButton.icon(
+                            onPressed: () async {
+                              // 从本地存储获取配置
+                              SysConfig localConfig =
+                                  ToolsStorage().sysConfig();
+                              // 获取线路列表
+                              List<Map<String, String>> routeList =
+                                  await AppConfig.requestHostgroup;
+                              _showRouteDialog(localConfig, routeList);
+                            },
+                            icon: const Icon(AppFonts.e642,
+                                color: Color(0xFF00ABFF), size: 18),
+                            label: const Text(
+                              '选择线路',
+                              style: TextStyle(
+                                  color: Color(0xFF00ABFF), fontSize: 16),
+                            ),
+                          ),
+                        ),
                         _buildLoginButton(),
                         _buildRegisterAndForgotPassword(),
+                        /* Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: TextButton.icon(
+                            onPressed: () async {
+                              ChatRobot chatRobot = await ToolsSqlite()
+                                  .robot
+                                  .getById(AppConfig.robotId);
+                              ToolsRoute().chatPage(
+                                chatId: chatRobot.robotId,
+                                nickname: chatRobot.nickname,
+                                portrait: chatRobot.portrait,
+                                chatTalk: ChatTalk.robot,
+                              );
+                            },
+                            icon: const Icon(Icons.headset_mic,
+                                size: 16, color: Colors.grey),
+                            label: const Text(
+                              '联系客服',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ), */
                       ],
                     ),
                   ),
@@ -103,10 +150,10 @@ class LoginIndexPage extends GetView<LoginIndexController> {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16), // 确保图片也有圆角
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16), // 确保图片也有圆角
           child: Image.asset(
             AppImage.logo,
             fit: BoxFit.contain,
@@ -138,7 +185,7 @@ class LoginIndexPage extends GetView<LoginIndexController> {
             ],
             decoration: InputDecoration(
               hintText: '请输入手机号',
-              prefixIcon: Icon(Icons.phone_iphone),
+              prefixIcon: const Icon(Icons.phone_iphone),
               hintStyle: const TextStyle(color: Color(0xFFCCCCCC)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(35),
@@ -228,241 +275,6 @@ class LoginIndexPage extends GetView<LoginIndexController> {
       children: [
         Row(
           children: [
-            GestureDetector(
-              onLongPress: () async {
-                // 1. 从本地存储获取配置（允许为null，但后续会兜底）
-                SysConfig localConfig = ToolsStorage().sysconfig();
-                print(localConfig.toJson().toString());
-                print(ToolsStorage().sconfig());
-                // 2. 获取线路列表（即使为空，后续也会处理）
-                List<Map<String, String>> routeList =
-                    await AppConfig.requestHostgroup;
-
-                // ===================== 核心优化：selectedIndex 强制有值 =====================
-                int selectedIndex;
-                // 场景1：线路列表为空 → 强制设为0（后续会拦截无效选择，避免报错）
-                if (routeList.isEmpty) {
-                  selectedIndex = 0;
-                }
-                // 场景2：线路列表非空 → 优先匹配本地配置
-                else {
-                  // 查找与本地配置（httpUrl+wsUrl）完全匹配的索引
-                  final matchedIndex = routeList.indexWhere((route) {
-                    // 确保本地配置非null + 线路的http/ws地址非null，才进行匹配
-                    return localConfig != null &&
-                        route["httpUrl"] != null &&
-                        route["wsUrl"] != null &&
-                        route["httpUrl"] == localConfig.requestHost &&
-                        route["wsUrl"] == localConfig.requestSocket;
-                  });
-                  // 匹配成功 → 用匹配到的索引；匹配失败 → 兜底设为0（默认选中第一条）
-                  selectedIndex = matchedIndex != -1 ? matchedIndex : 0;
-                }
-                // ==========================================================================
-
-                // 添加"添加新线路"选项标记（保持原有逻辑）
-                bool showAddRoute = false;
-
-                await showDialog(
-                  context: Get.context!,
-                  barrierDismissible: true,
-                  builder: (dialogContext) {
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return AlertDialog(
-                          title: const Center(
-                            child: Text(
-                              "选择服务线路",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF333333),
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          // 线路列表为空时，显示提示文本（避免空UI）
-                          content: routeList.isEmpty
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 20),
-                                  child: Center(
-                                    child: Text(
-                                      "暂无可用服务线路",
-                                      style:
-                                          TextStyle(color: Color(0xFF666666)),
-                                    ),
-                                  ),
-                                )
-                              : SingleChildScrollView(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 12, horizontal: 16),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // 原有线路列表（仅当线路非空时渲染）
-                                      ...routeList.asMap().entries.map((entry) {
-                                        int index = entry.key;
-                                        var route = entry.value;
-                                        // 确保线路的name/httpUrl/wsUrl非null（避免空指针）
-                                        final routeName =
-                                            route["name"] ?? "未知线路";
-                                        return Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 6),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
-                                                color: selectedIndex == index
-                                                    ? const Color(0xFF0463F7)
-                                                    : const Color(0xFFEEEEEE),
-                                                width: 1),
-                                            color: selectedIndex == index
-                                                ? const Color(0xFFF0F7FF)
-                                                : Colors.white,
-                                          ),
-                                          child: ListTile(
-                                            leading: Icon(
-                                              selectedIndex == index
-                                                  ? Icons.radio_button_checked
-                                                  : Icons
-                                                      .radio_button_unchecked,
-                                              color: const Color(0xFF0463F7),
-                                            ),
-                                            title: Text(routeName),
-                                            onTap: () {
-                                              // 点击切换选中状态（确保索引在有效范围内）
-                                              if (index >= 0 &&
-                                                  index < routeList.length) {
-                                                setState(() {
-                                                  selectedIndex = index;
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        );
-                                      }).toList(),
-
-                                      // 添加新线路按钮（仅当线路非空时显示）
-                                      if (!showAddRoute && routeList.isNotEmpty)
-                                        Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 6),
-                                          child: ListTile(
-                                            leading: const Icon(
-                                              Icons.add_circle_outline,
-                                              color: Color(0xFF0463F7),
-                                            ),
-                                            title: const Text(
-                                              "添加新线路",
-                                              style: TextStyle(
-                                                  color: Color(0xFF0463F7)),
-                                            ),
-                                            onTap: () async {
-                                              // 先检查相机权限
-                                              bool result =
-                                                  await ToolsPerms.camera();
-                                              if (!result) return;
-                                              // 关闭当前对话框
-                                              if (Get.context != null) {
-                                                Navigator.of(Get.context!)
-                                                    .pop();
-                                              }
-                                              // 调用扫码功能
-                                              ToolsScan.scan();
-                                            },
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                          actions: [
-                            Container(
-                              width: double.infinity,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  // 最终校验：确保线路列表非空 + 选中索引有效
-                                  if (routeList.isEmpty) {
-                                    EasyLoading.showError('暂无可用服务线路');
-                                  } else if (selectedIndex < 0 ||
-                                      selectedIndex >= routeList.length) {
-                                    EasyLoading.showError('请选择有效的服务线路');
-                                  } else {
-                                    // 选中线路有效 → 更新配置
-                                    var selectedRoute =
-                                        routeList[selectedIndex];
-                                    // 再次确保httpUrl/wsUrl非null（避免空指针）
-                                    final httpUrl =
-                                        selectedRoute["httpUrl"] ?? "";
-                                    final wsUrl = selectedRoute["wsUrl"] ?? "";
-                                    if (httpUrl.isEmpty || wsUrl.isEmpty) {
-                                      EasyLoading.showError('选中线路信息不完整');
-                                      return;
-                                    }
-
-                                    // 打印日志 + 更新本地配置
-                                    debugPrint(
-                                        "选中线路：${selectedRoute["name"] ?? "未知线路"}");
-                                    debugPrint("HTTP地址：$httpUrl");
-                                    debugPrint("WS地址：$wsUrl");
-                                    SysConfig newConfig = SysConfig(
-                                      requestHost: httpUrl,
-                                      requestSocket: wsUrl,
-                                    );
-                                    // 修正后逻辑（等待存储完成）
-                                    try {
-                                      // 1. 等待存储操作完全完成（关键！）
-                                      await ToolsStorage()
-                                          .sysconfig(value: newConfig);
-                                          print(newConfig.toJson().toString());
-                                          ToolsStorage().sconfig(value: selectedRoute["name"]!);
-                                      // 2. 提示用户（可选：延迟1-2秒，让用户看到提示，再重启）
-                                      EasyLoading.showSuccess(
-                                          '服务器配置成功，新配置将在3秒以后生效');
-                                      await Future.delayed(
-                                          const Duration(seconds: 3));
-                                      // 3. 执行重启
-                                      ToolsRequest.reset();
-                                      //Restart.restartApp();
-                                    } catch (e) {
-                                      // 捕获存储异常，避免崩溃
-                                      EasyLoading.showError('配置存储失败，请重试');
-                                      debugPrint('存储配置错误：$e');
-                                    }
-                                  }
-                                  // 无论是否成功，都关闭对话框
-                                  Navigator.pop(dialogContext);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0463F7),
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: const Text(
-                                  "确定",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-              onLongPressDown: (_) => HapticFeedback.vibrate(),
-              child: const Icon(
-                Icons.settings,
-                color: Color(0xFF666666),
-                size: 18,
-              ),
-            ),
-            const SizedBox(width: 5),
             const Text(
               '没有账号？',
               style: TextStyle(color: Color(0xFF333333)),
@@ -488,6 +300,190 @@ class LoginIndexPage extends GetView<LoginIndexController> {
           ),
         ),
       ],
+    );
+  }
+
+  // 显示线路选择对话框
+  void _showRouteDialog(
+      SysConfig localConfig, List<Map<String, String>> routeList) async {
+    int selectedIndex;
+
+    if (routeList.isEmpty) {
+      selectedIndex = 0;
+    } else {
+      final matchedIndex = routeList.indexWhere((route) {
+        return localConfig != null &&
+            route["httpUrl"] != null &&
+            route["wsUrl"] != null &&
+            route["httpUrl"] == localConfig.requestHost &&
+            route["wsUrl"] == localConfig.requestSocket;
+      });
+      selectedIndex = matchedIndex != -1 ? matchedIndex : 0;
+    }
+
+    bool showAddRoute = false;
+
+    await showDialog(
+      context: Get.context!,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+              contentPadding: const EdgeInsets.all(16),
+              title: const Center(
+                child: Text(
+                  "选择服务线路",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF333333),
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              // 在content外层包裹ConstrainedBox
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth:
+                      MediaQuery.of(context).size.width * 0.65, // 占屏幕宽度的80%
+                ),
+                child: routeList.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            "暂无可用服务线路",
+                            style: TextStyle(color: Color(0xFF666666)),
+                          ),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ...routeList.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              var route = entry.value;
+                              final routeName = route["name"] ?? "未知线路";
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                      color: selectedIndex == index
+                                          ? const Color(0xFF00ABFF)
+                                          : const Color(0xFFBDBDBD),
+                                      width: 1),
+                                  color: selectedIndex == index
+                                      ? const Color(0xFFF0F7FF)
+                                      : Colors.white,
+                                ),
+                                child: ListTile(
+                                  leading: Icon(
+                                    selectedIndex == index
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_unchecked,
+                                    color: const Color(0xFF00ABFF),
+                                  ),
+                                  title: Text(
+                                    routeName,
+                                    style: TextStyle(
+                                      color: selectedIndex == index
+                                          ? const Color(0xFF00ABFF)
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    if (index >= 0 &&
+                                        index < routeList.length) {
+                                      setState(() {
+                                        selectedIndex = index;
+                                      });
+                                    }
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                            if (!showAddRoute && routeList.isNotEmpty)
+                              Container(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.add_circle_outline,
+                                    color: Color(0xFF00ABFF),
+                                  ),
+                                  title: const Text(
+                                    "添加新线路",
+                                    style: TextStyle(color: Color(0xFF00ABFF)),
+                                  ),
+                                  onTap: () async {
+                                    bool result = await ToolsPerms.camera();
+                                    if (!result) return;
+                                    if (Get.context != null) {
+                                      Navigator.of(Get.context!).pop();
+                                    }
+                                    ToolsScan.scan();
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+              ),
+              actions: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (routeList.isEmpty) {
+                        EasyLoading.showError('暂无可用服务线路');
+                      } else if (selectedIndex < 0 ||
+                          selectedIndex >= routeList.length) {
+                        EasyLoading.showError('请选择有效的服务线路');
+                      } else {
+                        var selectedRoute = routeList[selectedIndex];
+                        final httpUrl = selectedRoute["httpUrl"] ?? "";
+                        final wsUrl = selectedRoute["wsUrl"] ?? "";
+                        if (httpUrl.isEmpty || wsUrl.isEmpty) {
+                          EasyLoading.showError('选中线路信息不完整');
+                          return;
+                        }
+                        final eName = selectedRoute["name"] ?? "未知线路";
+                        debugPrint("选中线路：$eName");
+                        debugPrint("HTTP地址：$httpUrl");
+                        debugPrint("WS地址：$wsUrl");
+                        SysConfig newConfig = SysConfig(
+                          hostName: eName,
+                          requestHost: httpUrl,
+                          requestSocket: wsUrl,
+                        );
+                        Navigator.pop(dialogContext);
+                        await controller.saveRouteConfig(newConfig, eName);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      "确定",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

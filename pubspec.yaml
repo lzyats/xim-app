@@ -144,6 +144,8 @@ dependencies:
   # 滚动显示
   visibility_detector: ^0.4.0+2  # 添加这一行
   #日期格式化
+  restart_app: ^1.1.0
+  # 重启APP
 
 alipay_kit:
   scheme: alipay123
@@ -170,3 +172,6 @@ flutter:
     - family: iconfonta
       fonts:
         - asset: assets/fonts/iconfonta.ttf
+    - family: iconfontb
+      fonts:
+        - asset: assets/fonts/iconfontb.ttf

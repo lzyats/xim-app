@@ -1,6 +1,7 @@
 import 'package:get_storage/get_storage.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
+import 'dart:math';
 
 // 本地存储
 class ToolsStorage {
@@ -20,6 +21,42 @@ class ToolsStorage {
     // 写入
     _storage.write(type, token);
     return token;
+  }
+
+  // 游客登录标识（16位随机字符）
+  String visitorLogin({String? value}) {
+    // 存储键名（保持原有标识，避免数据冲突）
+    String type = 'visitor_login';
+
+    // 写入操作：传入值时更新存储
+    if (value != null) {
+      // 校验传入值是否为16位纯数字且不以0开头
+      if (value.length != 16 || !RegExp(r'^[1-9]\d{15}$').hasMatch(value)) {
+        throw ArgumentError('游客登录标识必须是16位纯数字且不以0开头');
+      }
+      _storage.write(type, value);
+      return value;
+    }
+
+    // 读取操作：无传入值时读取，无数据则生成16位随机数字并存储
+    String storedValue = _storage.read(type) ?? '';
+    if (storedValue.isEmpty) {
+      // 生成16位随机数字（不以0开头）
+      storedValue = _generate16RandomNumber();
+      _storage.write(type, storedValue);
+    }
+    return storedValue;
+  }
+
+  // 生成16位纯数字（不以0开头）
+  String _generate16RandomNumber() {
+    final Random random = Random();
+    // 第一位：1-9 随机数字（避免0开头）
+    int firstDigit = random.nextInt(9) + 1;
+    // 剩余15位：0-9 随机数字
+    String remainingDigits = List.generate(15, (_) => random.nextInt(10)).join();
+    // 拼接成16位数字字符串
+    return '$firstDigit$remainingDigits';
   }
 
   // status
@@ -87,30 +124,18 @@ class ToolsStorage {
   }
 
   // 系统配置（新增）
-  SysConfig sysconfig({SysConfig? value}) {
+  SysConfig sysConfig({SysConfig? value}) {
     // 存储键名（与其他配置区分）
     String type = 'sysconfig';
     // 写入操作
     if (value != null) {
       _storage.write(type, value.toJson());
+      _storage.save();
       return value;
     }
     // 读取操作
     Map<String, dynamic> data = _storage.read(type) ?? {};
     return SysConfig.fromJson(data);
-  }
-
-  String sconfig({String value = ''}) {
-    // 存储键名（与其他配置区分）
-    // 类型
-    String type = 'scon';
-    // 读取
-    if (value.isEmpty) {
-      return _storage.read(type) ?? '';
-    }
-    // 写入
-    _storage.write(type, value);
-    return value;
   }
 
   // 朋友圈提醒
@@ -673,11 +698,13 @@ class LocalConfig {
 
 //软件基本配置类
 class SysConfig {
+  String? hostName;
   String requestHost; // 接口请求主机地址（如 HTTP 接口域名）
   String requestSocket; // Socket 连接地址（如 WebSocket 地址）
 
   // 构造函数
   SysConfig({
+    this.hostName,
     required this.requestHost,
     required this.requestSocket,
   });
@@ -685,6 +712,7 @@ class SysConfig {
   // 从 JSON 数据初始化实例
   factory SysConfig.fromJson(Map<String, dynamic> data) {
     return SysConfig(
+      hostName: data['hostName'] ?? '',
       requestHost: data['requestHost'] ?? '', // 默认为空字符串
       requestSocket: data['requestSocket'] ?? '', // 默认为空字符串
     );
@@ -693,13 +721,9 @@ class SysConfig {
   // 转换为 JSON 数据（用于存储）
   Map<String, dynamic> toJson() {
     return {
+      'hostName': hostName,
       'requestHost': requestHost,
       'requestSocket': requestSocket,
     };
-  }
-
-  // 初始化一个默认空配置的实例
-  factory SysConfig.init() {
-    return SysConfig.fromJson({});
   }
 }

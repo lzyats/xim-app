@@ -65,7 +65,7 @@ class ToolsRequest {
 
   // 从缓存获取API服务器配置（你的原方法）
   static Future<String> getapihost() async {
-    SysConfig sysConfig = ToolsStorage().sysconfig();
+    SysConfig sysConfig = ToolsStorage().sysConfig();
     if (sysConfig.requestHost != null && sysConfig.requestHost.isNotEmpty) {
       return sysConfig.requestHost; // 返回缓存中的值
     }
@@ -170,6 +170,9 @@ class _AuthInterCeptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    debugPrint("token:"+ToolsStorage().token());
+    debugPrint("version:"+AppConfig.version);
+    debugPrint("device:"+AppConfig.device);
     Map<String, dynamic> headers = {
       'Authorization': ToolsStorage().token(),
       'version': AppConfig.version,

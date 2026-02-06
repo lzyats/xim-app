@@ -106,6 +106,20 @@ class RequestAuth {
     EasyLoading.showToast('登录成功');
   }
 
+  // 游客登录（获取游客token）
+  static Future<AuthModel02> loginTourist(String touristId) async {
+
+    // 执行请求（注意：接口接收raw字符串，需直接传递touristId而非map）
+    AjaxData ajaxData = await ToolsRequest().post(
+      '$_prefix/vlogin',
+      data: {
+        'touristId': touristId,
+      }, // 直接传递字符串，适配后端@RequestBody接收方式
+    );
+    // 转换为AuthModel02模型（兼容现有token返回格式）
+    return ajaxData.getData((data) => AuthModel02.fromJson(data));
+  }
+
   // 退出登录
   static Future<void> logout() async {
     // 执行

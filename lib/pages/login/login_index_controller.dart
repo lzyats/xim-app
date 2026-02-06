@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alpaca/request/request_robot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_storage.dart';
 import 'package:alpaca/tools/tools_submit.dart';
 import 'package:alpaca/tools/tools_timer.dart';
+import 'package:restart_app/restart_app.dart';
 
 class LoginIndexController extends BaseController {
   TextEditingController phoneController = TextEditingController();
@@ -23,7 +25,7 @@ class LoginIndexController extends BaseController {
   RxBool isPrivacy = false.obs;
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
-
+  SysConfig localConfig = ToolsStorage().sysConfig();
 
 
   // 发送验证码
@@ -85,10 +87,39 @@ class LoginIndexController extends BaseController {
     }
   }
 
+  /// 新增：处理服务线路配置存储逻辑
+  /// [newConfig]：待存储的新服务配置（含HTTP/WS地址）
+  /// [routeName]：选中线路的名称
+  Future<void> saveRouteConfig(SysConfig newConfig, String routeName) async {
+    try {
+      // 1. 等待存储操作完全完成（关键！）
+      await ToolsStorage().sysConfig(value: newConfig);
+      print(newConfig.toJson().toString());
+
+      // 2. 提示用户（延迟3秒，确保用户看到提示）
+      EasyLoading.showSuccess('服务器配置成功，将在3秒后重启动生效');
+      await Future.delayed(const Duration(seconds: 3));
+
+      // 3. 执行请求重置（使新配置生效）
+      //ToolsRequest.reset();
+      Restart.restartApp(); // 如需重启App可取消注释（需导入对应包）
+
+    } catch (e) {
+      // 捕获存储异常，避免崩溃
+      EasyLoading.showError('配置存储失败，请重试');
+      debugPrint('存储配置错误：$e');
+    }
+  }
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     // 设置登录状态
     ToolsStorage().status(value: MiddleStatus.login);
+    //防止被清空线路信息
+    ToolsStorage().sysConfig(value: localConfig);
+    print('线路信息：'+localConfig.toJson().toString());
+    // 获取机器人列表
+    RequestRobot.getRobotList();
   }
 }

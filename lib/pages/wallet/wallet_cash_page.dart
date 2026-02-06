@@ -387,7 +387,7 @@ class WalletCashPage extends GetView<WalletCashController> {
                           text: TextSpan(
                             style: const TextStyle(color: Colors.black87),
                             children: [
-                              TextSpan(
+                             const TextSpan(
                                 text: '实时汇率转换 ',
                                 style: const TextStyle(
                                   fontSize: 14.0,

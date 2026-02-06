@@ -18,6 +18,7 @@ import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_route.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_submit.dart';
+import 'package:restart_app/restart_app.dart';
 
 // 扫一扫
 class ToolsScan {
@@ -146,12 +147,13 @@ class ToolsScan {
     String secondValue = parts.length >= 2 ? parts[1] : '';
     // 打印结果（可根据实际需求处理这两个值）
     SysConfig localConfig =
-        new SysConfig(requestHost: firstValue, requestSocket: secondValue);
-    await ToolsStorage().sysconfig(value: localConfig);
+        new SysConfig(hostName: '新建线路',requestHost: firstValue, requestSocket: secondValue);
+    await ToolsStorage().sysConfig(value: localConfig);
     EasyLoading.showSuccess('服务器配置成功，即将重启应用');
                                     // 延迟2秒后重启
                                     await Future.delayed(
                                         const Duration(seconds: 2));
+                                        Restart.restartApp();
     debugPrint(decrypt);
   }
 

@@ -79,7 +79,7 @@ class ToolsSocket {
 
   // 从缓存获取WebSocket服务器配置（新增方法）
   static Future<String> getSocketHost() async {
-    SysConfig sysConfig = ToolsStorage().sysconfig();
+    SysConfig sysConfig = ToolsStorage().sysConfig();
     // 优先使用缓存中的WebSocket地址
     if (sysConfig.requestSocket != null && sysConfig.requestSocket.isNotEmpty) {
       return sysConfig.requestSocket;

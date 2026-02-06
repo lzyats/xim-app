@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class AppFonts {
   static const String _fontFamily = 'iconfont';
   static const String _fontFamilya = 'iconfonta';
+  static const String _fontFamilyb = 'iconfontb';
   static const bool _matchText = true;
 
   // 首页-好友
@@ -18,6 +19,9 @@ class AppFonts {
   // 首页-圈子
   static const IconData qz01 =
       IconData(58926, fontFamily: _fontFamilya, matchTextDirection: _matchText);
+  // 首页-线路选择
+  static const IconData e642 =
+      IconData(58946, fontFamily: _fontFamilyb, matchTextDirection: _matchText);
   // 电脑
   static const IconData e605 =
       IconData(58885, fontFamily: _fontFamily, matchTextDirection: _matchText);
