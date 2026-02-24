@@ -31,6 +31,11 @@ class MineIndexPage extends GetView<MineIndexController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => MineIndexController());
+    var involevel = controller.localConfig.involevel;
+    bool inlevel = false;
+    if (involevel == 'Y' || involevel == 'YES') {
+      inlevel = true;
+    }
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -111,13 +116,13 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 localUser.portrait,
                               ),
                             ),
-                            SizedBox(width: 16.0),
+                            const SizedBox(width: 16.0),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
                                   localUser.nickname,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 20.0,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -125,7 +130,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                 SizedBox(height: 4.0),
                                 Text(
                                   'ID号: ${localUser.userNo}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.grey,
                                   ),
@@ -138,11 +143,11 @@ class MineIndexPage extends GetView<MineIndexController> {
                       // 右侧：二维码图标和箭头（已移到最右边）
                       Row(
                         children: <Widget>[
-                          Icon(
+                          const Icon(
                             Icons.qr_code,
                             color: Colors.red,
                           ),
-                          SizedBox(width: 8.0), // 增加图标间距
+                          const SizedBox(width: 8.0), // 增加图标间距
                           WidgetCommon.arrow(),
                         ],
                       ),
@@ -153,8 +158,9 @@ class MineIndexPage extends GetView<MineIndexController> {
 
               // 钱包区域
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-                padding: EdgeInsets.all(12.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+                padding: const EdgeInsets.all(12.0),
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.8), // 增加透明度避免与背景冲突
                   borderRadius: BorderRadius.circular(8.0),
@@ -165,14 +171,14 @@ class MineIndexPage extends GetView<MineIndexController> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
+                        const Text(
                           '我的钱包',
                           style: TextStyle(
                             fontSize: 16.0,
                             color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 2.0),
+                        const SizedBox(height: 2.0),
                         // 余额与刷新按钮组合（用Row包裹）
                         Obx(() {
                           return Row(
@@ -180,16 +186,16 @@ class MineIndexPage extends GetView<MineIndexController> {
                               // 余额文本（保持Obx监听）
                               Text(
                                 controller.balance.value, // balance 为 RxString
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 24.0,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(width: 12.0), // 文本与按钮间距
+                              const SizedBox(width: 12.0), // 文本与按钮间距
                               // 刷新按钮
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.refresh,
                                   color: Colors.white, // 图标颜色与文本一致
                                   size: 20.0, // 图标大小
@@ -199,7 +205,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                                   controller.getInfo();
                                 },
                                 padding: EdgeInsets.zero, // 去除默认内边距
-                                constraints: BoxConstraints(), // 去除最小点击区域限制
+                                constraints:
+                                    const BoxConstraints(), // 去除最小点击区域限制
                               ),
                             ],
                           );
@@ -224,13 +231,14 @@ class MineIndexPage extends GetView<MineIndexController> {
 
               // 邀请好友和在线签到区域
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(right: 2.0),
-                        padding: EdgeInsets.all(8.0),
+                        margin: const EdgeInsets.only(right: 2.0),
+                        padding: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(8.0),
@@ -249,7 +257,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.start, // 文字左对齐
                                   children: [
-                                    Text(
+                                    const Text(
                                       '邀请好友',
                                       style: TextStyle(
                                         fontSize: 15.0,
@@ -257,19 +265,27 @@ class MineIndexPage extends GetView<MineIndexController> {
                                         color: Color(0xFF0463F7),
                                       ),
                                     ),
-                                    SizedBox(height: 4.0),
-                                    Text(
+                                    const SizedBox(height: 4.0),
+                                    const Text(
                                       '得豪华大礼',
                                       style: TextStyle(
                                         fontSize: 12.0,
                                         color: Color(0xFF0463F7),
                                       ),
                                     ),
-                                    SizedBox(height: 2.0), // 文字图片区域与按钮的间距
+                                    const SizedBox(height: 2.0), // 文字图片区域与按钮的间距
 
                                     ElevatedButton(
                                       onPressed: () {
                                         // 去邀请按钮点击事件
+                                        // 判断级别是否满足要求
+                                        if (inlevel) {
+                                          print('邀请好友');
+                                          if (controller.localUser.value.isvip <
+                                              1) {
+                                            throw Exception('您的级别不够邀请他人');
+                                          }
+                                        }
                                         // 打开 MineIncodePage 的导航代码
                                         Get.toNamed(MineIncodePage.routeName);
                                       },
@@ -296,8 +312,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                     ),
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(left: 2.0),
-                        padding: EdgeInsets.all(8.0),
+                        margin: const EdgeInsets.only(left: 2.0),
+                        padding: const EdgeInsets.all(8.0),
                         decoration: BoxDecoration(
                           color: Colors.pink.shade50.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(8.0),
@@ -316,7 +332,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.start, // 文字左对齐
                                   children: [
-                                    Text(
+                                    const Text(
                                       '在线签到',
                                       style: TextStyle(
                                         fontSize: 15.0,
@@ -324,15 +340,15 @@ class MineIndexPage extends GetView<MineIndexController> {
                                         color: Color(0xFFC04EEB),
                                       ),
                                     ),
-                                    SizedBox(height: 4.0),
-                                    Text(
+                                    const SizedBox(height: 4.0),
+                                    const Text(
                                       '得豪华大礼',
                                       style: TextStyle(
                                         fontSize: 14.0,
                                         color: Color(0xFFC04EEB),
                                       ),
                                     ),
-                                    SizedBox(height: 2.0), // 文字图片区域与按钮的间距
+                                    const SizedBox(height: 2.0), // 文字图片区域与按钮的间距
 
                                     ElevatedButton(
                                       onPressed: () {
@@ -347,7 +363,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                                         foregroundColor: Colors.white,
                                       ),
                                     ),
-                                    SizedBox(width: 10.0), //
+                                    const SizedBox(width: 10.0), //
                                   ],
                                 ),
                                 // 右侧：新增图片hltj
@@ -369,7 +385,7 @@ class MineIndexPage extends GetView<MineIndexController> {
 
               // 其他功能区域
               Container(
-                margin: EdgeInsets.all(16.0),
+                margin: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(8),
@@ -377,7 +393,7 @@ class MineIndexPage extends GetView<MineIndexController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text(
                         '其他功能',
@@ -388,10 +404,10 @@ class MineIndexPage extends GetView<MineIndexController> {
                       ),
                     ),
                     ListTile(
-                      leading: Icon(
+                      leading: const Icon(
                         AppFonts.e607,
                       ),
-                      title: Text('我的钱包'),
+                      title: const Text('我的钱包'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // 关于我们点击事件
@@ -401,8 +417,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.update),
-                      title: Text('账号安全'),
+                      leading: const Icon(Icons.update),
+                      title: const Text('账号安全'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // 版本更新点击事件
@@ -412,8 +428,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(AppFonts.ec85),
-                      title: Text('我的收藏'),
+                      leading: const Icon(AppFonts.ec85),
+                      title: const Text('我的收藏'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // 关于我们点击事件
@@ -423,8 +439,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      title: Text('通知公告'),
-                      trailing: Icon(Icons.arrow_forward_ios),
+                      title: const Text('通知公告'),
+                      trailing: const Icon(Icons.arrow_forward_ios),
                       leading: Icon(
                         AppFonts.e61a,
                         size: _iconSize,
@@ -436,8 +452,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.settings),
-                      title: Text('软件设置'),
+                      leading: const Icon(Icons.settings),
+                      title: const Text('软件设置'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // 设置点击事件
@@ -447,8 +463,8 @@ class MineIndexPage extends GetView<MineIndexController> {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('关于我们'),
+                      leading: const Icon(Icons.info),
+                      title: const Text('关于我们'),
                       trailing: Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         // 关于我们点击事件

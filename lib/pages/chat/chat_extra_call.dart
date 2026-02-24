@@ -24,7 +24,7 @@ class ChatExtraCall extends StatelessWidget {
         height: 24,
         fit: BoxFit.contain, // 保持图片比例
       ),
-      color: Color(0xFFC2FFF1),
+      color: const Color(0xFFC2FFF1),
       onTap: () async {
         // 权限
         bool result = await ToolsPerms.camera();
@@ -40,7 +40,7 @@ class ChatExtraCall extends StatelessWidget {
           WidgetBottom([
             BottomModel(
               '视频通话',
-              icon: Icon(Icons.videocam), // 添加视频通话图标
+              icon: const Icon(Icons.videocam), // 添加视频通话图标
               onTap: () async {
                 // 关闭
                 Get.back();
@@ -50,7 +50,7 @@ class ChatExtraCall extends StatelessWidget {
             ),
             BottomModel(
               '语音通话',
-              icon: Icon(Icons.phone), // 添加语音通话图标
+              icon: const Icon(Icons.phone), // 添加语音通话图标
               onTap: () async {
                 // 关闭
                 Get.back();
@@ -63,7 +63,7 @@ class ChatExtraCall extends StatelessWidget {
           WidgetBottom([
             BottomModel(
               '语音通话',
-              icon: Icon(Icons.phone), // 添加语音通话图标
+              icon: const Icon(Icons.phone), // 添加语音通话图标
               onTap: () async {
                 // 关闭
                 Get.back();

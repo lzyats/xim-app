@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alpaca/request/request_common.dart';
 import 'package:alpaca/request/request_robot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -26,7 +27,6 @@ class LoginIndexController extends BaseController {
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
   SysConfig localConfig = ToolsStorage().sysConfig();
-
 
   // 发送验证码
   Future<void> sendCode() async {
@@ -103,7 +103,6 @@ class LoginIndexController extends BaseController {
       // 3. 执行请求重置（使新配置生效）
       //ToolsRequest.reset();
       Restart.restartApp(); // 如需重启App可取消注释（需导入对应包）
-
     } catch (e) {
       // 捕获存储异常，避免崩溃
       EasyLoading.showError('配置存储失败，请重试');
@@ -118,8 +117,10 @@ class LoginIndexController extends BaseController {
     ToolsStorage().status(value: MiddleStatus.login);
     //防止被清空线路信息
     ToolsStorage().sysConfig(value: localConfig);
-    print('线路信息：'+localConfig.toJson().toString());
+    print('线路信息：' + localConfig.toJson().toString());
     // 获取机器人列表
     RequestRobot.getRobotList();
+    // 获取配置
+    RequestCommon.getConfig();
   }
 }

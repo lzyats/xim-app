@@ -39,6 +39,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
       }
     });
 
+    var invomust = controller.localConfig.invomust;
+    bool must = false;
+    if (invomust == 'Y' || invomust == 'YES') {
+      must = true;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('欢迎注册'),
@@ -320,12 +326,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 70,
                     child: Text(
-                      '邀请码(选填)',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      must ? '邀请码' : '邀请码(选填)',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                   Expanded(
@@ -337,7 +343,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                         LengthLimitingTextInputFormatter(6),
                       ],
                       decoration: InputDecoration(
-                        hintText: '请输入6位邀请码（选填）',
+                        hintText: must ? '请输入6位邀请码' : '请输入6位邀请码（选填）',
                         prefixIcon: const Icon(Icons.card_giftcard),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(35),
@@ -570,7 +576,11 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 
   _checkincode(LoginRegisterController controller) {
     var safe = controller.inviteCodeController.text.trim();
-    if (!safe.isEmpty) {
+    var invomust = controller.localConfig.invomust;
+    if ((invomust == 'Y' || invomust == 'YES') && safe.isEmpty) {
+      throw Exception('邀请码不能为空');
+    }
+    if (!safe.isEmpty || invomust == 'Y') {
       if (safe.length < 6) {
         throw Exception('邀请码长度为6位');
       }

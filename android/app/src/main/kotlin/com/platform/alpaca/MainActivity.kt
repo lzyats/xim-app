@@ -37,6 +37,7 @@ import java.util.WeakHashMap
 
 import android.content.ComponentName
 import android.content.pm.PackageManager
+import android.view.WindowInsets
 
 class MainActivity : FlutterFragmentActivity() {
     // ===================== 常量定义 =====================
@@ -44,6 +45,8 @@ class MainActivity : FlutterFragmentActivity() {
     private val WAKEUP_CHANNEL = "lansoft.com/wakeup"
     private val UNI_EVENT_CHANNEL = "flutter_uni_stream"
     private val UNI_METHOD_CHANNEL = "flutter_uni_channel"
+    private val LAUNCH_PARAMS_CHANNEL = "lansoft.com/launchParams"
+    private val SYSTEM_CHANNEL = "lansoft.com/system"
 
     // ===================== 成员变量 =====================
     private val unimpMap = WeakHashMap<String, IUniMP>()
@@ -64,7 +67,6 @@ class MainActivity : FlutterFragmentActivity() {
 
     // ===================== 核心生命周期 =====================
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        // 移除旧的插件注册判断方式，直接使用新的注册方法
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         super.configureFlutterEngine(flutterEngine)
         registerChannels(flutterEngine)
@@ -78,13 +80,14 @@ class MainActivity : FlutterFragmentActivity() {
         pendingOverlayResult = null
     }
 
-   
-
     // ===================== 通道注册与处理 =====================
     private fun registerChannels(flutterEngine: FlutterEngine) {
         val messenger = flutterEngine.dartExecutor.binaryMessenger
 
+        // wakeup
         MethodChannel(messenger, WAKEUP_CHANNEL).setMethodCallHandler(this::handleWakeupMethods)
+
+        // UniMP event stream
         EventChannel(messenger, UNI_EVENT_CHANNEL).setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink) {
                 eventSink = events
@@ -96,9 +99,12 @@ class MainActivity : FlutterFragmentActivity() {
                 Log.w(TAG, "EventChannel disconnected")
             }
         })
+
+        // UniMP methods
         MethodChannel(messenger, UNI_METHOD_CHANNEL).setMethodCallHandler(this::handleUniMPMethods)
-        
-        MethodChannel(messenger, "lansoft.com/launchParams").setMethodCallHandler { call, result ->
+
+        // launch params
+        MethodChannel(messenger, LAUNCH_PARAMS_CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "getLaunchParams") {
                 val params = mutableMapOf<String, Any?>()
                 intent.extras?.let { extras ->
@@ -112,52 +118,54 @@ class MainActivity : FlutterFragmentActivity() {
                 result.notImplemented()
             }
         }
-    
-        
+
+        // ✅ system / navigation mode
+        MethodChannel(messenger, SYSTEM_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getNavigationMode" -> result.success(getNavigationMode())
+                "isGestureNavigation" -> result.success(getNavigationMode() == "gesture")
+                else -> result.notImplemented()
+            }
+        }
     }
 
-    // ===================== 全屏设置方法 =====================
-    
-
-    
     // ===================== 唤醒功能处理 =====================
     private fun handleWakeupMethods(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "wakeUp") {
-            // 获取通话参数
             val callData = call.arguments as? Map<String, String>
             val callType = callData?.get("callType") ?: "voice"
             val channel = callData?.get("channel") ?: ""
             val chatId = callData?.get("chatId") ?: ""
 
-            // 唤醒屏幕
             val powerManager = getSystemService(POWER_SERVICE) as PowerManager
             val wakeLock = powerManager.newWakeLock(
                 PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
                 "MyApp:WakeLockTag"
             )
-            wakeLock.acquire(10*1000L)
+            wakeLock.acquire(10 * 1000L)
 
-            // 解锁屏幕（部分机型需要）
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true)
                 setTurnScreenOn(true)
             } else {
                 window.addFlags(
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED 
-                    or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                            or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 )
             }
 
-            // 构建启动意图
             val intent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT 
-                        or Intent.FLAG_ACTIVITY_NEW_TASK 
-                        or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                addFlags(
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                            or Intent.FLAG_ACTIVITY_NEW_TASK
+                            or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                )
                 putExtra("callType", callType)
                 putExtra("channel", channel)
                 putExtra("chatId", chatId)
                 putExtra("isIncomingCall", true)
             }
+
             intent?.let {
                 startActivity(it)
                 result.success(true)
@@ -292,6 +300,123 @@ class MainActivity : FlutterFragmentActivity() {
         val data = call.argument<Any>("data") ?: ""
         uniMpJsCallback?.invoke(data)
         result.success(true)
+    }
+
+    // ===================== ✅ 导航模式检测（国产机强化版） =====================
+
+    private fun getNavigationMode(): String {
+        // 返回：gesture / three_button / two_button / unknown
+
+        val manu = (Build.MANUFACTURER ?: "").lowercase()
+
+        // =====================
+        // 1) 通用：navigation_mode（Secure）
+        // 0=3-button, 1=2-button, 2=gesture
+        // =====================
+        readIntSetting {
+            Settings.Secure.getInt(contentResolver, "navigation_mode")
+        }?.let { mode ->
+            return when (mode) {
+                0 -> "three_button"
+                1 -> "two_button"
+                2 -> "gesture"
+                else -> "unknown"
+            }
+        }
+
+        // =====================
+        // 2) 通用：navigation_mode（Global）
+        // =====================
+        readIntSetting {
+            Settings.Global.getInt(contentResolver, "navigation_mode")
+        }?.let { mode ->
+            return when (mode) {
+                0 -> "three_button"
+                1 -> "two_button"
+                2 -> "gesture"
+                else -> "unknown"
+            }
+        }
+
+        // =====================
+        // 3) 小米 / 红米 / POCO（MIUI / HyperOS）
+        // =====================
+        if (manu.contains("xiaomi") || manu.contains("redmi") || manu.contains("poco")) {
+            readIntSetting {
+                Settings.Global.getInt(contentResolver, "force_fsg_nav_bar")
+            }?.let { v ->
+                if (v == 1) return "gesture"
+                if (v == 0) return "three_button"
+            }
+
+            // 少量 ROM 的拼写变体
+            readIntSetting {
+                Settings.Global.getInt(contentResolver, "forse_fsg_nav_bar")
+            }?.let { v ->
+                if (v == 1) return "gesture"
+                if (v == 0) return "three_button"
+            }
+        }
+
+        // =====================
+        // 4) 一加 / OPPO / ColorOS 系
+        // OnePlus 8+ / ColorOS 12+ 实测有效
+        // =====================
+        if (
+            manu.contains("oneplus") ||
+            manu.contains("oppo")
+        ) {
+            // 隐藏导航栏（手势时常为 1）
+            readIntSetting {
+                Settings.Secure.getInt(contentResolver, "hide_navigationbar_enable")
+            }?.let { v ->
+                if (v == 1) return "gesture"
+                if (v == 0) return "three_button"
+            }
+
+            // 部分系统直接给手势开关
+            readIntSetting {
+                Settings.Secure.getInt(contentResolver, "navigation_gesture_on")
+            }?.let { v ->
+                if (v == 1) return "gesture"
+                if (v == 0) return "three_button"
+            }
+        }
+
+        // =====================
+        // 5) 最终兜底：WindowInsets（API 29+）
+        // =====================
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                val insets = window.decorView.rootWindowInsets
+                if (insets != null) {
+                    val gestureBottom = insets.systemGestureInsets.bottom
+                    val threshold = (24 * resources.displayMetrics.density).toInt()
+
+                    if (gestureBottom >= threshold) {
+                        return "gesture"
+                    }
+
+                    val navBottom =
+                        insets.getInsets(android.view.WindowInsets.Type.navigationBars()).bottom
+                    if (navBottom >= threshold) {
+                        return "three_button"
+                    }
+                }
+            } catch (_: Throwable) {
+            }
+        }
+
+        return "unknown"
+    }
+
+
+    private fun readIntSetting(getter: () -> Int): Int? {
+        return try {
+            getter()
+        } catch (_: Throwable) {
+            null
+        }
     }
 
     // ===================== 工具方法 =====================

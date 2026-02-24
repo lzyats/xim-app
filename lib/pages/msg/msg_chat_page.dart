@@ -1,5 +1,6 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -25,6 +26,7 @@ import 'package:alpaca/widgets/widget_action.dart';
 import 'package:alpaca/widgets/widget_common.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tdesign_flutter/tdesign_flutter.dart';
+import 'dart:io';
 
 // 聊天页面
 class MsgChatPage extends GetView<MsgChatController> {
@@ -41,53 +43,48 @@ class MsgChatPage extends GetView<MsgChatController> {
         EventSetting().handle(SettingModel(SettingType.close));
       },
       child: Scaffold(
-        backgroundColor:const Color(0xFFFFFFFF),
-        resizeToAvoidBottomInset: false,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFC6DBF7), Color(0xFFE6EFFA)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.0, 1.0],
-              ),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Obx(
+            () => controller.chatTitle.value,
+          ),
+          actions: [
+            WidgetAction(
+              icon: const Icon(Icons.more_horiz),
+              enable: ChatTalk.robot != ToolsStorage().chat().chatTalk,
+              onTap: () {
+                LocalChat localChat = ToolsStorage().chat();
+                // 好友
+                if (ChatTalk.friend == localChat.chatTalk) {
+                  Get.toNamed(
+                    FriendDetailsPage.routeName,
+                    arguments: {
+                      "userId": localChat.chatId,
+                    },
+                  );
+                }
+                // 群组
+                else if (ChatTalk.group == localChat.chatTalk) {
+                  Get.toNamed(
+                    GroupDetailsPage.routeName,
+                    arguments: localChat.chatId,
+                  );
+                }
+              },
             ),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: Obx(
-                () => controller.chatTitle.value,
-              ),
-              actions: [
-                WidgetAction(
-                  icon: const Icon(Icons.more_horiz),
-                  enable: ChatTalk.robot != ToolsStorage().chat().chatTalk,
-                  onTap: () {
-                    LocalChat localChat = ToolsStorage().chat();
-                    // 好友
-                    if (ChatTalk.friend == localChat.chatTalk) {
-                      Get.toNamed(
-                        FriendDetailsPage.routeName,
-                        arguments: {
-                          "userId": localChat.chatId,
-                        },
-                      );
-                    }
-                    // 群组
-                    else if (ChatTalk.group == localChat.chatTalk) {
-                      Get.toNamed(
-                        GroupDetailsPage.routeName,
-                        arguments: localChat.chatId,
-                      );
-                    }
-                  },
-                ),
-              ],
+          ],
+          // 新增：AppBar 底部细横线
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1), // 横线高度（即粗细），1 表示 1px 细横线
+            child: Divider(
+              color: Color(0xFFEEEEEE), // 横线颜色（浅灰色，可根据设计调整）
+              height: 1, // 与 preferredSize 高度一致，确保横线无额外间距
+              thickness: 1, // 横线厚度（可选，与 height 配合使用）
             ),
           ),
         ),
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             Obx(() => _buildNotice()),
@@ -117,34 +114,51 @@ class MsgChatPage extends GetView<MsgChatController> {
           ],
         ),
         bottomNavigationBar: Obx(() {
-          // 多选菜单
-          if (controller.configCheckBox.isTrue) {
-            return ChatBottomCheck(
-              configCheckBox: controller.configCheckBox,
-              checkboxList: controller.checkboxList,
-            );
-          }
-          // 自定义菜单
-          if ('[]' != controller.configMenu.value) {
-            return ChatBottomMenu(
-              menu: controller.configMenu,
-            );
-          }
-          // 输入框
-          if ('Y' == controller.configInput.value) {
-            return IgnorePointer(
-              ignoring: 'Y' == controller.configSpeak.value,
-              child: ChatBottom(
-                controller.scrollController,
-                controller.textController,
-                configSpeak: controller.configSpeak,
-                configMedia: controller.configMedia,
-                configPacket: controller.configPacket,
-                configReply: controller.configReply,
-              ),
-            );
-          }
-          return const SizedBox(height: 0);
+          // 获取系统安全区域信息
+          final mediaQuery = MediaQuery.of(context);
+          final double num = controller.nav.value ? 38 : 0;
+          final double adhight = Platform.isIOS ? 0 : num;
+          final bottomMargin = adhight;
+
+          // 定义统一的背景色（可根据实际需求调整）
+          final bottomBgColor = Color(0xFFF8F8F8);
+
+          return Container(
+            color: bottomBgColor, // 统一背景色
+            child: Padding(
+              padding: EdgeInsets.only(bottom: bottomMargin),
+              child: () {
+                // 多选菜单
+                if (controller.configCheckBox.isTrue) {
+                  return ChatBottomCheck(
+                    configCheckBox: controller.configCheckBox,
+                    checkboxList: controller.checkboxList,
+                  );
+                }
+                // 自定义菜单
+                if ('[]' != controller.configMenu.value) {
+                  return ChatBottomMenu(
+                    menu: controller.configMenu,
+                  );
+                }
+                // 输入框
+                if ('Y' == controller.configInput.value) {
+                  return IgnorePointer(
+                    ignoring: 'Y' == controller.configSpeak.value,
+                    child: ChatBottom(
+                      controller.scrollController,
+                      controller.textController,
+                      configSpeak: controller.configSpeak,
+                      configMedia: controller.configMedia,
+                      configPacket: controller.configPacket,
+                      configReply: controller.configReply,
+                    ),
+                  );
+                }
+                return const SizedBox(height: 0);
+              }(),
+            ),
+          );
         }),
         floatingActionButton: _buildFloating(),
       ),
@@ -361,7 +375,7 @@ class MsgChatPage extends GetView<MsgChatController> {
       child: Text(
         title,
         style: const TextStyle(
-          color: Colors.white,
+          color: Colors.black,
           fontSize: 10,
         ),
         textAlign: TextAlign.center,
@@ -503,7 +517,7 @@ class MsgChatPage extends GetView<MsgChatController> {
     }
     String label = formatDate(
       chatHis.createTime,
-      [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn, ':', ss],
+      [mm, '-', dd, ' ', HH, ':', nn, ':', ss],
     );
     return WidgetCommon.tips(
       label,

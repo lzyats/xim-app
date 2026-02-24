@@ -22,7 +22,7 @@ class LoginRegisterController extends BaseController {
   TextEditingController safePassController = TextEditingController();
   TextEditingController inviteCodeController = TextEditingController();
   TextEditingController nicknameController = TextEditingController();
-
+  LocalConfig localConfig = ToolsStorage().config();
   // 定时任务
   final ToolsTimer toolsTimer = ToolsTimer();
 

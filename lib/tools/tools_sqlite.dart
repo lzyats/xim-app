@@ -19,7 +19,7 @@ class ToolsSqlite {
     String databasesPath = await getDatabasesPath();
     return await openDatabase(
       path_.join(databasesPath, AppConfig.dbName),
-      version: 6,
+      version: 7,
       onCreate: (Database db, int version) async {
         var batch = db.batch();
         // 创建消息表
@@ -35,7 +35,8 @@ class ToolsSqlite {
         await db.execute(
             'CREATE TABLE chat_group (groupId TEXT, groupName TEXT, groupNo TEXT, portrait TEXT, notice TEXT, noticeTop TEXT, configMember TEXT, configInvite TEXT, configSpeak TEXT, configTitle TEXT, configAudit TEXT, configMedia TEXT, configAssign TEXT, configNickname TEXT, configPacket TEXT, configAmount TEXT, configScan TEXT, configReceive TEXT, privacyNo TEXT, privacyScan TEXT, privacyName TEXT, current TEXT, memberTop TEXT, memberDisturb TEXT, memberType TEXT, memberSpeak TEXT, memberWhite TEXT, memberRemark TEXT, memberSize TEXT, memberTotal TEXT, PRIMARY KEY(groupId, current))');
         // 创建设置表
-        await db.execute('CREATE TABLE chat_config (audio TEXT, notice TEXT)');
+        await db.execute(
+            'CREATE TABLE chat_config (audio TEXT, notice TEXT, nav TEXT)');
         // 创建账号表
         await db.execute(
             'CREATE TABLE chat_phone (phone TEXT, token TEXT, PRIMARY KEY(phone))');
@@ -67,6 +68,11 @@ class ToolsSqlite {
         if (v1 < 6) {
           await db.execute('ALTER TABLE chat_group ADD COLUMN configScan');
         }
+        // 新增：当版本 < 7 时，为 chat_config 表添加 nav TEXT 字段
+        if (v1 < 7) {
+          await db.execute('ALTER TABLE chat_config ADD COLUMN nav TEXT');
+        }
+
         // 提交事物
         batch.commit();
       },
@@ -1116,22 +1122,27 @@ class ChatConfig {
   String audio;
   // 通知
   String notice;
+  // 导航
+  String nav;
 
   ChatConfig(
     this.audio,
     this.notice,
+    this.nav,
   );
 
   factory ChatConfig.fromJson(Map<String, dynamic> data) {
     return ChatConfig(
       data['audio'] ?? 'Y',
       data['notice'] ?? 'Y',
+      data['nav'] ?? 'N',
     );
   }
 
   Map<String, dynamic> toJson() => {
         'audio': audio,
         'notice': notice,
+        'nav': nav,
       };
 }
 

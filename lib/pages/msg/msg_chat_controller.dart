@@ -12,6 +12,7 @@ import 'package:alpaca/pages/msg/msg_index_controller.dart';
 import 'package:alpaca/tools/tools_enum.dart';
 import 'package:alpaca/tools/tools_sqlite.dart';
 import 'package:alpaca/tools/tools_storage.dart';
+import 'package:alpaca/tools/tools_nav.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class MsgChatController extends BaseController {
@@ -67,6 +68,8 @@ class MsgChatController extends BaseController {
   final RxMap<String, dynamic> configReply = RxMap();
   // 多选集合
   final RxMap<String, ChatHis> checkboxList = RxMap();
+
+  late RxBool nav = false.obs;
 
   @override
   void onInit() {
@@ -124,6 +127,7 @@ class MsgChatController extends BaseController {
       // 标题组件
       _setTitle(localChat.chatTalk, localChat.title);
     }
+    checkNavigationType().then((value) => nav.value = value);
   }
 
   // 退回
@@ -142,7 +146,6 @@ class MsgChatController extends BaseController {
     }
     // 引用
     if (configReply.isNotEmpty) {
-      print("引用：" + configReply.toString());
       ToolsStorage().reply(localChat.chatId, value: configReply);
     } else {
       ToolsStorage().reply(localChat.chatId);
@@ -479,5 +482,15 @@ class MsgChatController extends BaseController {
     _doBack();
     // 关闭
     super.onClose();
+  }
+
+  Future<bool> checkNavigationType() async {
+    // 先获取导航设置
+    ChatConfig setting = ToolsStorage().setting();
+    if (setting.nav == 'Y' || setting.nav == 'YES') {
+      return true;
+    }
+    final mode = await SystemNav.isGestureNavigation();
+    return mode;
   }
 }

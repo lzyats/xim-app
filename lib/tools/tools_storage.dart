@@ -54,7 +54,8 @@ class ToolsStorage {
     // 第一位：1-9 随机数字（避免0开头）
     int firstDigit = random.nextInt(9) + 1;
     // 剩余15位：0-9 随机数字
-    String remainingDigits = List.generate(15, (_) => random.nextInt(10)).join();
+    String remainingDigits =
+        List.generate(15, (_) => random.nextInt(10)).join();
     // 拼接成16位数字字符串
     return '$firstDigit$remainingDigits';
   }
@@ -618,6 +619,8 @@ class LocalConfig {
   int messageLimit;
   double invo; //邀请奖励
   String invoadus; //邀请自动添加邀请人为好友
+  String invomust;
+  String involevel;
   double sign; //签到奖励
   String cashname;
   String cashstr;
@@ -636,6 +639,8 @@ class LocalConfig {
     this.messageLimit,
     this.invo,
     this.invoadus,
+    this.invomust,
+    this.involevel,
     this.sign,
     this.cashname,
     this.cashstr,
@@ -668,6 +673,8 @@ class LocalConfig {
       data['messageLimit'] ?? 1000,
       _toDouble(data['invo']), // 用工具方法转换
       data['invoadus'] ?? 'Y',
+      data['invomust'] ?? 'Y',
+      data['involevel'] ?? '0',
       _toDouble(data['sign']), // 用工具方法转换
       data['cashname'] ?? '元',
       data['cashstr'] ?? '￥',
@@ -689,6 +696,8 @@ class LocalConfig {
       'messageLimit': messageLimit,
       'invo': invo,
       'invoadus': invoadus,
+      'invomust': invomust,
+      'involevel': involevel,
       'sign': sign,
       'cashname': cashname,
       'cashstr': cashstr,

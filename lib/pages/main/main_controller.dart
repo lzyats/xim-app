@@ -122,7 +122,7 @@ class MainController extends BaseController {
     // 检查更新
     RequestCommon.upgrade();
     // 获取配置
-    RequestCommon.getConfig();
+    //RequestCommon.getConfig();
     ToolsStorage().pushnotic(value: 1);
     // 监听Socket消息
     subscription1 = EventSocket().addListen();

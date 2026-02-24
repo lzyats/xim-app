@@ -9,6 +9,7 @@ class MineIndexController extends BaseController {
   Rx<LocalUser> localUser = ToolsStorage().local().obs;
   RxString balance = '0.00'.obs;
   var duration = const Duration(seconds: 10);
+  LocalConfig localConfig = ToolsStorage().config();
 
   @override
   void onInit() async {

@@ -4,6 +4,7 @@ import 'dart:ui' as ui_;
 
 import 'package:alpaca/config/app_resource.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -205,11 +206,15 @@ class WidgetCommon {
   }
 
   // 分割线
-  static Widget divider({double indent = 15.0}) {
+  static Widget divider(
+      {double indent = 15.0,
+      double height = 0.5,
+      double thickness = 0.5,
+      color = const Color.fromARGB(255, 232, 228, 228)}) {
     return Divider(
-      color: const Color.fromARGB(255, 232, 228, 228), // 设置分割线的颜色
-      height: 0.5, // 设置分割线的高度为2.0像素
-      thickness: 0.5, // 设置分割线的粗细为1.0像素
+      color: color, // 设置分割线的颜色
+      height: height, // 设置分割线的高度为2.0像素
+      thickness: thickness, // 设置分割线的粗细为1.0像素
       indent: indent, // 设置分割线的缩进为16.0像素
       endIndent: indent, // 设置分割线结束位置的缩进为16.0像素
     );
@@ -302,14 +307,20 @@ class WidgetCommon {
   static Widget label(
     String value, {
     Alignment alignment = Alignment.centerLeft,
+    double fontSize = 16.0,
+    FontWeight fontWeight = FontWeight.bold,
+    double vertical = 10, // 新增vertical参数，默认值10与原padding一致
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: vertical), // 使用vertical参数
       child: Align(
         alignment: alignment,
         child: Text(
           value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+          ),
         ),
       ),
     );
@@ -334,9 +345,9 @@ class WidgetCommon {
       child: Text(
         value,
         style: TextStyle(
-          // 移除 const 修饰，允许引用变量
-          color: color,
-        ),
+            // 移除 const 修饰，允许引用变量
+            color: color,
+            fontSize: 12),
         textAlign: textAlign,
       ),
     );
@@ -377,8 +388,8 @@ class WidgetCommon {
         avatar,
         ImageType.network,
         fit: BoxFit.cover,
-        width: size,
         height: size,
+        width: size,
       ),
     );
   }
@@ -456,12 +467,12 @@ class WidgetCommon {
   }
 
   // 自定义椭圆区域
-  static Widget customRedClipper() {
+  static Widget customRedClipper({Color color = Colors.red}) {
     // 椭圆区域
     return ClipPath(
       clipper: const _CustomClipper(search: true),
       child: Container(
-        color: Colors.red,
+        color: color,
         width: double.infinity,
         height: 50,
       ),
@@ -523,5 +534,316 @@ class _CustomClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
     return false;
+  }
+}
+
+/// 完全匹配UI的自定义弹窗（替代CupertinoDialogAction，实现轻度渐变）
+class CustomStatusDialog extends StatelessWidget {
+  final String status;
+  final String title;
+  final String description;
+  final String buttonText;
+  final VoidCallback onButtonTap;
+
+  const CustomStatusDialog({
+    super.key,
+    required this.status,
+    required this.title,
+    required this.description,
+    required this.buttonText,
+    required this.onButtonTap,
+  });
+
+  // 渐变/标题色逻辑（保持之前的设置）
+  Decoration _getUiMatchGradientDecoration() {
+    switch (status) {
+      case "success":
+        return BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 0.4, 1.0],
+            colors: [Color(0xFFEBF5FF), Color(0xFFF5F9FF), Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))
+          ],
+        );
+      case "review":
+        return BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 0.4, 1.0],
+            colors: [Color(0xFFFFF7EB), Color(0xFFFFFAF0), Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))
+          ],
+        );
+      case "failed":
+        return BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0.0, 0.4, 1.0],
+            colors: [Color(0xFFF8F8F8), Color(0xFFFAFAFA), Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))
+          ],
+        );
+      default:
+        return BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                  color: Color(0x0F000000), blurRadius: 8, offset: Offset(0, 2))
+            ]);
+    }
+  }
+
+  Color _getTitleColor() {
+    switch (status) {
+      case "success":
+        return const Color(0xFF1677FF);
+      case "review":
+        return const Color(0xFFFF9900);
+      case "failed":
+        return const Color(0xFF333333);
+      default:
+        return const Color(0xFF333333);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      // 用Center+Container替代CupertinoAlertDialog的默认容器，彻底消除多余间距
+      child: Container(
+        // 宽度适配内容（或固定宽度，根据UI需求调整）
+        width: MediaQuery.of(context).size.width * 0.85, // 占屏幕85%宽度，更紧凑
+        constraints: const BoxConstraints(maxWidth: 320), // 最大宽度限制
+        decoration: _getUiMatchGradientDecoration(),
+        // 仅保留必要内边距（去掉多余空间）
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // 高度随内容自适应
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: _getTitleColor(),
+                  height: 1.2),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12), // 缩小标题与描述的间距
+            Text(
+              description,
+              style: const TextStyle(
+                  fontSize: 14, color: Color(0xFF666666), height: 1.4),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20), // 缩小描述与按钮的间距
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                color: const Color(0xFF000000),
+                borderRadius: BorderRadius.circular(18),
+                onPressed: () {
+                  Navigator.pop(context);
+                  onButtonTap();
+                },
+                child: Text(buttonText,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 通用圆角框组件
+class RoundedContainer extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final double? circular;
+  final Color? color;
+  final List<BoxShadow>? boxShadow;
+
+  const RoundedContainer({
+    super.key,
+    required this.child,
+    this.margin,
+    this.padding,
+    this.circular,
+    this.color,
+    this.boxShadow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin ?? const EdgeInsets.all(20),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: color ?? Colors.white,
+        borderRadius: BorderRadius.circular(circular ?? 12),
+        boxShadow: boxShadow ??
+            const [
+              BoxShadow(
+                color: Color(0x10000000),
+                blurRadius: 8,
+                spreadRadius: 2,
+                offset: Offset(0, 2),
+              )
+            ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class eConfirmDialog extends StatelessWidget {
+  // 1. 新增可配置文本变量，设置合理预设值（与原固定文本一致）
+  final String warningTitle; // 警告标题：默认"警告：清空后将无法恢复"
+  final String confirmDesc; // 确认描述：默认"确定清空朋友圈所有记录？"
+  final String cancelText; // 取消按钮文本：默认"取消"
+  final String confirmText; // 清空按钮文本：默认"清空"
+
+  // 确认/取消回调（保留原有逻辑）
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+
+  // 2. 构造函数：添加新变量并设置预设值，确保兼容性
+  const eConfirmDialog({
+    super.key,
+    // 文本变量预设值：默认使用原有固定文本，外部可按需修改
+    this.warningTitle = "警告：清空后将无法恢复",
+    this.confirmDesc = "确定清空朋友圈所有记录？",
+    this.cancelText = "取消",
+    this.confirmText = "清空",
+    required this.onConfirm,
+    required this.onCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.85,
+        constraints: const BoxConstraints(maxWidth: 300),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 3. 替换为变量：警告标题
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+              child: Column(
+                children: [
+                  Text(
+                    warningTitle, // 原固定文本 → 变量
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  // 4. 替换为变量：确认描述
+                  Text(
+                    confirmDesc, // 原固定文本 → 变量
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            Container(height: 1, color: const Color(0xFFE0E0E0)),
+            Row(
+              children: [
+                // 5. 替换为变量：取消按钮文本
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      onCancel();
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.only(bottomLeft: Radius.circular(8)),
+                      ),
+                    ),
+                    child: Text(
+                      cancelText, // 原固定文本 → 变量
+                      style:
+                          const TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                  ),
+                ),
+                Container(width: 1, height: 48, color: const Color(0xFFE0E0E0)),
+                // 6. 替换为变量：清空按钮文本
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      onConfirm();
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.only(bottomRight: Radius.circular(8)),
+                      ),
+                    ),
+                    child: Text(
+                      confirmText, // 原固定文本 → 变量
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF00ABFF),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
